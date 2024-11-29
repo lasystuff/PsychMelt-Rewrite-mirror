@@ -1145,7 +1145,7 @@ class CharacterEditorState extends MusicBeatState
 		var directories:Array<String> = [
 			Paths.mods('characters/'),
 			Paths.mods(Paths.currentModDirectory + '/characters/'),
-			Paths.getPreloadPath('characters/')
+			Paths.getSharedPath('characters/')
 		];
 		for (mod in Paths.getGlobalMods())
 			directories.push(Paths.mods(mod + '/characters/'));
