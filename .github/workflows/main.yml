@@ -23,11 +23,11 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.7
 
       - uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.5
+          haxe-version: 4.3.4
       # Runs a set of commands using the runners shell
       - name: Install Haxelib
         run: |
@@ -50,11 +50,11 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2.3.0
+      - uses: actions/checkout@v4.1.7.3.0
 
       - uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.5
+          haxe-version: 4.3.4
       # Runs a set of commands using the runners shell
       - name: Install Haxelib
         run: |
@@ -76,11 +76,11 @@ jobs:
 
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4.1.7
 
       - uses: krdlab/setup-haxe@master
         with:
-          haxe-version: 4.2.5
+          haxe-version: 4.3.4
       # Runs a set of commands using the runners shell
       - name: Install Haxelib
         run: |
