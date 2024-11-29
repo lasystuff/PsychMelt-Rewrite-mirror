@@ -1,18 +1,34 @@
 package;
 
+import flixel.math.FlxPoint;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;
+import math.Vector3;
 
 using StringTools;
 
 class StrumNote extends FlxSprite
 {
+	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
+	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
+
+	public var zIndex:Float = 0;
+	public var desiredZIndex:Float = 0;
+	public var z:Float = 0;
+
+
+	override function destroy()
+	{
+		defScale.put();
+		super.destroy();
+	}
+
 	private var colorSwap:ColorSwap;
 
 	public var resetAnim:Float = 0;
 
-	private var noteData:Int = 0;
+	public var noteData:Int = 0;
 
 	public var direction:Float = 90; // plan on doing scroll directions soon -bb
 	public var downScroll:Bool = false; // plan on doing scroll directions soon -bb
@@ -31,6 +47,19 @@ class StrumNote extends FlxSprite
 		}
 		return value;
 	}
+
+	public function getZIndex()
+		{
+			var animZOffset:Float = 0;
+			if (animation.curAnim != null && animation.curAnim.name == 'confirm')
+				animZOffset += 1;
+			return z + desiredZIndex + animZOffset - (player == 0 ? 1 : 0);
+		}
+	
+		function updateZIndex()
+		{
+			zIndex = getZIndex();
+		}
 
 	public function new(x:Float, y:Float, leData:Int, player:Int)
 	{
@@ -121,6 +150,7 @@ class StrumNote extends FlxSprite
 			}
 		}
 		updateHitbox();
+		defScale.copyFrom(scale);
 
 		if (lastAnim != null)
 		{
@@ -155,6 +185,8 @@ class StrumNote extends FlxSprite
 			// }
 		}
 
+		updateZIndex();
+
 		super.update(elapsed);
 	}
 
@@ -163,6 +195,7 @@ class StrumNote extends FlxSprite
 		animation.play(anim, force);
 		centerOffsets();
 		centerOrigin();
+		updateZIndex();
 		if (animation.curAnim == null || animation.curAnim.name == 'static')
 		{
 			colorSwap.hue = 0;
