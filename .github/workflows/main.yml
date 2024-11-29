@@ -38,6 +38,9 @@ jobs:
           haxelib run hmm install
       - name: Create Version Tag
         run: echo "${{github.run_id}}" > VERSION
+      # if this works then tysm for the comment at https://github.com/ninjamuffin99/Funkin/issues/625#issuecomment-805200377 i love open source development
+      - name: Hxcpp.h Fix
+        run: cp $(haxelib config)hxcpp/$(sed -e 's:\.:,:g' $(haxelib config)hxcpp/.current)/include/hxcpp.h export/linux/obj/obj/linux64/__pch/haxe/hxcpp.h
       - name: Compile
         run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id}}"
       - name: Publish Artifact
