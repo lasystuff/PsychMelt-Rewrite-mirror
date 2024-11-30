@@ -4,11 +4,8 @@ import animateatlas.AtlasFrameMaker;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.effects.FlxTrail;
-import flixel.animation.FlxBaseAnimation;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxSort;
-import Section.SwagSection;
 #if MODS_ALLOWED
 import sys.io.File;
 import sys.FileSystem;
@@ -16,7 +13,8 @@ import sys.FileSystem;
 import openfl.utils.AssetType;
 import openfl.utils.Assets;
 import haxe.Json;
-import haxe.format.JsonParser;
+import flixel.util.FlxColor;
+import flixel.tweens.FlxEase;
 
 using StringTools;
 
@@ -48,6 +46,8 @@ typedef AnimArray =
 
 class Character extends FlxSprite
 {
+	public var mostRecentRow:Int = 0; // for ghost anims n shit
+
 	public var animOffsets:Map<String, Array<Dynamic>>;
 	public var debugMode:Bool = false;
 
@@ -70,6 +70,11 @@ class Character extends FlxSprite
 
 	public var positionArray:Array<Float> = [0, 0];
 	public var cameraPosition:Array<Float> = [0, 0];
+
+	public var doubleGhosts:Array<FlxSprite> = [];
+	public var ghostID:Int = 0;
+	public var ghostAnim:String = '';
+	public var ghostTweenGRP:Array<FlxTween> = [];
 
 	public var hasMissAnimations:Bool = false;
 
@@ -94,7 +99,14 @@ class Character extends FlxSprite
 		curCharacter = character;
 		this.isPlayer = isPlayer;
 		antialiasing = ClientPrefs.globalAntialiasing;
-		var library:String = null;
+
+		for(i in 0...4){
+			var ghost = new FlxSprite();
+			ghost.visible = false;
+			ghost.alpha = 0.6;
+			doubleGhosts.push(ghost);
+		}
+
 		switch (curCharacter)
 		{
 			// case 'your character name in case you want to hardcode them instead':
@@ -261,14 +273,6 @@ class Character extends FlxSprite
 					}
 			}*/
 		}
-
-		switch (curCharacter)
-		{
-			case 'pico-speaker':
-				skipDance = true;
-				loadMappedAnims();
-				playAnim("shoot1");
-		}
 	}
 
 	override function update(elapsed:Float)
@@ -330,7 +334,19 @@ class Character extends FlxSprite
 				playAnim(animation.curAnim.name + '-loop');
 			}
 		}
+
+		for (ghost in doubleGhosts)
+			ghost.update(elapsed);
 		super.update(elapsed);
+	}
+
+	override function draw(){
+		for(ghost in doubleGhosts){
+			if(ghost.visible)
+				ghost.draw();
+		}
+		
+		super.draw();
 	}
 
 	public var danced:Bool = false;
@@ -358,13 +374,13 @@ class Character extends FlxSprite
 		}
 	}
 
-	public function playAnim(AnimName:String, Force:Bool = false, Reversed:Bool = false, Frame:Int = 0):Void
+	public function playAnim(animName:String, force:Bool = false, reversed:Bool = false, Frame:Int = 0):Void
 	{
 		specialAnim = false;
-		animation.play(AnimName, Force, Reversed, Frame);
+		animation.play(animName, force, reversed, Frame);
 
-		var daOffset = animOffsets.get(AnimName);
-		if (animOffsets.exists(AnimName))
+		var daOffset = animOffsets.get(animName);
+		if (animOffsets.exists(animName))
 		{
 			offset.set(daOffset[0], daOffset[1]);
 		}
@@ -373,36 +389,21 @@ class Character extends FlxSprite
 
 		if (curCharacter.startsWith('gf'))
 		{
-			if (AnimName == 'singLEFT')
+			if (animName == 'singLEFT')
 			{
 				danced = true;
 			}
-			else if (AnimName == 'singRIGHT')
+			else if (animName == 'singRIGHT')
 			{
 				danced = false;
 			}
 
-			if (AnimName == 'singUP' || AnimName == 'singDOWN')
+			if (animName == 'singUP' || animName == 'singDOWN')
 			{
 				danced = !danced;
 			}
 		}
 	}
-
-	function loadMappedAnims():Void
-	{
-		var noteData:Array<SwagSection> = Song.loadFromJson('picospeaker', Paths.formatToSongPath(PlayState.SONG.song)).notes;
-		for (section in noteData)
-		{
-			for (songNotes in section.sectionNotes)
-			{
-				animationNotes.push(songNotes);
-			}
-		}
-		TankmenBG.animationNotes = animationNotes;
-		animationNotes.sort(sortAnims);
-	}
-
 	function sortAnims(Obj1:Array<Dynamic>, Obj2:Array<Dynamic>):Int
 	{
 		return FlxSort.byValues(FlxSort.ASCENDING, Obj1[0], Obj2[0]);
@@ -442,5 +443,60 @@ class Character extends FlxSprite
 	public function quickAnimAdd(name:String, anim:String)
 	{
 		animation.addByPrefix(name, anim, 24, false);
+	}
+
+	public function playGhostAnim(ghostID = 0, animName:String, force:Bool = false, reversed:Bool = false, frame:Int = 0){
+
+		var ghost:FlxSprite = doubleGhosts[ghostID];
+		ghost.scale.copyFrom(scale);
+		ghost.frames = frames;
+		ghost.animation.copyFrom(animation);
+		// ghost.shader = shader;
+		ghost.x = x;
+		ghost.y = y;
+		ghost.flipX = flipX;
+		ghost.flipY = flipY;
+		ghost.alpha = alpha * 0.6;
+		ghost.antialiasing = antialiasing;
+		ghost.visible = true;
+		ghost.color = FlxColor.fromRGB(healthColorArray[0], healthColorArray[1], healthColorArray[2]);
+		ghost.animation.play(animName, force, reversed, frame);
+		if (ghostTweenGRP[ghostID] != null)
+			ghostTweenGRP[ghostID].cancel();
+
+		var direction:String = animName.substring(4);
+
+		var directionMap:Map<String, Array<Float>> = [//Uh idk but it like position offset
+			'UP' => [0, -45],
+			'DOWN' => [0, 45],
+			'RIGHT' => [45, 0],
+			'LEFT' => [-45, 0],
+			'UP-alt' => [0, -45],
+			'DOWN-alt' => [0, 45],
+			'RIGHT-alt' => [45, 0],
+			'LEFT-alt' => [-45, 0],
+		];
+		//had to add alt cuz it kept crashing on room code LOL
+
+		var moveDirections:Array<Float> = [
+			x + (directionMap.get(direction)[0]),
+			y + (directionMap.get(direction)[1])
+		];
+
+		ghostTweenGRP[ghostID] = FlxTween.tween(ghost, {alpha: 0, x: moveDirections[0], y: moveDirections[1]}, 0.75, {
+			ease: FlxEase.linear,
+			onComplete: function(twn:FlxTween)
+			{
+				ghost.visible = false;
+				ghostTweenGRP[ghostID].destroy(); // maybe?
+				ghostTweenGRP[ghostID] = null;
+			}
+		});
+
+		var daOffset = animOffsets.get(animName);
+		if (animOffsets.exists(animName))
+			ghost.offset.set(daOffset[0], daOffset[1]);
+		else
+			ghost.offset.set(0, 0);
 	}
 }

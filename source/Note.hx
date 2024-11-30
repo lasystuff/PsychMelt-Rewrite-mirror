@@ -21,6 +21,8 @@ typedef EventNote = {
 
 class Note extends FlxSprite
 {
+	public var row:Int = 0;
+	
 	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
 	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
 

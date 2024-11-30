@@ -79,6 +79,8 @@ class PlayState extends MusicBeatState
 {
 	public var modManager:ModManager;
 
+	var noteRows:Array<Array<Array<Note>>> = [[],[]];
+
 	public static var STRUM_X = 42;
 	public static var STRUM_X_MIDDLESCROLL = -278;
 
@@ -156,6 +158,11 @@ class PlayState extends MusicBeatState
 	public var dad:Character = null;
 	public var gf:Character = null;
 	public var boyfriend:Boyfriend = null;
+
+	public var dadGhostTween:FlxTween = null;
+	public var bfGhostTween:FlxTween = null;
+	public var dadGhost:FlxSprite = null;
+	public var bfGhost:FlxSprite = null;
 
 	public var notes:FlxTypedGroup<Note>;
 	public var unspawnNotes:Array<Note> = [];
@@ -480,6 +487,9 @@ class PlayState extends MusicBeatState
 				GameOverSubstate.characterName = 'bf-holding-gf-dead';
 		}
 
+		dadGhost = new FlxSprite();
+		bfGhost = new FlxSprite();
+
 		if (isPixelStage)
 		{
 			introSoundsSuffix = '-pixel';
@@ -589,6 +599,17 @@ class PlayState extends MusicBeatState
 		startCharacterPos(boyfriend);
 		boyfriendGroup.add(boyfriend);
 		startCharacterLua(boyfriend.curCharacter);
+
+		dadGhost.visible = false;
+		dadGhost.antialiasing = true;
+		dadGhost.alpha = 0.7;
+		dadGhost.scale.copyFrom(dad.scale);
+		dadGhost.updateHitbox();
+		bfGhost.visible = false;
+		bfGhost.antialiasing = true;
+		bfGhost.alpha = 0.6;
+		bfGhost.scale.copyFrom(boyfriend.scale);
+		bfGhost.updateHitbox();
 
 		var camPos:FlxPoint = new FlxPoint(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
 		if (gf != null)
@@ -1867,8 +1888,14 @@ class PlayState extends MusicBeatState
 					oldNote = null;
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 
+				swagNote.row = Conductor.secsToRow(daStrumTime);
+				var rowArray = noteRows[gottaHitNote?0:1];
+				if(rowArray[swagNote.row]==null)
+					rowArray[swagNote.row]=[];
+				rowArray[swagNote.row].push(swagNote);
+
 				swagNote.mustPress = gottaHitNote;
-				swagNote.sustainLength = songNotes[2];
+				swagNote.sustainLength = Math.round(songNotes[2] / Conductor.stepCrochet) * Conductor.stepCrochet;
 				swagNote.gfNote = (section.gfSection && (songNotes[1] < 4));
 				swagNote.noteType = songNotes[3];
 				if (!Std.isOfType(songNotes[3], String))
@@ -1879,11 +1906,12 @@ class PlayState extends MusicBeatState
 				susLength = susLength / Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
 
-				var floorSus:Int = Math.floor(susLength);
+				var floorSus:Int = Math.round(swagNote.sustainLength / Conductor.stepCrochet);
 
 				if (floorSus > 0)
 				{
-					for (susNote in 0...floorSus + 1)
+					if(floorSus == 1) floorSus++;
+					for (susNote in 0...floorSus)
 					{
 						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
 						var sustainNote:Note = new Note(daStrumTime
@@ -1898,31 +1926,6 @@ class PlayState extends MusicBeatState
 						swagNote.tail.push(sustainNote);
 						sustainNote.parent = swagNote;
 						unspawnNotes.push(sustainNote);
-
-						if (sustainNote.mustPress)
-						{
-							sustainNote.x += FlxG.width / 2; // general offset
-						}
-						else if (ClientPrefs.middleScroll)
-						{
-							sustainNote.x += 310;
-							if (daNoteData > 1) // Up and Right
-							{
-								sustainNote.x += FlxG.width / 2 + 25;
-							}
-						}
-					}
-				}
-				if (swagNote.mustPress)
-				{
-					swagNote.x += FlxG.width / 2; // general offset
-				}
-				else if (ClientPrefs.middleScroll)
-				{
-					swagNote.x += 310;
-					if (daNoteData > 1) // Up and Right
-					{
-						swagNote.x += FlxG.width / 2 + 25;
 					}
 				}
 				if (!noteTypeMap.exists(swagNote.noteType))
@@ -3927,6 +3930,30 @@ class PlayState extends MusicBeatState
 			{
 				char.playAnim(animToPlay, true);
 				char.holdTimer = 0;
+
+				if (!note.isSustainNote && noteRows[note.mustPress ? 0 : 1][note.row] != null && noteRows[note.mustPress ? 0 : 1][note.row].length > 1)
+				{
+					// potentially have jump anims?
+					var chord = noteRows[note.mustPress ? 0 : 1][note.row];
+					var animNote = chord[0];
+					var realAnim = singAnimations[Std.int(Math.abs(animNote.noteData))] + altAnim;
+					if (char.mostRecentRow != note.row)
+						char.playAnim(realAnim, true);
+
+					if(note.nextNote != null && note.prevNote != null){
+						if (note != animNote && !note.nextNote.isSustainNote) {
+							char.playGhostAnim(chord.indexOf(note), animToPlay, true);
+						}else if(note.nextNote.isSustainNote){
+							char.playAnim(realAnim, true);
+							char.playGhostAnim(chord.indexOf(note), animToPlay, true);
+
+						}
+					}
+					char.mostRecentRow = note.row;
+				}
+				else{
+					char.playAnim(animToPlay, true);
+				}
 			}
 		}
 
@@ -4017,18 +4044,31 @@ class PlayState extends MusicBeatState
 			{
 				var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
 
+				var char:Character = boyfriend;
+
 				if (note.gfNote)
 				{
 					if (gf != null)
 					{
-						gf.playAnim(animToPlay + note.animSuffix, true);
-						gf.holdTimer = 0;
+						char = gf;
 					}
 				}
-				else
+				
+				char.holdTimer = 0;
+				char.playAnim(animToPlay + note.animSuffix, true);
+
+				if (!note.isSustainNote && noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row]!=null && noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row].length > 1)
 				{
-					boyfriend.playAnim(animToPlay + note.animSuffix, true);
-					boyfriend.holdTimer = 0;
+					// potentially have jump anims?
+					var chord = noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row];
+					var animNote = chord[0];
+					var realAnim = singAnimations[Std.int(Math.abs(animNote.noteData))] + note.animSuffix;
+
+					if (note != animNote && chord.indexOf(note) != animNote.noteData)
+						char.playGhostAnim(chord.indexOf(note), animToPlay + note.animSuffix, true);
+						// doGhostAnim('bf', animToPlay);
+
+					char.mostRecentRow = note.row;
 				}
 
 				if (note.noteType == 'Hey!')
