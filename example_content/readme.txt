@@ -1,0 +1,1 @@
+content folder works same as mods folder in psych!!

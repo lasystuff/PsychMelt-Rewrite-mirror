@@ -62,6 +62,8 @@ class FunkinHScript extends Interp
         importClass("PlayState");
         importClass("Math");
         importClass("StringTools");
+        importClass("BGSprite");
+        importClass("Std");
 
         variables.set('add', flixel.FlxG.state.add);
 		variables.set('insert', flixel.FlxG.state.insert);

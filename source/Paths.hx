@@ -510,8 +510,11 @@ class Paths
 				if (dat[1] == "1")
 				{
 					var folder = dat[0];
-					var path = Paths.mods(folder + '/pack.json');
-					if (FileSystem.exists(path))
+
+					//Make all mod globally cuz its not mod!!! it is "content"!!
+					globalMods.push(dat[0]);
+					//var path = Paths.mods(folder + '/pack.json');
+					/*if (FileSystem.exists(path))
 					{
 						try
 						{
@@ -529,6 +532,7 @@ class Paths
 							trace(e);
 						}
 					}
+					*/
 				}
 			}
 		}
