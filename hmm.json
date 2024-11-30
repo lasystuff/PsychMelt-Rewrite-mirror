@@ -70,6 +70,11 @@
 		"dir": null,
 		"ref": "master",
 		"url": "https://github.com/superpowers04/linc_luajit"
+	  },
+	  {
+		"name": "hscript-improved",
+		"type": "git",
+		"url": "https://github.com/FNF-CNE-Devs/hscript-improved"
 	  }
 	]
   }

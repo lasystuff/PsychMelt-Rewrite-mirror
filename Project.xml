@@ -135,6 +135,7 @@
 	<!--<haxelib name="polymod"/> -->
 	<haxelib name="hxdiscord_rpc" if="desktop"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
+	<haxelib name="hscript-improved"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
