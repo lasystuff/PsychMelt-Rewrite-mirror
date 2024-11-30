@@ -158,7 +158,6 @@ class PlayState extends MusicBeatState
 
 	public var notes:FlxTypedGroup<Note>;
 	public var unspawnNotes:Array<Note> = [];
-	public var notesToSpawn:Array<Array<Note>> = []; // too lazy to redo all unspawnNotes code so this'll handle the spawning and thats it lol
 	public var eventNotes:Array<EventNote> = [];
 
 	private var strumLine:FlxSprite;
@@ -965,14 +964,14 @@ class PlayState extends MusicBeatState
 		if (FileSystem.exists(Paths.modFolders(hscriptFile)))
 		{
 			hscriptFile = Paths.modFolders(hscriptFile);
-			hscriptArray.push(new FunkinHScript(hscriptFile));
+			hscriptArray.push(new FunkinHScript(hscriptFile, this));
 		}
 		else
 		{
 			hscriptFile = Paths.getSharedPath(hscriptFile);
 			if (FileSystem.exists(hscriptFile))
 			{
-				hscriptArray.push(new FunkinHScript(hscriptFile));
+				hscriptArray.push(new FunkinHScript(hscriptFile, this));
 			}
 		}
 		#end
@@ -2653,9 +2652,6 @@ class PlayState extends MusicBeatState
 			}
 		}
 
-		for(i in 0...4)
-			notesToSpawn[i] = [];
-
 		for (section in noteData)
 		{
 			for (songNotes in section.sectionNotes)
@@ -2689,11 +2685,6 @@ class PlayState extends MusicBeatState
 				susLength = susLength / Conductor.stepCrochet;
 				unspawnNotes.push(swagNote);
 
-				if(notesToSpawn[swagNote.noteData]==null)
-					notesToSpawn[swagNote.noteData] = [];
-
-				notesToSpawn[swagNote.noteData].push(swagNote);
-
 				var floorSus:Int = Math.floor(susLength);
 
 				if (floorSus > 0)
@@ -2713,8 +2704,6 @@ class PlayState extends MusicBeatState
 						swagNote.tail.push(sustainNote);
 						sustainNote.parent = swagNote;
 						unspawnNotes.push(sustainNote);
-
-						notesToSpawn[swagNote.noteData].push(sustainNote);
 
 						if (sustainNote.mustPress)
 						{
