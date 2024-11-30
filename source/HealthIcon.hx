@@ -2,6 +2,8 @@ package;
 
 import flixel.FlxSprite;
 
+using StringTools;
+
 class HealthIcon extends FlxSprite {
     public var sprTracker:FlxSprite;
     private var isPlayer:Bool;
@@ -13,7 +15,7 @@ class HealthIcon extends FlxSprite {
         super();
         this.isPlayer = isPlayer;
         
-        changeIcon(char, allowGPU);
+        changeIcon(char);
         scrollFactor.set();
     }
 
@@ -25,20 +27,24 @@ class HealthIcon extends FlxSprite {
         }
     }
 
-    public function changeIcon(char:String, ?allowGPU:Bool = true):Void {
+    public function changeIcon(char:String):Void {
         if (this.char != char) {
             this.char = char;
             
-            var graphic = Paths.image(getIconPath(char), allowGPU);
+            var graphic = Paths.image(getIconPath(char));
             loadGraphic(graphic, true, Math.floor(graphic.width / 3), Math.floor(graphic.height));
             super.updateHitbox();
 
             animation.add(char, [0, 1, 2], 0, false, isPlayer);
             animation.play(char);
 
-            antialiasing = char.endsWith('-pixel') ? false : ClientPrefs.data.antialiasing;
+            antialiasing = char.endsWith('-pixel') ? false : ClientPrefs.globalAntialiasing;
         }
     }
+
+	public function getCharacter():String {
+		return char;
+	}
 
     public function getIconPath(char:String):String {
         var name:String = 'icons/' + char;
