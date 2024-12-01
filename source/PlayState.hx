@@ -1100,7 +1100,7 @@ class PlayState extends MusicBeatState
 		{
 			var blah = luaDebugGroup.members[34];
 			blah.destroy();
-			luaDebugGroup.remove(blah);
+			luaDebugGroup.remove(blah, true);
 		}
 		luaDebugGroup.insert(0, new DebugLuaText(text, luaDebugGroup, color));
 		#end
@@ -1535,7 +1535,7 @@ class PlayState extends MusicBeatState
 							ease: FlxEase.cubeInOut,
 							onComplete: function(twn:FlxTween)
 							{
-								remove(countdownReady);
+								remove(countdownReady, true);
 								countdownReady.destroy();
 							}
 						});
@@ -1555,7 +1555,7 @@ class PlayState extends MusicBeatState
 							ease: FlxEase.cubeInOut,
 							onComplete: function(twn:FlxTween)
 							{
-								remove(countdownSet);
+								remove(countdownSet, true);
 								countdownSet.destroy();
 							}
 						});
@@ -1577,7 +1577,7 @@ class PlayState extends MusicBeatState
 							ease: FlxEase.cubeInOut,
 							onComplete: function(twn:FlxTween)
 							{
-								remove(countdownGo);
+								remove(countdownGo, true);
 								countdownGo.destroy();
 							}
 						});
@@ -2530,6 +2530,13 @@ class PlayState extends MusicBeatState
 		setOnLuas('botPlay', cpuControlled);
 		callOnLuas('onUpdatePost', [elapsed]);
 		callOnHScript('updatePost', [elapsed]);
+
+		grpNoteSplashes.forEachDead(function(splash:NoteSplash) {
+			if (grpNoteSplashes.length > 1) {
+				grpNoteSplashes.remove(splash, true);
+				splash.destroy();
+			}
+		});
 	}
 
 	function set_health(HP:Float):Float
@@ -3425,6 +3432,7 @@ class PlayState extends MusicBeatState
 			FlxTween.tween(numScore, {alpha: 0}, 0.2 / playbackRate, {
 				onComplete: function(tween:FlxTween)
 				{
+					remove(numScore, true);
 					numScore.destroy();
 				},
 				startDelay: Conductor.crochet * 0.002 / playbackRate
@@ -3452,7 +3460,7 @@ class PlayState extends MusicBeatState
 			{
 				coolText.destroy();
 				comboSpr.destroy();
-
+				remove(rating, true);
 				rating.destroy();
 			},
 			startDelay: Conductor.crochet * 0.002 / playbackRate
