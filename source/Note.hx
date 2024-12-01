@@ -29,6 +29,8 @@ class Note extends FlxSprite
 	override function destroy()
 	{
 		defScale.put();
+		clipRect = flixel.util.FlxDestroyUtil.put(clipRect);
+		
 		super.destroy();
 	}	
 

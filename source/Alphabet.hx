@@ -8,6 +8,7 @@ import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
 import flixel.util.FlxTimer;
 import flash.media.Sound;
+import flixel.util.FlxDestroyUtil;
 
 using StringTools;
 
@@ -35,8 +36,8 @@ class Alphabet extends FlxSpriteGroup
 	public var scaleY(default, set):Float = 1;
 	public var rows:Int = 0;
 
-	public var distancePerItem:FlxPoint = new FlxPoint(20, 120);
-	public var startPosition:FlxPoint = new FlxPoint(0, 0); //for the calculations
+	public var distancePerItem:FlxPoint = FlxPoint.get(20, 120);
+	public var startPosition:FlxPoint = FlxPoint.get(0, 0); //for the calculations
 
 	public function new(x:Float, y:Float, text:String = "", ?bold:Bool = true)
 	{
@@ -166,6 +167,13 @@ class Alphabet extends FlxSpriteGroup
 				y = FlxMath.lerp(y, (targetY * 1.3 * distancePerItem.y) + startPosition.y, lerpVal);
 		}
 		super.update(elapsed);
+	}
+
+	override function destroy()
+	{
+		distancePerItem = FlxDestroyUtil.put(distancePerItem);
+		startPosition = FlxDestroyUtil.put(startPosition);
+		super.destroy();
 	}
 
 	public function snapToPosition()

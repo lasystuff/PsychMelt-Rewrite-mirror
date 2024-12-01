@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxBasic;
 import flixel.math.FlxPoint;
 import flixel.FlxG;
 import openfl.utils.Assets;
@@ -56,7 +57,7 @@ class CoolUtil
 	inline public static function quantize(f:Float, snap:Float)
 	{
 		// changed so this actually works lol
-		var m:Float = Math.fround(f * snap);
+		final m:Float = Math.fround(f * snap);
 		return (m / snap);
 	}
 	
@@ -76,7 +77,7 @@ class CoolUtil
 		return Paths.formatToSongPath(fileSuffix);
 	}
 
-	public static function difficultyString():String
+	inline public static function difficultyString():String
 	{
 		return difficulties[PlayState.storyDifficulty].toUpperCase();
 	}
@@ -87,37 +88,23 @@ class CoolUtil
 
 	public static function coolTextFile(path:String):Array<String>
 	{
-		var daList:Array<String> = [];
 		#if sys
-		if(FileSystem.exists(path)) daList = File.getContent(path).trim().split('\n');
+		if(FileSystem.exists(path)) return [for (i in File.getContent(path).trim().split('\n')) i.trim()];
 		#else
-		if(Assets.exists(path)) daList = Assets.getText(path).trim().split('\n');
+		if(Assets.exists(path)) return [for (i in Assets.getText(path).trim().split('\n')) i.trim()];
 		#end
 
-		for (i in 0...daList.length)
-		{
-			daList[i] = daList[i].trim();
-		}
-
-		return daList;
+		return [];
 	}
-	public static function listFromString(string:String):Array<String>
+	inline public static function listFromString(string:String):Array<String>
 	{
-		var daList:Array<String> = [];
-		daList = string.trim().split('\n');
-
-		for (i in 0...daList.length)
-		{
-			daList[i] = daList[i].trim();
-		}
-
-		return daList;
+		return [for (i in string.trim().split('\n')) i.trim()];
 	}
 	public static function dominantColor(sprite:flixel.FlxSprite):Int{
-		var countByColor:Map<Int, Int> = [];
+		final countByColor:Map<Int, Int> = [];
 		for(col in 0...sprite.frameWidth){
 			for(row in 0...sprite.frameHeight){
-			  var colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
+			  final colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
 			  if(colorOfThisPixel != 0){
 				  if(countByColor.exists(colorOfThisPixel)){
 				    countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
@@ -139,14 +126,8 @@ class CoolUtil
 		return maxKey;
 	}
 
-	public static function numberArray(max:Int, ?min = 0):Array<Int>
-	{
-		var dumbArray:Array<Int> = [];
-		for (i in min...max)
-		{
-			dumbArray.push(i);
-		}
-		return dumbArray;
+	inline public static function sortByID(i:Int, basic1:FlxBasic, basic2:FlxBasic):Int {
+		return basic1.ID > basic2.ID ? -i : basic2.ID > basic1.ID ? i : 0;
 	}
 
 	//uhhhh does this even work at all? i'm starting to doubt
@@ -158,7 +139,7 @@ class CoolUtil
 		Paths.music(sound, library);
 	}
 
-	public static function browserLoad(site:String) {
+	inline public static function browserLoad(site:String) {
 		#if linux
 		Sys.command('/usr/bin/xdg-open', [site]);
 		#else

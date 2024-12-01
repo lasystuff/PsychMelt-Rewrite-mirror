@@ -10,10 +10,9 @@ class PhillyGlowParticle extends FlxSprite
 
 	public function new(x:Float, y:Float, color:FlxColor)
 	{
-		super(x, y);
+		super(x, y, Paths.image('philly/particle'));
 		this.color = color;
 
-		loadGraphic(Paths.image('philly/particle'));
 		antialiasing = ClientPrefs.globalAntialiasing;
 		lifeTime = FlxG.random.float(0.6, 0.9);
 		decay = FlxG.random.float(0.8, 1);

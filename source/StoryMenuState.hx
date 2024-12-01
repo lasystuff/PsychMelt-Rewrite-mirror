@@ -171,7 +171,7 @@ class StoryMenuState extends MusicBeatState
 		add(bgSprite);
 		add(grpWeekCharacters);
 
-		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgSprite.y + 425).loadGraphic(Paths.image('Menu_Tracks'));
+		var tracksSprite:FlxSprite = new FlxSprite(FlxG.width * 0.07, bgSprite.y + 425, Paths.image('Menu_Tracks'));
 		tracksSprite.antialiasing = ClientPrefs.globalAntialiasing;
 		add(tracksSprite);
 
@@ -293,7 +293,7 @@ class StoryMenuState extends MusicBeatState
 			{
 				FlxG.sound.play(Paths.sound('confirmMenu'));
 
-				grpWeekText.members[curWeek].startFlashing();
+				grpWeekText.members[curWeek].isFlashing = true;
 
 				for (char in grpWeekCharacters.members)
 				{
@@ -343,12 +343,7 @@ class StoryMenuState extends MusicBeatState
 
 	function changeDifficulty(change:Int = 0):Void
 	{
-		curDifficulty += change;
-
-		if (curDifficulty < 0)
-			curDifficulty = CoolUtil.difficulties.length - 1;
-		if (curDifficulty >= CoolUtil.difficulties.length)
-			curDifficulty = 0;
+		curDifficulty = FlxMath.wrap(curDifficulty + change, 0, CoolUtil.difficulties.length - 1);
 
 		WeekData.setDirectoryFromWeek(loadedWeeks[curWeek]);
 
@@ -385,12 +380,7 @@ class StoryMenuState extends MusicBeatState
 
 	function changeWeek(change:Int = 0):Void
 	{
-		curWeek += change;
-
-		if (curWeek >= loadedWeeks.length)
-			curWeek = 0;
-		if (curWeek < 0)
-			curWeek = loadedWeeks.length - 1;
+		curWeek = FlxMath.wrap(curWeek + change, 0, loadedWeeks.length - 1);
 
 		var leWeek:WeekData = loadedWeeks[curWeek];
 		WeekData.setDirectoryFromWeek(leWeek);
@@ -404,12 +394,8 @@ class StoryMenuState extends MusicBeatState
 		var unlocked:Bool = !weekIsLocked(leWeek.fileName);
 		for (item in grpWeekText.members)
 		{
-			item.targetY = bullShit - curWeek;
-			if (item.targetY == Std.int(0) && unlocked)
-				item.alpha = 1;
-			else
-				item.alpha = 0.6;
-			bullShit++;
+			item.targetY = bullShit++ - curWeek;
+			item.alpha = (item.targetY == 0 && unlocked ? 1 : 0.6);
 		}
 
 		bgSprite.visible = true;

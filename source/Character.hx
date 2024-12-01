@@ -85,9 +85,9 @@ class Character extends FlxSprite
 	public var originalFlipX:Bool = false;
 	public var healthColorArray:Array<Int> = [255, 0, 0];
 
-	public static var DEFAULT_CHARACTER:String = 'bf'; // In case a character is missing, it will use BF on its place
+	inline public static final DEFAULT_CHARACTER:String = 'bf'; // In case a character is missing, it will use BF on its place
 
-	public function new(x:Float, y:Float, ?character:String = 'bf', ?isPlayer:Bool = false)
+	public function new(x:Float, y:Float, ?character:String = DEFAULT_CHARACTER, ?isPlayer:Bool = false)
 	{
 		super(x, y);
 
@@ -244,8 +244,12 @@ class Character extends FlxSprite
 		}
 		originalFlipX = flipX;
 
-		if (animOffsets.exists('singLEFTmiss') || animOffsets.exists('singDOWNmiss') || animOffsets.exists('singUPmiss') || animOffsets.exists('singRIGHTmiss'))
-			hasMissAnimations = true;
+		for (name => offset in animOffsets)
+			if (name.startsWith('sing') && name.contains('miss')) // includes alt miss animations now (idk why but whatever)
+			{
+				hasMissAnimations = true;
+				break;
+			}
 		recalculateDanceIdle();
 		dance();
 
@@ -415,8 +419,8 @@ class Character extends FlxSprite
 
 	public function recalculateDanceIdle()
 	{
-		var lastDanceIdle:Bool = danceIdle;
-		danceIdle = (animation.getByName('danceLeft' + idleSuffix) != null && animation.getByName('danceRight' + idleSuffix) != null);
+		final lastDanceIdle:Bool = danceIdle;
+		danceIdle = (animation.exists('danceLeft' + idleSuffix) && animation.exists('danceRight' + idleSuffix));
 
 		if (settingCharacterUp)
 		{

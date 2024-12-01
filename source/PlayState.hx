@@ -159,11 +159,6 @@ class PlayState extends MusicBeatState
 	public var gf:Character = null;
 	public var boyfriend:Boyfriend = null;
 
-	public var dadGhostTween:FlxTween = null;
-	public var bfGhostTween:FlxTween = null;
-	public var dadGhost:FlxSprite = null;
-	public var bfGhost:FlxSprite = null;
-
 	public var notes:FlxTypedGroup<Note>;
 	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
@@ -487,9 +482,6 @@ class PlayState extends MusicBeatState
 				GameOverSubstate.characterName = 'bf-holding-gf-dead';
 		}
 
-		dadGhost = new FlxSprite();
-		bfGhost = new FlxSprite();
-
 		if (isPixelStage)
 		{
 			introSoundsSuffix = '-pixel';
@@ -599,17 +591,6 @@ class PlayState extends MusicBeatState
 		startCharacterPos(boyfriend);
 		boyfriendGroup.add(boyfriend);
 		startCharacterLua(boyfriend.curCharacter);
-
-		dadGhost.visible = false;
-		dadGhost.antialiasing = true;
-		dadGhost.alpha = 0.7;
-		dadGhost.scale.copyFrom(dad.scale);
-		dadGhost.updateHitbox();
-		bfGhost.visible = false;
-		bfGhost.antialiasing = true;
-		bfGhost.alpha = 0.6;
-		bfGhost.scale.copyFrom(boyfriend.scale);
-		bfGhost.updateHitbox();
 
 		var camPos:FlxPoint = new FlxPoint(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
 		if (gf != null)
@@ -3409,7 +3390,7 @@ class PlayState extends MusicBeatState
 		rating.x += ClientPrefs.comboOffset[0];
 		rating.y -= ClientPrefs.comboOffset[1];
 
-		var comboSpr:FlxSprite = new FlxSprite().loadGraphic(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
+		var comboSpr:FlxSprite = new FlxSprite(Paths.image(pixelShitPart1 + 'combo' + pixelShitPart2));
 		comboSpr.cameras = [camHUD];
 		comboSpr.screenCenter();
 		comboSpr.x = coolText.x;
