@@ -30,7 +30,7 @@ import flixel.group.FlxSpriteGroup;
 import flixel.input.keyboard.FlxKey;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
-import flixel.system.FlxSound;
+import flixel.sound.FlxSound;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
@@ -236,6 +236,8 @@ class ChartingState extends MusicBeatState
 			addSection();
 			PlayState.SONG = _song;
 		}
+
+		PlayState.startOnTime = 0;
 
 		// Paths.clearMemory();
 
@@ -1849,6 +1851,9 @@ class ChartingState extends MusicBeatState
 				if (opponentVocals != null)
 					opponentVocals.stop();
 
+				if (FlxG.keys.pressed.SHIFT)
+					PlayState.startOnTime = Conductor.songPosition;
+
 				// if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
 				StageData.loadDirectory(_song);
 				LoadingState.loadAndSwitchState(new PlayState());
@@ -2230,9 +2235,7 @@ class ChartingState extends MusicBeatState
 		vocals.pitch = playbackSpeed;
 		opponentVocals.pitch = playbackSpeed;
 
-		bpmTxt.text = Std.string(FlxMath.roundDecimal(Conductor.songPosition / 1000, 2))
-			+ " / "
-			+ Std.string(FlxMath.roundDecimal(FlxG.sound.music.length / 1000, 2))
+		bpmTxt.text = calculateTime(FlxMath.roundDecimal(FlxG.sound.music.time, 2)) + " / " + calculateTime(FlxG.sound.music.length)
 			+ "\nSection: "
 			+ curSec
 			+ "\n\nBeat: "
@@ -2687,6 +2690,14 @@ class ChartingState extends MusicBeatState
 
 		updateNoteUI();
 		updateGrid();
+	}
+
+	function calculateTime(miliseconds:Float = 0):String
+	{
+		var seconds = Std.int(miliseconds / 1000);
+    	var minutes = Std.int(seconds / 60);
+    	seconds = seconds % 60;
+    	return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 	}
 
 	function recalculateSteps(add:Float = 0):Int
