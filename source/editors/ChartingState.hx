@@ -1493,7 +1493,7 @@ class ChartingState extends MusicBeatState
 
 	function generateSong()
 	{
-		var instrumental = Paths.inst(currentSongName, "-" + boyfriend.curCharacter);
+		var instrumental = Paths.inst(currentSongName, "-" + _song.player1);
 		if (instrumental == null)
 			instrumental = Paths.inst(currentSongName);
 

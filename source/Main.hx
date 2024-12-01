@@ -10,6 +10,10 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 
+import openfl.text.TextField;
+import openfl.text.TextFormat;
+import flixel.util.FlxColor;
+
 //crash handler stuff
 #if CRASH_HANDLER
 import lime.app.Application;
@@ -97,6 +101,22 @@ class Main extends Sprite
 		FlxG.autoPause = false;
 		FlxG.mouse.visible = false;
 		#end
+
+		var compTime = CompileTime.buildDateString();
+		var time = Date.now().toString();
+		var usrName = #if windows Sys.environment()["USERNAME"]; #elseif (linux || macos) Sys.environment()["USER"]; #end
+
+		var compilationInformation = new TextField();
+		compilationInformation.y = (FlxG.height / 4) * 3;
+		compilationInformation.defaultTextFormat = new TextFormat("_sans", 24, FlxColor.fromRGB(255, 125, 125));
+		compilationInformation.text = 'Build Compilation Date: ${compTime}\nBuild open date: ${time}\nBuild Compiled by: Soushimiya\nYou are: ${usrName}! Dont Leak!!';
+		compilationInformation.multiline = true;
+		compilationInformation.selectable = false;
+		compilationInformation.autoSize = LEFT;
+		compilationInformation.mouseEnabled = false;
+		compilationInformation.alpha = 0.675;
+		//Comment out this if you don't want to leaking your mod!!!
+		addChild(compilationInformation);
 		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);

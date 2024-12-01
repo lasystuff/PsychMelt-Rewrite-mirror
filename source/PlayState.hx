@@ -3206,18 +3206,6 @@ class PlayState extends MusicBeatState
 					trace('LOADING NEXT SONG');
 					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
 
-					var winterHorrorlandNext = (Paths.formatToSongPath(SONG.song) == "eggnog");
-					if (winterHorrorlandNext)
-					{
-						var blackShit:FlxSprite = new FlxSprite(-FlxG.width * FlxG.camera.zoom,
-							-FlxG.height * FlxG.camera.zoom).makeGraphic(FlxG.width * 3, FlxG.height * 3, FlxColor.BLACK);
-						blackShit.scrollFactor.set();
-						add(blackShit);
-						camHUD.visible = false;
-
-						FlxG.sound.play(Paths.sound('Lights_Shut_off'));
-					}
-
 					FlxTransitionableState.skipNextTransIn = true;
 					FlxTransitionableState.skipNextTransOut = true;
 
@@ -3226,20 +3214,6 @@ class PlayState extends MusicBeatState
 
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
 					FlxG.sound.music.stop();
-
-					if (winterHorrorlandNext)
-					{
-						new FlxTimer().start(1.5, function(tmr:FlxTimer)
-						{
-							cancelMusicFadeTween();
-							LoadingState.loadAndSwitchState(new PlayState());
-						});
-					}
-					else
-					{
-						cancelMusicFadeTween();
-						LoadingState.loadAndSwitchState(new PlayState());
-					}
 				}
 			}
 			else

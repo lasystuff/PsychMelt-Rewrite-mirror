@@ -113,6 +113,7 @@
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
 	<haxelib name="hscript-improved"/>
 	<define name="hscriptPos"/>
+	<haxelib name="compiletime"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
