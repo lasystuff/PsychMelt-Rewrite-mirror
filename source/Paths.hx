@@ -71,25 +71,28 @@ class Paths
 			// if it is not currently contained within the used local assets
 			if (!localTrackedAssets.contains(key) && !dumpExclusions.contains(key))
 			{
-				// get rid of it
-				var obj = currentTrackedAssets.get(key);
-				@:privateAccess
-				if (obj != null)
-				{
-					openfl.Assets.cache.removeBitmapData(key);
-					FlxG.bitmap._cache.remove(key);
-					obj.destroy();
-					currentTrackedAssets.remove(key);
-				}
+				destroyGraphic(currentTrackedAssets.get(key)); // get rid of the graphic
+				currentTrackedAssets.remove(key); // and remove the key from local cache map
 			}
 		}
+
 		// run the garbage collector for good measure lmfao
 		System.gc();
+	}
+
+	@:access(openfl.display.BitmapData)
+	inline static function destroyGraphic(graphic:FlxGraphic)
+	{
+		// free some gpu memory
+		if (graphic != null && graphic.bitmap != null && graphic.bitmap.__texture != null)
+			graphic.bitmap.__texture.dispose();
+		FlxG.bitmap.remove(graphic);
 	}
 
 	// define the locally tracked assets
 	public static var localTrackedAssets:Array<String> = [];
 
+	@:access(flixel.system.frontEnds.BitmapFrontEnd._cache)
 	public static function clearStoredMemory(?cleanUnused:Bool = false)
 	{
 		// clear anything not in the tracked assets list
@@ -99,7 +102,7 @@ class Paths
 			var obj = FlxG.bitmap._cache.get(key);
 			if (obj != null && !currentTrackedAssets.exists(key))
 			{
-				openfl.Assets.cache.removeBitmapData(key);
+				FlxG.bitmap.remove(FlxG.bitmap.get(key));
 				FlxG.bitmap._cache.remove(key);
 				obj.destroy();
 			}
@@ -113,6 +116,7 @@ class Paths
 				// trace('test: ' + dumpExclusions, key);
 				Assets.cache.clear(key);
 				currentTrackedSounds.remove(key);
+				destroyGraphic(currentTrackedAssets.get(key)); // get rid of the graphic
 			}
 		}
 		// flags everything to be cleared out next unused memory clear
@@ -241,6 +245,8 @@ class Paths
 		return inst;
 	}
 
+	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
+
 	public static function image(key:String, ?library:String)
 	{
 		var bitmap:BitmapData = null;
@@ -282,6 +288,7 @@ class Paths
 			}
 			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
 			newGraphic.persist = true;
+			newGraphic.destroyOnNoUse = false;
 			currentTrackedAssets.set(file, newGraphic);
 			return newGraphic;
 		}
@@ -343,7 +350,7 @@ class Paths
 	inline static public function getSparrowAtlas(key:String, ?library:String):FlxAtlasFrames
 	{
 		#if MODS_ALLOWED
-		var imageLoaded:FlxGraphic = returnGraphic(key);
+		var imageLoaded:FlxGraphic = image(key);
 		var xmlExists:Bool = false;
 		if (FileSystem.exists(modsXml(key)))
 		{
@@ -360,7 +367,7 @@ class Paths
 	inline static public function getPackerAtlas(key:String, ?library:String)
 	{
 		#if MODS_ALLOWED
-		var imageLoaded:FlxGraphic = returnGraphic(key);
+		var imageLoaded:FlxGraphic = image(key);
 		var txtExists:Bool = false;
 		if (FileSystem.exists(modsTxt(key)))
 		{
@@ -381,44 +388,6 @@ class Paths
 
 		var path = invalidChars.split(path.replace(' ', '-')).join("-");
 		return hideChars.split(path).join("").toLowerCase();
-	}
-
-	// completely rewritten asset loading? fuck!
-	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
-
-	public static function returnGraphic(key:String, ?library:String)
-	{
-		#if MODS_ALLOWED
-		var modKey:String = modsImages(key);
-		if (FileSystem.exists(modKey))
-		{
-			if (!currentTrackedAssets.exists(modKey))
-			{
-				var newBitmap:BitmapData = BitmapData.fromFile(modKey);
-				var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(newBitmap, false, modKey);
-				newGraphic.persist = true;
-				currentTrackedAssets.set(modKey, newGraphic);
-			}
-			localTrackedAssets.push(modKey);
-			return currentTrackedAssets.get(modKey);
-		}
-		#end
-
-		var path = getPath('images/$key.png', IMAGE, library);
-		// trace(path);
-		if (OpenFlAssets.exists(path, IMAGE))
-		{
-			if (!currentTrackedAssets.exists(path))
-			{
-				var newGraphic:FlxGraphic = FlxG.bitmap.add(path, false, path);
-				newGraphic.persist = true;
-				currentTrackedAssets.set(path, newGraphic);
-			}
-			localTrackedAssets.push(path);
-			return currentTrackedAssets.get(path);
-		}
-		trace('oh no its returning null NOOOO');
-		return null;
 	}
 
 	public static var currentTrackedSounds:Map<String, Sound> = [];

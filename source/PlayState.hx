@@ -160,7 +160,6 @@ class PlayState extends MusicBeatState
 	public var boyfriend:Boyfriend = null;
 
 	public var notes:FlxTypedGroup<Note>;
-	public var unspawnNotes:Array<Note> = [];
 	public var eventNotes:Array<EventNote> = [];
 
 	private var strumLine:FlxSprite;
@@ -834,6 +833,20 @@ class PlayState extends MusicBeatState
 					luaArray.push(new FunkinLua(luaToLoad));
 				}
 			}
+
+			var hxToLoad:String = Paths.modFolders('custom_events/' + event + '.hx');
+			if (FileSystem.exists(hxToLoad))
+			{
+				hscriptArray.push(new FunkinHScript(hxToLoad, this));
+			}
+			else
+			{
+				hxToLoad = Paths.getSharedPath('custom_events/' + event + '.hx');
+				if (FileSystem.exists(hxToLoad))
+				{
+					hscriptArray.push(new FunkinHScript(hxToLoad, this));
+				}
+			}
 			#elseif sys
 			var luaToLoad:String = Paths.getSharedPath('custom_events/' + event + '.lua');
 			if (OpenFlAssets.exists(luaToLoad))
@@ -1455,7 +1468,6 @@ class PlayState extends MusicBeatState
 
 			if (startOnTime > 0)
 			{
-				clearNotesBefore(startOnTime);
 				setSongTime(startOnTime - 350);
 				return;
 			}
@@ -1594,26 +1606,6 @@ class PlayState extends MusicBeatState
 	public function addBehindDad(obj:FlxObject)
 	{
 		insert(members.indexOf(dadGroup), obj);
-	}
-
-	public function clearNotesBefore(time:Float)
-	{
-		var i = notes.length - 1;
-		while (i >= 0)
-		{
-			var daNote:Note = notes.members[i];
-			if (daNote.strumTime - 350 < time)
-			{
-				daNote.active = false;
-				daNote.visible = false;
-				daNote.ignoreNote = true;
-
-				daNote.kill();
-				notes.remove(daNote, true);
-				daNote.destroy();
-			}
-			--i;
-		}
 	}
 
 	public function updateScore(miss:Bool = false)
@@ -1845,6 +1837,7 @@ class PlayState extends MusicBeatState
 					oldNote = notes.members[Std.int(notes.length - 1)];
 				else
 					oldNote = null;
+				
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
 
 				swagNote.row = Conductor.secsToRow(daStrumTime);
@@ -1864,9 +1857,6 @@ class PlayState extends MusicBeatState
 
 				susLength = susLength / Conductor.stepCrochet;
 				notes.add(swagNote);
-				unspawnNotes.push(swagNote);
-
-				swagNote.kill();
 
 				var floorSus:Int = Math.round(swagNote.sustainLength / Conductor.stepCrochet);
 
@@ -1888,8 +1878,6 @@ class PlayState extends MusicBeatState
 						swagNote.tail.push(sustainNote);
 						sustainNote.parent = swagNote;
 						notes.add(sustainNote);
-						unspawnNotes.push(sustainNote);
-						sustainNote.kill();
 					}
 				}
 				if (!noteTypeMap.exists(swagNote.noteType))
@@ -1899,6 +1887,7 @@ class PlayState extends MusicBeatState
 			}
 			daBeats += 1;
 		}
+		
 		for (event in songData.events) // Event Notes
 		{
 			for (i in 0...event[1].length)
@@ -2362,16 +2351,6 @@ class PlayState extends MusicBeatState
 		modManager.updateTimeline(curDecStep);
 		modManager.update(elapsed);
 
-		for (note in unspawnNotes)
-		{
-			//dumbest idea ever
-			if (note.strumTime - Conductor.songPosition < (1500 / songSpeed))
-			{
-				unspawnNotes.splice(0, 1);
-				note.revive();
-			}
-		}
-
 		if(startedCountdown){
 			opponentStrums.forEachAlive(function(strum:StrumNote)
 			{
@@ -2529,7 +2508,6 @@ class PlayState extends MusicBeatState
 			if (FlxG.keys.justPressed.TWO)
 			{ // Go 10 seconds into the future :O
 				setSongTime(Conductor.songPosition + 10000);
-				clearNotesBefore(Conductor.songPosition);
 			}
 		}
 		#end
@@ -2941,7 +2919,7 @@ class PlayState extends MusicBeatState
 				}
 		}
 		callOnLuas('onEvent', [eventName, value1, value2]);
-		callOnLuas('onEvent', [eventName, value1, value2]);
+		callOnHScript('onEvent', [eventName, value1, value2]);
 	}
 
 	function moveCameraSection():Void

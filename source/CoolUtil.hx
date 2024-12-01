@@ -130,15 +130,6 @@ class CoolUtil
 		return basic1.ID > basic2.ID ? -i : basic2.ID > basic1.ID ? i : 0;
 	}
 
-	//uhhhh does this even work at all? i'm starting to doubt
-	public static function precacheSound(sound:String, ?library:String = null):Void {
-		Paths.sound(sound, library);
-	}
-
-	public static function precacheMusic(sound:String, ?library:String = null):Void {
-		Paths.music(sound, library);
-	}
-
 	inline public static function browserLoad(site:String) {
 		#if linux
 		Sys.command('/usr/bin/xdg-open', [site]);
