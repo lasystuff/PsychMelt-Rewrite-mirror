@@ -46,8 +46,9 @@
 		"version": null
 	  },
 	  {
-		"name": "hxvlc",
-		"type": "haxelib"
+		"name": "hxCodec",
+		"type": "git",
+		"url": "https://github.com/FunkinCrew/hxCodec"
 	  },
 	  {
 		"name": "hscript",

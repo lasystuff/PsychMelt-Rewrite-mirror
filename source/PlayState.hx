@@ -69,7 +69,7 @@ import sys.FileSystem;
 import sys.io.File;
 #end
 #if VIDEOS_ALLOWED
-import hxvlc.flixel.FlxVideo;
+import hxcodec.flixel.FlxVideo as VideoHandler;
 #end
 import modchart.*;
 
@@ -487,8 +487,7 @@ class PlayState extends MusicBeatState
 			introSoundsSuffix = '-pixel';
 		}
 
-		add(gfGroup); // Needed for blammed lights
-
+		add(gfGroup);
 		add(dadGroup);
 		add(boyfriendGroup);
 
@@ -807,6 +806,20 @@ class PlayState extends MusicBeatState
 				if (FileSystem.exists(luaToLoad))
 				{
 					luaArray.push(new FunkinLua(luaToLoad));
+				}
+			}
+
+			var hxToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.hx');
+			if (FileSystem.exists(hxToLoad))
+			{
+				hscriptArray.push(new FunkinHScript(hxToLoad, this));
+			}
+			else
+			{
+				hxToLoad = Paths.getSharedPath('custom_notetypes/' + notetype + '.hx');
+				if (FileSystem.exists(hxToLoad))
+				{
+					hscriptArray.push(new FunkinHScript(hxToLoad, this));
 				}
 			}
 			#elseif sys
@@ -1208,9 +1221,9 @@ class PlayState extends MusicBeatState
 
 		var filepath:String = Paths.video(name);
 		#if sys
-		if (!FileSystem.exists(filepath))
+		if(!FileSystem.exists(filepath))
 		#else
-		if (!OpenFlAssets.exists(filepath))
+		if(!OpenFlAssets.exists(filepath))
 		#end
 		{
 			FlxG.log.warn('Couldnt find video file: ' + name);
@@ -1218,14 +1231,14 @@ class PlayState extends MusicBeatState
 			return;
 		}
 
-		var video:FlxVideo = new FlxVideo();
-		video.load(filepath);
-		video.play();
+		var video:VideoHandler = new VideoHandler();
+		video.play(filepath);
 		video.onEndReached.add(function()
 		{
+			video.dispose();
 			startAndEnd();
 			return;
-		});
+		}, true);
 		#else
 		FlxG.log.warn('Platform not supported!');
 		startAndEnd();
@@ -1411,6 +1424,7 @@ class PlayState extends MusicBeatState
 
 	public function startCountdown():Void
 	{
+		callOnHScript("startCountdown");
 		final introAlts:Array<String> = switch(isPixelStage)
 		{
 			case false: ["ready", "set" ,"go"];
@@ -1422,7 +1436,6 @@ class PlayState extends MusicBeatState
 		if (startedCountdown)
 		{
 			callOnLuas('onStartCountdown', []);
-			callOnHScript("startCountdown");
 			return;
 		}
 
@@ -1430,7 +1443,7 @@ class PlayState extends MusicBeatState
 		var ret:Dynamic = callOnLuas('onStartCountdown', [], false);
 		if (ret != FunkinLua.Function_Stop)
 		{
-			if (skipCountdown || startOnTime > 0)
+			if (skipCountdown)
 				skipArrowStartTween = true;
 
 			generateStaticArrows(0);
@@ -3699,7 +3712,9 @@ class PlayState extends MusicBeatState
 			}
 		});
 		combo = 0;
-		health -= daNote.missHealth * healthLoss;
+		//like shitty fix??
+		if (startOnTime > 0)
+			health -= daNote.missHealth * healthLoss;
 
 		if (instakillOnMiss)
 		{

@@ -1027,6 +1027,17 @@ class ChartingState extends MusicBeatState
 							key++;
 						}
 					}
+					if (!FileSystem.isDirectory(path) && file.endsWith('.hx'))
+					{
+						var fileToCheck:String = file.substr(0, file.length - 3);
+						if (!noteTypeMap.exists(fileToCheck))
+						{
+							displayNameList.push(fileToCheck);
+							noteTypeMap.set(fileToCheck, key);
+							noteTypeIntMap.set(key, fileToCheck);
+							key++;
+						}
+					}
 				}
 			}
 		}
