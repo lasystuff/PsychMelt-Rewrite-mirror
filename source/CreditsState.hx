@@ -384,11 +384,7 @@ class CreditsState extends MusicBeatState
 
 			if (!unselectableCheck(bullShit - 1))
 			{
-				item.alpha = 0.6;
-				if (item.targetY == 0)
-				{
-					item.alpha = 1;
-				}
+				item.alpha = (item.targetY == 0 ? 1 : 0.6);
 			}
 		}
 

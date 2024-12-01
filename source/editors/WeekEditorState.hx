@@ -443,7 +443,7 @@ class WeekEditorState extends MusicBeatState
 					else
 					{ // Edit song
 						weekFile.songs[i][0] = splittedText[i];
-						if (weekFile.songs[i][1] == null || weekFile.songs[i][1])
+						if (weekFile.songs[i][1] == null)
 						{
 							weekFile.songs[i][1] = 'dad';
 							weekFile.songs[i][2] = [146, 113, 253];
