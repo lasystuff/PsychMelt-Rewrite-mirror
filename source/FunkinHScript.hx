@@ -69,4 +69,9 @@ class FunkinHScript extends Interp
 		variables.set('insert', flixel.FlxG.state.insert);
 		variables.set('remove', flixel.FlxG.state.remove);
     }
+
+    public function stop(){
+        //idk how i stop it please help please
+        variables.clear();
+    }
 }
