@@ -1,16 +1,9 @@
 package;
 
-import openfl.text.Font;
-import flixel.FlxG;
-import flixel.math.FlxMath;
-
+import haxe.Timer;
+import openfl.events.Event;
 import openfl.text.TextField;
 import openfl.text.TextFormat;
-import openfl.text.TextFormatAlign;
-import openfl.system.System;
-import openfl.events.Event;
-import haxe.Timer;
-
 #if gl_stats
 import openfl.display._internal.stats.Context3DStats;
 import openfl.display._internal.stats.DrawCallContext;
@@ -19,41 +12,25 @@ import openfl.display._internal.stats.DrawCallContext;
 import openfl.Lib;
 #end
 
+#if openfl
+import openfl.system.System;
+#end
+
 /**
 	The FPS class provides an easy-to-use monitor to display
 	the current frame rate of an OpenFL project
 **/
 class FPS extends TextField
 {
-	/** The current frame rate, expressed using frames-per-second **/
-	public var currentFPS(default, null):Float = 0.0;
-	/** The current state class name **/
-	public var currentState(default, null):String = "";
-	/** Whether to show a memory usage counter or not **/
-	public var showMemory:Bool = #if final false #else true #end;
+	/**
+		The current frame rate, expressed using frames-per-second
+	**/
+	public var currentFPS(default, null):Int;
 
-	public var align(default, set):TextFormatAlign;
-	function set_align(val) {		
-		return align = defaultTextFormat.align = switch (val){
-			default: 
-				this.x = 10;
-				autoSize = LEFT;
-				LEFT;
-
-			case CENTER: 
-				this.x = (this.stage.stageWidth - this.textWidth) * 0.5; 
-				autoSize = CENTER;
-				CENTER;
-
-			case RIGHT: 
-				this.x = (this.stage.stageWidth - this.textWidth) - 10; 
-				autoSize = RIGHT;
-				RIGHT;
-		}
-	}
-
-	function onGameResized(windowWidth, ?windowHeight)
-		align = align;
+	/**
+		The current memory usage.
+	**/
+	public var memoryMegas:Float = 0;
 
 	@:noCompletion private var cacheCount:Int;
 	@:noCompletion private var currentTime:Float;
@@ -66,104 +43,56 @@ class FPS extends TextField
 		this.x = x;
 		this.y = y;
 
-		var textFormat = new TextFormat(null, 12, color);
-
-		#if tgt
-		embedFonts = true;
-		textFormat.size = 14;
-		textFormat.font = "Calibri";
-		#else
-		embedFonts = false;
-		textFormat.font = "_sans";
-		#end
-		defaultTextFormat = textFormat;
-
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-
+		defaultTextFormat = new TextFormat("_sans", 14, color);
+		autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
 
-		////
 		cacheCount = 0;
 		currentTime = 0;
 		times = [];
-
-		////
-		addEventListener(Event.ADDED_TO_STAGE, (e:Event)->{
-			if (align == null)
-				align = #if mobile CENTER #else LEFT #end;
-		});
-		
-		/*
-		addEventListener(openfl.events.KeyboardEvent.KEY_DOWN, (e)->{
-			if (e.keyCode == flixel.input.keyboard.FlxKey.F3)
-				this.align = switch (this.align){
-					case LEFT: CENTER;
-					case CENTER: RIGHT;
-					case RIGHT: LEFT;
-					default: LEFT;
-				}
-		});
-		*/
-
-		#if flash
-		addEventListener(Event.ENTER_FRAME, function(e){
-			var time = Lib.getTimer();
-			__enterFrame(time - currentTime);
-		});
-		#end
-
-		FlxG.signals.gameResized.add(onGameResized);
-
-		#if (debug && false)
-		FlxG.signals.preStateCreate.add((nextState)->{
-			currentState = Type.getClassName(Type.getClass(nextState));
-		});
-		#end
 	}
+
+	var deltaTimeout:Float = 0.0;
 
 	// Event Handlers
 	@:noCompletion
-	private #if !flash override #end function __enterFrame(deltaTime:Float):Void
+	private override function __enterFrame(deltaTime:Float):Void
 	{
+		if (deltaTimeout > 1000) {
+			// there's no need to update this every frame and it only causes performance losses.
+			deltaTimeout = 0.0;
+			return;
+		}
 		currentTime += deltaTime;
 		times.push(currentTime);
-
 		while (times[0] < currentTime - 1000)
-		{
 			times.shift();
-		}
 
 		var currentCount = times.length;
-		currentFPS = Math.ffloor((currentCount + cacheCount) * 0.5);
-		if (currentFPS > FlxG.drawFramerate)
-			currentFPS = FlxG.drawFramerate;
+		currentFPS = Math.round((currentCount + cacheCount) / 2);
+		if (currentFPS > ClientPrefs.framerate) currentFPS = ClientPrefs.framerate;
 
-		if (currentCount != cacheCount)
+		if (currentCount != cacheCount /*&& visible*/)
 		{
-			cacheCount = currentCount;
-
-			text = 'FPS: $currentFPS';
+			text = 'FPS: ${currentFPS}';
 			
-			if (showMemory)
-				text += ' • Memory: ${Math.abs(FlxMath.roundDecimal(System.totalMemory / 1000000, 1))}MB';
-
-			#if (debug && false)
-			text += '\nState: $currentState';
+			#if openfl
+			memoryMegas = cast(System.totalMemory, UInt);
+			text += '\nMemory: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
 			#end
 
-			if (currentFPS <= FlxG.drawFramerate * 0.5)
+			textColor = 0xFFFFFFFF;
+			if (currentFPS <= ClientPrefs.framerate / 2)
 				textColor = 0xFFFF0000;
-			else
-				textColor = 0xFFFFFFFF;
 
-			#if (gl_stats && !disable_cffi && (!html5 || !canvas))
-			text += "\ntotalDC: " + Context3DStats.totalDrawCalls();
-			text += "\nstageDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE);
-			text += "\nstage3DDC: " + Context3DStats.contextDrawCalls(DrawCallContext.STAGE3D);
-			#end
+			text += "\n";
 		}
+
+		cacheCount = currentCount;
+		deltaTimeout += deltaTime;
 	}
 }

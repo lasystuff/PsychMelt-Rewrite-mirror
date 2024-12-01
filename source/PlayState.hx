@@ -933,6 +933,7 @@ class PlayState extends MusicBeatState
 		callOnLuas('onCreatePost', []);
 		callOnHScript("createPost");
 
+		openfl.system.System.gc();
 		super.create();
 
 		cacheCountdown();
@@ -950,6 +951,7 @@ class PlayState extends MusicBeatState
 					Paths.music(key);
 			}
 		}
+		
 		Paths.clearUnusedMemory();
 
 		CustomFadeTransition.nextCamera = camOther;
@@ -1038,8 +1040,6 @@ class PlayState extends MusicBeatState
 		{
 			final ratio:Float = value / songSpeed; //funny word huh
 			for (note in notes)
-				note.resizeByRatio(ratio);
-			for (note in unspawnNotes)
 				note.resizeByRatio(ratio);
 		}
 		songSpeed = value;
@@ -1598,24 +1598,7 @@ class PlayState extends MusicBeatState
 
 	public function clearNotesBefore(time:Float)
 	{
-		var i:Int = unspawnNotes.length - 1;
-		while (i >= 0)
-		{
-			var daNote:Note = unspawnNotes[i];
-			if (daNote.strumTime - 350 < time)
-			{
-				daNote.active = false;
-				daNote.visible = false;
-				daNote.ignoreNote = true;
-
-				daNote.kill();
-				unspawnNotes.remove(daNote);
-				daNote.destroy();
-			}
-			--i;
-		}
-
-		i = notes.length - 1;
+		var i = notes.length - 1;
 		while (i >= 0)
 		{
 			var daNote:Note = notes.members[i];
@@ -1858,8 +1841,8 @@ class PlayState extends MusicBeatState
 				}
 				var oldNote:Note;
 
-				if (unspawnNotes.length > 0)
-					oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
+				if (notes.length > 0)
+					oldNote = notes.members[Std.int(notes.length - 1)];
 				else
 					oldNote = null;
 				var swagNote:Note = new Note(daStrumTime, daNoteData, oldNote);
@@ -1880,7 +1863,10 @@ class PlayState extends MusicBeatState
 				var susLength:Float = swagNote.sustainLength;
 
 				susLength = susLength / Conductor.stepCrochet;
+				notes.add(swagNote);
 				unspawnNotes.push(swagNote);
+
+				swagNote.kill();
 
 				var floorSus:Int = Math.round(swagNote.sustainLength / Conductor.stepCrochet);
 
@@ -1889,7 +1875,7 @@ class PlayState extends MusicBeatState
 					if(floorSus == 1) floorSus++;
 					for (susNote in 0...floorSus)
 					{
-						oldNote = unspawnNotes[Std.int(unspawnNotes.length - 1)];
+						oldNote = notes.members[Std.int(notes.length - 1)];
 						var sustainNote:Note = new Note(daStrumTime
 							+ (Conductor.stepCrochet * susNote)
 							+ (Conductor.stepCrochet / FlxMath.roundDecimal(songSpeed, 2)), daNoteData, oldNote,
@@ -1901,7 +1887,9 @@ class PlayState extends MusicBeatState
 						sustainNote.scrollFactor.set();
 						swagNote.tail.push(sustainNote);
 						sustainNote.parent = swagNote;
+						notes.add(sustainNote);
 						unspawnNotes.push(sustainNote);
+						sustainNote.kill();
 					}
 				}
 				if (!noteTypeMap.exists(swagNote.noteType))
@@ -1927,9 +1915,6 @@ class PlayState extends MusicBeatState
 				eventPushed(subEvent);
 			}
 		}
-		// trace(unspawnNotes.length);
-		// playerCounter += 1;
-		unspawnNotes.sort(sortByShit);
 		if (eventNotes.length > 1)
 		{ // No need to sort if there's a single one or none at all
 			eventNotes.sort(sortByTime);
@@ -1979,11 +1964,6 @@ class PlayState extends MusicBeatState
 				return 280; // Plays 280ms before the actual position
 		}
 		return 0;
-	}
-
-	function sortByShit(Obj1:Note, Obj2:Note):Int
-	{
-		return FlxSort.byValues(FlxSort.ASCENDING, Obj1.strumTime, Obj2.strumTime);
 	}
 
 	function sortByTime(Obj1:EventNote, Obj2:EventNote):Int
@@ -2382,22 +2362,13 @@ class PlayState extends MusicBeatState
 		modManager.updateTimeline(curDecStep);
 		modManager.update(elapsed);
 
-		if (unspawnNotes[0] != null)
+		for (note in unspawnNotes)
 		{
-			var time:Float = (modManager.getValue("noteSpawnTime", 0) + modManager.getValue("noteSpawnTime", 1)) / 2;
-			if(songSpeed < 1) time /= songSpeed;
-			if(unspawnNotes[0].multSpeed < 1) time /= unspawnNotes[0].multSpeed;
-
-			while (unspawnNotes.length > 0 && unspawnNotes[0].strumTime - Conductor.songPosition < time)
+			//dumbest idea ever
+			if (note.strumTime - Conductor.songPosition < (1500 / songSpeed))
 			{
-				var dunceNote:Note = unspawnNotes[0];
-				notes.insert(0, dunceNote);
-				dunceNote.spawned=true;
-				callOnLuas('onSpawnNote', [notes.members.indexOf(dunceNote), dunceNote.noteData, dunceNote.noteType, dunceNote.isSustainNote]);
-				callOnHScript('onSpawnNote', [notes.members.indexOf(dunceNote), dunceNote.noteData, dunceNote.noteType, dunceNote.isSustainNote]);
-
-				var index:Int = unspawnNotes.indexOf(dunceNote);
-				unspawnNotes.splice(index, 1);
+				unspawnNotes.splice(0, 1);
+				note.revive();
 			}
 		}
 
@@ -3090,13 +3061,6 @@ class PlayState extends MusicBeatState
 					health -= 0.05 * healthLoss;
 				}
 			});
-			for (daNote in unspawnNotes)
-			{
-				if (daNote.strumTime < songLength - Conductor.safeZoneOffset)
-				{
-					health -= 0.05 * healthLoss;
-				}
-			}
 
 			if (doDeathCheck())
 			{
@@ -3269,7 +3233,6 @@ class PlayState extends MusicBeatState
 			notes.remove(daNote, true);
 			daNote.destroy();
 		}
-		unspawnNotes = [];
 		eventNotes = [];
 	}
 
