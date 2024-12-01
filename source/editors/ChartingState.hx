@@ -1493,12 +1493,12 @@ class ChartingState extends MusicBeatState
 
 	function generateSong()
 	{
-		var instrumental = Paths.inst(PlayState.SONG.song, "-" + boyfriend.curCharacter);
+		var instrumental = Paths.inst(currentSongName, "-" + boyfriend.curCharacter);
 		if (instrumental == null)
-			instrumental = Paths.inst(PlayState.SONG.song);
+			instrumental = Paths.inst(currentSongName);
 
 		FlxG.sound.playMusic(instrumental, 1, false);
-		
+
 		if (instVolume != null)
 			FlxG.sound.music.volume = instVolume.value;
 		if (check_mute_inst != null && check_mute_inst.checked)
