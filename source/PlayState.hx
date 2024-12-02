@@ -794,35 +794,35 @@ class PlayState extends MusicBeatState
 		for (notetype in noteTypeMap.keys())
 		{
 			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.lua');
+			var luaToLoad:String = Paths.modFolders('notetypes/' + notetype + '.lua');
 			if (FileSystem.exists(luaToLoad))
 			{
 				luaArray.push(new FunkinLua(luaToLoad));
 			}
 			else
 			{
-				luaToLoad = Paths.getSharedPath('custom_notetypes/' + notetype + '.lua');
+				luaToLoad = Paths.getSharedPath('notetypes/' + notetype + '.lua');
 				if (FileSystem.exists(luaToLoad))
 				{
 					luaArray.push(new FunkinLua(luaToLoad));
 				}
 			}
 
-			var hxToLoad:String = Paths.modFolders('custom_notetypes/' + notetype + '.hx');
+			var hxToLoad:String = Paths.modFolders('notetypes/' + notetype + '.hx');
 			if (FileSystem.exists(hxToLoad))
 			{
 				hscriptArray.push(new FunkinHScript(hxToLoad, this));
 			}
 			else
 			{
-				hxToLoad = Paths.getSharedPath('custom_notetypes/' + notetype + '.hx');
+				hxToLoad = Paths.getSharedPath('notetypes/' + notetype + '.hx');
 				if (FileSystem.exists(hxToLoad))
 				{
 					hscriptArray.push(new FunkinHScript(hxToLoad, this));
 				}
 			}
 			#elseif sys
-			var luaToLoad:String = Paths.getSharedPath('custom_notetypes/' + notetype + '.lua');
+			var luaToLoad:String = Paths.getSharedPath('notetypes/' + notetype + '.lua');
 			if (OpenFlAssets.exists(luaToLoad))
 			{
 				luaArray.push(new FunkinLua(luaToLoad));
@@ -832,35 +832,35 @@ class PlayState extends MusicBeatState
 		for (event in eventPushedMap.keys())
 		{
 			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('custom_events/' + event + '.lua');
+			var luaToLoad:String = Paths.modFolders('events/' + event + '.lua');
 			if (FileSystem.exists(luaToLoad))
 			{
 				luaArray.push(new FunkinLua(luaToLoad));
 			}
 			else
 			{
-				luaToLoad = Paths.getSharedPath('custom_events/' + event + '.lua');
+				luaToLoad = Paths.getSharedPath('events/' + event + '.lua');
 				if (FileSystem.exists(luaToLoad))
 				{
 					luaArray.push(new FunkinLua(luaToLoad));
 				}
 			}
 
-			var hxToLoad:String = Paths.modFolders('custom_events/' + event + '.hx');
+			var hxToLoad:String = Paths.modFolders('events/' + event + '.hx');
 			if (FileSystem.exists(hxToLoad))
 			{
 				hscriptArray.push(new FunkinHScript(hxToLoad, this));
 			}
 			else
 			{
-				hxToLoad = Paths.getSharedPath('custom_events/' + event + '.hx');
+				hxToLoad = Paths.getSharedPath('events/' + event + '.hx');
 				if (FileSystem.exists(hxToLoad))
 				{
 					hscriptArray.push(new FunkinHScript(hxToLoad, this));
 				}
 			}
 			#elseif sys
-			var luaToLoad:String = Paths.getSharedPath('custom_events/' + event + '.lua');
+			var luaToLoad:String = Paths.getSharedPath('events/' + event + '.lua');
 			if (OpenFlAssets.exists(luaToLoad))
 			{
 				luaArray.push(new FunkinLua(luaToLoad));
@@ -1231,6 +1231,7 @@ class PlayState extends MusicBeatState
 		}
 
 		var video:VideoHandler = new VideoHandler();
+		video.volume = 1;
 		video.play(filepath);
 		video.onEndReached.add(function()
 		{
@@ -2198,10 +2199,6 @@ class PlayState extends MusicBeatState
 
 	override public function update(elapsed:Float)
 	{
-		/*if (FlxG.keys.justPressed.NINE)
-			{
-				iconP1.swapOldIcon();
-		}*/
 		callOnLuas('onUpdate', [elapsed]);
 		callOnHScript('update', [elapsed]);
 
@@ -3720,7 +3717,7 @@ class PlayState extends MusicBeatState
 		});
 		combo = 0;
 		//like shitty fix??
-		if (startOnTime > 0)
+		if (startOnTime == 0)
 			health -= daNote.missHealth * healthLoss;
 
 		if (instakillOnMiss)

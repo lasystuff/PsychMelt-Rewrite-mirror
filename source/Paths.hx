@@ -32,8 +32,8 @@ class Paths
 	#if MODS_ALLOWED
 	public static var ignoreModFolders:Array<String> = [
 		'characters',
-		'custom_events',
-		'custom_notetypes',
+		'events',
+		'notetypes',
 		'data',
 		'songs',
 		'music',
