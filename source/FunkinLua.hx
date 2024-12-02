@@ -9,7 +9,6 @@ import llua.Convert;
 #end
 import modchart.SubModifier;
 
-import animateatlas.AtlasFrameMaker;
 import flixel.FlxG;
 import flixel.addons.effects.FlxTrail;
 import flixel.input.keyboard.FlxKey;
@@ -2959,20 +2958,7 @@ class FunkinLua {
 
 	function loadFrames(spr:FlxSprite, image:String, spriteType:String)
 	{
-		switch(spriteType.toLowerCase().trim())
-		{
-			case "texture" | "textureatlas" | "tex":
-				spr.frames = AtlasFrameMaker.construct(image);
-
-			case "texture_noaa" | "textureatlas_noaa" | "tex_noaa":
-				spr.frames = AtlasFrameMaker.construct(image, null, true);
-
-			case "packer" | "packeratlas" | "pac":
-				spr.frames = Paths.getPackerAtlas(image);
-
-			default:
-				spr.frames = Paths.getSparrowAtlas(image);
-		}
+		spr.frames = Paths.getSparrowAtlas(image);
 	}
 
 	function setGroupStuff(leArray:Dynamic, variable:String, value:Dynamic) {
