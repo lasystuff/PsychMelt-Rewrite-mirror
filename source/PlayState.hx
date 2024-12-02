@@ -4266,7 +4266,7 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public function callOnHScript(func:String, ?args:Dynamic)
+	override public function callOnHScript(func:String, ?args:Dynamic)
 	{
 		for (script in hscriptArray)
 			script.callFunc(func, args);

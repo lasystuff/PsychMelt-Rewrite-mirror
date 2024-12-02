@@ -36,6 +36,7 @@ class Paths
 		'notetypes',
 		'data',
 		'songs',
+		'states',
 		'music',
 		'sounds',
 		'shaders',
@@ -512,6 +513,10 @@ class Paths
 	{
 		globalMods = [];
 		var path:String = 'modsList.txt';
+
+		//Make all mod globally cuz its not mod!!! it is "content"!!
+		globalMods = getModDirectories();
+		
 		if (FileSystem.exists(path))
 		{
 			var list:Array<String> = CoolUtil.coolTextFile(path);
@@ -521,9 +526,6 @@ class Paths
 				if (dat[1] == "1")
 				{
 					var folder = dat[0];
-
-					//Make all mod globally cuz its not mod!!! it is "content"!!
-					globalMods.push(dat[0]);
 					//var path = Paths.mods(folder + '/pack.json');
 					/*if (FileSystem.exists(path))
 					{

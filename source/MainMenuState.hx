@@ -32,7 +32,7 @@ class MainMenuState extends MusicBeatState
 	private var camGame:FlxCamera;
 	private var camAchievement:FlxCamera;
 	
-	var optionShit:Array<String> = [
+	public static var optionShit:Array<String> = [
 		'story_mode',
 		'freeplay',
 		#if ACHIEVEMENTS_ALLOWED 'awards', #end
@@ -52,6 +52,8 @@ class MainMenuState extends MusicBeatState
 		Paths.pushGlobalMods();
 		#end
 		WeekData.loadTheFirstEnabledMod();
+
+		super.create();
 
 		#if desktop
 		// Updating Discord Rich Presence
@@ -157,7 +159,7 @@ class MainMenuState extends MusicBeatState
 		}
 		#end
 
-		super.create();
+		callOnHScript("createPost");
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -233,6 +235,7 @@ class MainMenuState extends MusicBeatState
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
 								var daChoice:String = optionShit[curSelected];
+								callOnHScript("menuSelected", [daChoice]);
 
 								switch (daChoice)
 								{

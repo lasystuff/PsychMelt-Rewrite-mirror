@@ -17,6 +17,11 @@ import flixel.FlxBasic;
 
 class MusicBeatState extends FlxUIState
 {
+	static var script:FunkinHScript;
+	
+	//states that don't allow scripting by hscripts!
+	static final excludeStates = ["LoadingState", "PlayState"];
+
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
 
@@ -35,6 +40,13 @@ class MusicBeatState extends FlxUIState
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 
+		//State Script!
+		final statePath = Type.getClassName(Type.getClass(this)).split(".");
+		final stateString = statePath[statePath.length - 1];
+
+		if (sys.FileSystem.exists(Paths.modFolders('states/$stateString.hx')) && !excludeStates.contains(stateString))
+			script = new FunkinHScript(Paths.modFolders('states/$stateString.hx'), this);
+
 		super.create();
 
 		if(!skip) {
@@ -45,7 +57,7 @@ class MusicBeatState extends FlxUIState
 
 	override function update(elapsed:Float)
 	{
-		//everyStep();
+		callOnHScript("update");
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -68,6 +80,7 @@ class MusicBeatState extends FlxUIState
 		if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen;
 
 		super.update(elapsed);
+		callOnHScript("updatePost");
 	}
 
 	private function updateSection():Void
@@ -141,17 +154,25 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
+		callOnHScript("stepHit");
 		if (curStep % 4 == 0)
 			beatHit();
 	}
 
+	function callOnHScript(func:String, ?args:Dynamic)
+	{
+		if (script != null)
+			script.callFunc(func, args);
+	}
+
 	public function beatHit():Void
 	{
+		callOnHScript("beatHit");
 	}
 
 	public function sectionHit():Void
 	{
-		//trace('Section: ' + curSection + ', Beat: ' + curBeat + ', Step: ' + curStep);
+		callOnHScript("sectionHit");
 	}
 
 	function getBeatsOnSection()
@@ -162,10 +183,22 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static function switchState(nextState:FlxState) {
+		//final nextStatePath = Type.getClassName(Type.getClass(nextState)).split(".");
+		//final nextStateString = nextStatePath[nextStatePath.length - 1];
+
+		//if (sys.FileSystem.exists(Paths.modFolders('states/override/$nextStateString.hx')))
+		//	nextState = new HScriptState(nextStateString);
+
 		FlxG.switchState(nextState);
 	}
 
 	public static function resetState() {
 		FlxG.switchState(FlxG.state);
+	}
+
+	override public function destroy() {
+		callOnHScript("destroy");
+		script = null;
+		super.destroy();
 	}
 }

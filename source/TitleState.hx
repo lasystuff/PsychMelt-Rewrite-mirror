@@ -125,8 +125,9 @@ class TitleState extends MusicBeatState
 
 		// DEBUG BULLSHIT
 
-		swagShader = new ColorSwap();
 		super.create();
+
+		swagShader = new ColorSwap();
 
 		FlxG.save.bind('funkin', 'ninjamuffin99');
 
@@ -384,6 +385,8 @@ class TitleState extends MusicBeatState
 			skipIntro();
 		else
 			initialized = true;
+
+		callFunc("createPost");
 
 		// credGroup.add(credTextShit);
 	}

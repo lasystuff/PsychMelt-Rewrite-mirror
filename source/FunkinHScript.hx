@@ -57,7 +57,8 @@ class FunkinHScript extends Interp
     private function setVariables(){
         importClass("Paths");
         importClass("Character");
-        importClass("Utils");
+        importClass("CoolUtil");
+        importClass("MusicBeatState");
         importClass("Conductor");
         importClass("PlayState");
         importClass("Math");
