@@ -386,7 +386,7 @@ class TitleState extends MusicBeatState
 		else
 			initialized = true;
 
-		callFunc("createPost");
+		callOnHScript("createPost");
 
 		// credGroup.add(credTextShit);
 	}
