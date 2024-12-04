@@ -17,10 +17,10 @@ import flixel.FlxBasic;
 
 class MusicBeatState extends FlxUIState
 {
-	static var script:FunkinHScript;
+	public static var script:FunkinHScript;
 	
 	//states that don't allow scripting by hscripts!
-	static final excludeStates = ["LoadingState", "PlayState"];
+	static final excludeStates = ["LoadingState", "PlayState", "HScriptState"];
 
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -57,7 +57,7 @@ class MusicBeatState extends FlxUIState
 
 	override function update(elapsed:Float)
 	{
-		callOnHScript("update");
+		callOnHScript("update", [elapsed]);
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -80,7 +80,7 @@ class MusicBeatState extends FlxUIState
 		if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen;
 
 		super.update(elapsed);
-		callOnHScript("updatePost");
+		callOnHScript("updatePost", [elapsed]);
 	}
 
 	private function updateSection():Void
@@ -182,14 +182,21 @@ class MusicBeatState extends FlxUIState
 		return val == null ? 4 : val;
 	}
 
-	public static function switchState(nextState:FlxState) {
-		//final nextStatePath = Type.getClassName(Type.getClass(nextState)).split(".");
-		//final nextStateString = nextStatePath[nextStatePath.length - 1];
+	public static function switchState(nextState:FlxState, ?noOverride:Bool = false) {
+		
+		final statePath = Type.getClassName(Type.getClass(nextState)).split(".");
+		final stateString = statePath[statePath.length - 1];
 
-		//if (sys.FileSystem.exists(Paths.modFolders('states/override/$nextStateString.hx')))
-		//	nextState = new HScriptState(nextStateString);
+		if (sys.FileSystem.exists(Paths.modFolders('states/override/$stateString.hx')) && !excludeStates.contains(stateString))
+			nextState = new HScriptState('override/$stateString');
 
 		FlxG.switchState(nextState);
+	}
+
+	public static function switchCustomState(nextState:String)
+	{
+		if (sys.FileSystem.exists(Paths.modFolders('states/$nextState.hx')) && !excludeStates.contains(nextState))
+			FlxG.switchState(new HScriptState(nextState));
 	}
 
 	public static function resetState() {

@@ -4,37 +4,39 @@ import flixel.FlxG;
 
 class HScriptState extends MusicBeatState
 {
-	public var script:FunkinHScript;
+	public static var script:FunkinHScript;
 
 	override public function new(state:String)
 	{
 		super();
-		script = new FunkinHScript(Paths.modFolders('states/override/' + state + '.hx'), this);
+		script = new FunkinHScript(Paths.modFolders('states/$state.hx'), this);
 	}
 
 	override public function create()
 	{
 		super.create();
-		script.callFunc("createPost");
+		callOnHScript("createPost");
 	}
 
 	override public function update(elapsed:Float)
 	{
-		script.callFunc("update", [elapsed]);
-		
-		if (controls.BACK)
-		{
-			FlxG.sound.play(Paths.sound('cancelMenu'));
-			FlxG.switchState(new StoryMenuState());
-		}
+		callOnHScript("update", [elapsed]);
 
 		super.update(elapsed);
-		script.callFunc("updatePost", [elapsed]);
+
+		callOnHScript("updatePost", [elapsed]);
 	}
 
 	override public function beatHit()
 	{
 		super.beatHit();
-		script.callFunc("beatHit");
+		callOnHScript("beatHit");
+	}
+
+
+	override public function callOnHScript(func:String, ?args:Dynamic)
+	{
+		if (script != null)
+			script.callFunc(func, args);
 	}
 }

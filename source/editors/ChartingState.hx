@@ -1495,6 +1495,10 @@ class ChartingState extends MusicBeatState
 			vocals.loadEmbedded(Paths.voices(currentSongName));
 	
 		var oppVocals = Paths.voices(currentSongName, "-" + _song.player2);
+
+		if(Paths.voices(currentSongName, "-" + _song.player2 + "-" + _song.player1) != null)
+			oppVocals = Paths.voices(currentSongName, "-" + _song.player2 + "-" + _song.player1);
+
 		if(oppVocals != null)
 			opponentVocals.loadEmbedded(oppVocals);
 		

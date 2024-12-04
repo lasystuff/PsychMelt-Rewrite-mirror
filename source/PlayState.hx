@@ -1774,6 +1774,10 @@ class PlayState extends MusicBeatState
 				vocals.loadEmbedded(Paths.voices(PlayState.SONG.song));
 		
 			var oppVocals = Paths.voices(PlayState.SONG.song, "-" + dad.curCharacter);
+			//so stupid
+			if(Paths.voices(PlayState.SONG.song, "-" + dad.curCharacter + "-" + boyfriend.curCharacter) != null)
+				oppVocals = Paths.voices(PlayState.SONG.song, "-" + dad.curCharacter + "-" + boyfriend.curCharacter);
+
 			if(oppVocals != null)
 				opponentVocals.loadEmbedded(oppVocals);
 
