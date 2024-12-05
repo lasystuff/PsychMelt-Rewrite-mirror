@@ -115,6 +115,7 @@
 	<haxelib name="hscript-improved"/>
 	<define name="hscriptPos"/>
 	<haxelib name="compiletime"/>
+	<haxelib name="flxanimate"/>
 
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->

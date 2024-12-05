@@ -81,6 +81,12 @@
 		"name": "compiletime",
 		"type": "haxelib",
 		"version": null
+	  },
+	  {
+		"name": "flxanimate",
+		"type": "git",
+		"url": "https://github.com/ShadowMario/flxanimate",
+		"ref": "dev"
 	  }
 	]
   }
