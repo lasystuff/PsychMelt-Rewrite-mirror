@@ -102,20 +102,18 @@ class Main extends Sprite
 		FlxG.mouse.visible = false;
 		#end
 
-		var compTime = CompileTime.buildDateString();
-		var time = Date.now().toString();
-		var usrName = #if windows Sys.environment()["USERNAME"]; #elseif (linux || macos) Sys.environment()["USER"]; #end
+		final usrName = #if windows Sys.environment()["USERNAME"]; #elseif (linux || macos) Sys.environment()["USER"]; #end
 
 		var compilationInformation = new TextField();
 		compilationInformation.y = (FlxG.height / 4) * 3;
 		compilationInformation.defaultTextFormat = new TextFormat("_sans", 24, FlxColor.fromRGB(255, 125, 125));
-		compilationInformation.text = 'Build Compilation Date: ${compTime}\nBuild open date: ${time}\nBuild Compiled by: Soushimiya\nYou are: ${usrName}! Dont Leak!!';
+		compilationInformation.text = 'Build Compilation Date: ${CompileTime.buildDateString()}\nBuild open date: ${Date.now().toString()}\nYou are: ${usrName}!! Dont Leak Pls!!';
 		compilationInformation.multiline = true;
 		compilationInformation.selectable = false;
 		compilationInformation.autoSize = LEFT;
 		compilationInformation.mouseEnabled = false;
 		compilationInformation.alpha = 0.675;
-		//Comment out this if you don't want to leaking your mod!!!
+		//Comment out this if you don't want to leaking your(or your mod team's user) name!!!
 		addChild(compilationInformation);
 		
 		#if CRASH_HANDLER
