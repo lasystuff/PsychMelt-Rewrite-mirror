@@ -431,6 +431,16 @@ class Paths
 		return currentTrackedSounds.get(gottenPath);
 	}
 
+	inline static public function getFolderNeeds(key:String)
+	{
+		var file:String = Paths.modFolders(key);
+		if(!FileSystem.exists(file)) {
+			file = Paths.getSharedPath(key);
+		}
+
+		return file;
+	}
+
 	#if MODS_ALLOWED
 	inline static public function mods(key:String = '')
 	{

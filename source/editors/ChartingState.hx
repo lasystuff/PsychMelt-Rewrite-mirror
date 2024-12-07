@@ -243,7 +243,7 @@ class ChartingState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
+		DiscordClient.changePresence("Chart Editor", CoolUtil.capitalize(StringTools.replace(_song.song, '-', ' ')));
 		#end
 
 		vortex = FlxG.save.data.chart_vortex;
@@ -2004,7 +2004,7 @@ class ChartingState extends MusicBeatState
 
 			// ARROW VORTEX SHIT NO DEADASS
 
-			if (FlxG.keys.pressed.W || FlxG.keys.pressed.S)
+			if ((FlxG.keys.pressed.W || FlxG.keys.pressed.S) && !FlxG.keys.pressed.WINDOWS)
 			{
 				FlxG.sound.music.pause();
 
@@ -2249,6 +2249,24 @@ class ChartingState extends MusicBeatState
 		FlxG.sound.music.pitch = playbackSpeed;
 		vocals.pitch = playbackSpeed;
 		opponentVocals.pitch = playbackSpeed;
+
+		//shortcut shit!!
+		if (FlxG.keys.pressed.WINDOWS && FlxG.keys.justPressed.S)
+		{
+			//Save shortcut
+			FlxG.sound.play(Paths.sound("clickText"));
+
+			var json = {
+				"song": _song
+			};
+	
+			final data:String = Json.stringify(json, "\t");
+	
+			if ((data != null) && (data.length > 0))
+			{
+				File.saveContent(Paths.getFolderNeeds('data/${Paths.formatToSongPath(_song.song)}/${Paths.formatToSongPath(_song.song)}-${CoolUtil.difficulties[PlayState.storyDifficulty]}.json'), data.trim());
+			}
+		}
 
 		bpmTxt.text = calculateTime(FlxMath.roundDecimal(FlxG.sound.music.time, 2)) + " / " + calculateTime(FlxG.sound.music.length)
 			+ "\nSection: "
@@ -3348,7 +3366,7 @@ class ChartingState extends MusicBeatState
 		{
 			PlayState.SONG = Song.loadFromJson(song.toLowerCase(), song.toLowerCase());
 		}
-		MusicBeatState.resetState();
+		MusicBeatState.switchState(new ChartingState());
 	}
 
 	function autosaveSong():Void
