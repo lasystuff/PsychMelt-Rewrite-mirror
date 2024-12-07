@@ -9,6 +9,7 @@ using StringTools;
 
 class FunkinHScript extends Interp
 {
+
     override public function new(path:String, ?parentInstance:Dynamic){
         super();
         setVariables();
@@ -69,6 +70,10 @@ class FunkinHScript extends Interp
         variables.set('add', flixel.FlxG.state.add);
 		variables.set('insert', flixel.FlxG.state.insert);
 		variables.set('remove', flixel.FlxG.state.remove);
+
+        //aw... i remember i was an lua "coder"
+        variables.set('Function_Stop', FunkinLua.Function_Stop);
+		variables.set('Function_Continue', FunkinLua.Function_Continue);
     }
 
     public function stop(){

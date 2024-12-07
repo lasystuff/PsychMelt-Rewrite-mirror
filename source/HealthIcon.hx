@@ -40,7 +40,7 @@ class HealthIcon extends FlxSprite
 			loadGraphic(file); //Load stupidly first for getting the file size
 
 			//idk this is so stupid sorry
-			if (width == 450) {
+			if (width >= 450) {
 				loadGraphic(file, true, Math.floor(width / 3), Math.floor(height));
 				iconOffsets[0] = (width - 150) / 3;
 				iconOffsets[1] = (width - 150) / 3;

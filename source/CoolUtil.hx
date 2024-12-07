@@ -137,4 +137,15 @@ class CoolUtil
 		FlxG.openURL(site);
 		#end
 	}
+
+	inline public static function capitalize(stringTo:String):String 
+	{
+		var strArray:Array<String> = stringTo.split(' ');
+		var newArray:Array<String> = [];
+		
+		for (str in 0...strArray.length)
+		   newArray.push(strArray[str].charAt(0).toUpperCase() + strArray[str].substr(1));
+
+		return newArray.join(' ');
+	}
 }

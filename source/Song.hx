@@ -141,4 +141,14 @@ class Song
 		swagShit.validScore = true;
 		return swagShit;
 	}
+
+	public static function getSongMetadata(songName:String):Dynamic
+	{
+		var metadata:Dynamic = null;
+		var moddyFile:String = Paths.modsJson('${Paths.formatToSongPath(songName)}/metadata');
+		if(FileSystem.exists(moddyFile)) {
+			metadata = haxe.Json.parse(sys.io.File.getContent(moddyFile));
+		}
+		return metadata;
+	}
 }

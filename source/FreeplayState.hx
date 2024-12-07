@@ -87,26 +87,23 @@ class FreeplayState extends MusicBeatState
 			WeekData.setDirectoryFromWeek(leWeek);
 			for (song in leWeek.songs)
 			{
+				var metadata = Song.getSongMetadata(song[0]);
+				trace(song[0]);
+				//i have no idea why it not working...
+				var displayName = StringTools.replace(song[0], "-", " ");
+
+				if (metadata != null)
+					displayName = metadata.displayName;
+
 				var colors:Array<Int> = song[2];
 				if (colors == null || colors.length < 3)
 				{
 					colors = [146, 113, 253];
 				}
-				addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]));
+				addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]), displayName);
 			}
 		}
 		WeekData.loadTheFirstEnabledMod();
-
-		/*//KIND OF BROKEN NOW AND ALSO PRETTY USELESS//
-
-			var initSonglist = CoolUtil.coolTextFile(Paths.txt('freeplaySonglist'));
-			for (i in 0...initSonglist.length)
-			{
-				if(initSonglist[i] != null && initSonglist[i].length > 0) {
-					var songArray:Array<String> = initSonglist[i].split(":");
-					addSong(songArray[0], 0, songArray[1], Std.parseInt(songArray[2]));
-				}
-		}*/
 
 		bg = new FlxSprite(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
@@ -118,7 +115,7 @@ class FreeplayState extends MusicBeatState
 
 		for (i in 0...songs.length)
 		{
-			var songText:Alphabet = new Alphabet(90, 320, songs[i].songName, true);
+			var songText:Alphabet = new Alphabet(90, 320, songs[i].displayName, true);
 			songText.isMenuItem = true;
 			songText.targetY = i - curSelected;
 			grpSongs.add(songText);
@@ -216,9 +213,9 @@ class FreeplayState extends MusicBeatState
 		super.closeSubState();
 	}
 
-	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int)
+	public function addSong(songName:String, weekNum:Int, songCharacter:String, color:Int, ?displayName:String)
 	{
-		songs.push(new SongMetadata(songName, weekNum, songCharacter, color));
+		songs.push(new SongMetadata(songName, weekNum, songCharacter, color, displayName));
 	}
 
 	function weekIsLocked(name:String):Bool
@@ -228,22 +225,7 @@ class FreeplayState extends MusicBeatState
 			&& leWeek.weekBefore.length > 0
 			&& (!StoryMenuState.weekCompleted.exists(leWeek.weekBefore) || !StoryMenuState.weekCompleted.get(leWeek.weekBefore)));
 	}
-
-	/*public function addWeek(songs:Array<String>, weekNum:Int, weekColor:Int, ?songCharacters:Array<String>)
-		{
-			if (songCharacters == null)
-				songCharacters = ['bf'];
-
-			var num:Int = 0;
-			for (song in songs)
-			{
-				addSong(song, weekNum, songCharacters[num]);
-				this.songs[this.songs.length-1].color = weekColor;
-
-				if (songCharacters.length != 1)
-					num++;
-			}
-	}*/
+	
 	var instPlaying:Int = -1;
 
 	public static var vocals:FlxSound = null;
@@ -563,8 +545,9 @@ class SongMetadata
 	public var songCharacter:String = "";
 	public var color:Int = -7179779;
 	public var folder:String = "";
+	public var displayName:String = "";
 
-	public function new(song:String, week:Int, songCharacter:String, color:Int)
+	public function new(song:String, week:Int, songCharacter:String, color:Int, displayName:String)
 	{
 		this.songName = song;
 		this.week = week;
@@ -573,5 +556,7 @@ class SongMetadata
 		this.folder = Paths.currentModDirectory;
 		if (this.folder == null)
 			this.folder = '';
+
+		this.displayName = displayName;
 	}
 }

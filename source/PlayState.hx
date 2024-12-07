@@ -1424,7 +1424,6 @@ class PlayState extends MusicBeatState
 
 	public function startCountdown():Void
 	{
-		callOnHScript("startCountdown");
 		final introAlts:Array<String> = switch(isPixelStage)
 		{
 			case false: ["ready", "set" ,"go"];
@@ -1436,12 +1435,15 @@ class PlayState extends MusicBeatState
 		if (startedCountdown)
 		{
 			callOnLuas('onStartCountdown', []);
+			callOnHScript("startCountdown");
 			return;
 		}
 
 		inCutscene = false;
 		var ret:Dynamic = callOnLuas('onStartCountdown', [], false);
-		if (ret != FunkinLua.Function_Stop)
+		var ret2:Dynamic = callOnHScript("startCountdown");
+		
+		if (ret != FunkinLua.Function_Stop && ret2 != FunkinLua.Function_Stop)
 		{
 			if (skipCountdown)
 				skipArrowStartTween = true;
@@ -2356,10 +2358,7 @@ class PlayState extends MusicBeatState
 
 		// RESET = Quick Game Over Screen
 		if (!ClientPrefs.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)
-		{
 			health = 0;
-			trace("RESET = True");
-		}
 
 		modManager.updateTimeline(curDecStep);
 		modManager.update(elapsed);
@@ -3168,7 +3167,6 @@ class PlayState extends MusicBeatState
 				{
 					var difficulty:String = CoolUtil.getDifficultyFilePath();
 
-					trace('LOADING NEXT SONG');
 					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
 
 					FlxTransitionableState.skipNextTransIn = true;
@@ -3183,7 +3181,6 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				trace('WENT BACK TO FREEPLAY??');
 				WeekData.loadTheFirstEnabledMod();
 				cancelMusicFadeTween();
 				if (FlxTransitionableState.skipNextTransIn)
@@ -4270,10 +4267,14 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	override public function callOnHScript(func:String, ?args:Dynamic)
+	override public function callOnHScript(func:String, ?args:Dynamic):Dynamic
 	{
+		var returnThing:Dynamic = FunkinLua.Function_Continue;
 		for (script in hscriptArray)
-			script.callFunc(func, args);
+		{
+			returnThing = script.callFunc(func, args);
+		}
+		return returnThing;
 	}
 
 	function StrumPlayAnim(isDad:Bool, id:Int, time:Float)

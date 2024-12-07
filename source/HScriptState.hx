@@ -41,9 +41,11 @@ class HScriptState extends MusicBeatState
 	}
 
 
-	override public function callOnHScript(func:String, ?args:Dynamic)
+	override public function callOnHScript(func:String, ?args:Dynamic):Dynamic
 	{
 		if (script != null)
 			script.callFunc(func, args);
+
+		return null;
 	}
 }

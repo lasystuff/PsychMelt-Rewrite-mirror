@@ -159,10 +159,12 @@ class MusicBeatState extends FlxUIState
 			beatHit();
 	}
 
-	function callOnHScript(func:String, ?args:Dynamic)
+	function callOnHScript(func:String, ?args:Dynamic):Dynamic
 	{
 		if (script != null)
-			script.callFunc(func, args);
+			return script.callFunc(func, args);
+		
+		return null;
 	}
 
 	public function beatHit():Void

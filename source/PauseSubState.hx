@@ -80,7 +80,15 @@ class PauseSubState extends MusicBeatSubstate
 		add(bg);
 
 		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
-		levelInfo.text += PlayState.SONG.song;
+
+		var metadata = Song.getSongMetadata(PlayState.SONG.song);
+
+		if (metadata != null)
+			levelInfo.text = metadata.displayName;
+		else
+			//idk but it looks so cool right bro
+			levelInfo.text = CoolUtil.capitalize(StringTools.replace(PlayState.SONG.song, "-", " "));
+
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);
 		levelInfo.updateHitbox();
