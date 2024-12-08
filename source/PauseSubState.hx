@@ -87,7 +87,7 @@ class PauseSubState extends MusicBeatSubstate
 			levelInfo.text = metadata.displayName;
 		else
 			//idk but it looks so cool right bro
-			levelInfo.text = CoolUtil.capitalize(StringTools.replace(PlayState.SONG.song, "-", " "));
+			levelInfo.text = flixel.util.FlxStringUtil.toTitleCase(StringTools.replace(PlayState.SONG.song, "-", " "));
 
 		levelInfo.scrollFactor.set();
 		levelInfo.setFormat(Paths.font("vcr.ttf"), 32);

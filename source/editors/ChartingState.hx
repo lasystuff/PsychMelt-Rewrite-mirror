@@ -46,6 +46,7 @@ import openfl.media.Sound;
 import openfl.net.FileReference;
 import openfl.utils.Assets as OpenFlAssets;
 import openfl.utils.ByteArray;
+import flixel.util.FlxStringUtil;
 
 using StringTools;
 
@@ -210,6 +211,8 @@ class ChartingState extends MusicBeatState
 
 	public var mouseQuant:Bool = false;
 
+	static var originalWindowName:String = "";
+
 	override function create()
 	{
 		if (PlayState.SONG != null)
@@ -243,7 +246,7 @@ class ChartingState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Chart Editor", CoolUtil.capitalize(StringTools.replace(_song.song, '-', ' ')));
+		DiscordClient.changePresence("Chart Editor", StringTools.replace(_song.song, '-', ' '));
 		#end
 
 		vortex = FlxG.save.data.chart_vortex;
@@ -454,7 +457,7 @@ class ChartingState extends MusicBeatState
 		var loadAutosaveBtn:FlxButton = new FlxButton(reloadSongJson.x, reloadSongJson.y + 30, 'Load Autosave', function()
 		{
 			PlayState.SONG = Song.parseJSONshit(FlxG.save.data.autosave);
-			MusicBeatState.resetState();
+			MusicBeatState.switchState(new ChartingState());
 		});
 
 		var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events', function()
@@ -2004,7 +2007,7 @@ class ChartingState extends MusicBeatState
 
 			// ARROW VORTEX SHIT NO DEADASS
 
-			if ((FlxG.keys.pressed.W || FlxG.keys.pressed.S) && !FlxG.keys.pressed.WINDOWS)
+			if ((FlxG.keys.pressed.W || FlxG.keys.pressed.S) &&#if mac !FlxG.keys.pressed.WINDOWS#else !FlxG.keys.pressed.CONTROL#end)
 			{
 				FlxG.sound.music.pause();
 
@@ -2251,7 +2254,7 @@ class ChartingState extends MusicBeatState
 		opponentVocals.pitch = playbackSpeed;
 
 		//shortcut shit!!
-		if (FlxG.keys.pressed.WINDOWS && FlxG.keys.justPressed.S)
+		if (FlxG.keys.justPressed.S &&#if mac FlxG.keys.pressed.WINDOWS#else FlxG.keys.pressed.CONTROL#end)
 		{
 			//Save shortcut
 			FlxG.sound.play(Paths.sound("clickText"));
@@ -2267,8 +2270,8 @@ class ChartingState extends MusicBeatState
 				File.saveContent(Paths.getFolderNeeds('data/${Paths.formatToSongPath(_song.song)}/${Paths.formatToSongPath(_song.song)}-${CoolUtil.difficulties[PlayState.storyDifficulty]}.json'), data.trim());
 			}
 		}
-
-		bpmTxt.text = calculateTime(FlxMath.roundDecimal(FlxG.sound.music.time, 2)) + " / " + calculateTime(FlxG.sound.music.length)
+		
+		bpmTxt.text = FlxStringUtil.formatTime(FlxG.sound.music.time / 1000, true) + " / " + FlxStringUtil.formatTime(FlxG.sound.music.length / 1000)
 			+ "\nSection: "
 			+ curSec
 			+ "\n\nBeat: "
@@ -2723,14 +2726,6 @@ class ChartingState extends MusicBeatState
 
 		updateNoteUI();
 		updateGrid();
-	}
-
-	function calculateTime(miliseconds:Float = 0):String
-	{
-		var seconds = Std.int(miliseconds / 1000);
-    	var minutes = Std.int(seconds / 60);
-    	seconds = seconds % 60;
-    	return minutes + ":" + (seconds < 10 ? "0" : "") + seconds;
 	}
 
 	function recalculateSteps(add:Float = 0):Int

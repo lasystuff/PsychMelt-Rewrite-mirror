@@ -19,7 +19,7 @@ class MusicBeatState extends FlxUIState
 {
 	public static var script:FunkinHScript;
 	
-	//states that don't allow scripting by hscripts!
+	//states that don't allow scripting/overriding by hscripts!
 	static final excludeStates = ["LoadingState", "PlayState", "HScriptState"];
 
 	private var curSection:Int = 0;
