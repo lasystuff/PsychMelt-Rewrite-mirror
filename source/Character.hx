@@ -255,26 +255,6 @@ class Character extends FlxSprite
 		if (isPlayer)
 		{
 			flipX = !flipX;
-
-			/*// Doesn't flip for BF, since his are already in the right place???
-				if (!curCharacter.startsWith('bf'))
-				{
-					// var animArray
-					if(animation.getByName('singLEFT') != null && animation.getByName('singRIGHT') != null)
-					{
-						var oldRight = animation.getByName('singRIGHT').frames;
-						animation.getByName('singRIGHT').frames = animation.getByName('singLEFT').frames;
-						animation.getByName('singLEFT').frames = oldRight;
-					}
-
-					// IF THEY HAVE MISS ANIMATIONS??
-					if (animation.getByName('singLEFTmiss') != null && animation.getByName('singRIGHTmiss') != null)
-					{
-						var oldMiss = animation.getByName('singRIGHTmiss').frames;
-						animation.getByName('singRIGHTmiss').frames = animation.getByName('singLEFTmiss').frames;
-						animation.getByName('singLEFTmiss').frames = oldMiss;
-					}
-			}*/
 		}
 	}
 
@@ -318,18 +298,15 @@ class Character extends FlxSprite
 						playAnim(animation.curAnim.name, false, false, animation.curAnim.frames.length - 3);
 			}
 
-			if (!isPlayer)
+			if (animation.curAnim.name.startsWith('sing'))
 			{
-				if (animation.curAnim.name.startsWith('sing'))
-				{
-					holdTimer += elapsed;
-				}
+				holdTimer += elapsed;
+			}
 
-				if (holdTimer >= Conductor.stepCrochet * (0.0011 / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1)) * singDuration)
-				{
-					dance();
-					holdTimer = 0;
-				}
+			if (holdTimer >= Conductor.stepCrochet * (0.0011 / (FlxG.sound.music != null ? FlxG.sound.music.pitch : 1)) * singDuration)
+			{
+				dance();
+				holdTimer = 0;
 			}
 
 			if (animation.curAnim.finished && animation.getByName(animation.curAnim.name + '-loop') != null)

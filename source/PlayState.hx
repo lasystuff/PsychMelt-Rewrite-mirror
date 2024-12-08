@@ -100,7 +100,7 @@ class PlayState extends MusicBeatState
 	private var isCameraOnForcedPos:Bool = false;
 
 	#if (haxe >= "4.0.0")
-	public var boyfriendMap:Map<String, Boyfriend> = new Map();
+	public var boyfriendMap:Map<String, Character> = new Map();
 	public var dadMap:Map<String, Character> = new Map();
 	public var gfMap:Map<String, Character> = new Map();
 	public var variables:Map<String, Dynamic> = new Map();
@@ -111,7 +111,7 @@ class PlayState extends MusicBeatState
 	public var modchartTexts:Map<String, ModchartText> = new Map<String, ModchartText>();
 	public var modchartSaves:Map<String, FlxSave> = new Map<String, FlxSave>();
 	#else
-	public var boyfriendMap:Map<String, Boyfriend> = new Map<String, Boyfriend>();
+	public var boyfriendMap:Map<String, Boyfriend> = new Map<String, Character>();
 	public var dadMap:Map<String, Character> = new Map<String, Character>();
 	public var gfMap:Map<String, Character> = new Map<String, Character>();
 	public var variables:Map<String, Dynamic> = new Map<String, Dynamic>();
@@ -156,7 +156,7 @@ class PlayState extends MusicBeatState
 
 	public var dad:Character = null;
 	public var gf:Character = null;
-	public var boyfriend:Boyfriend = null;
+	public var boyfriend:Character = null;
 
 	public var notes:FlxTypedGroup<Note>;
 	public var eventNotes:Array<EventNote> = [];
@@ -584,7 +584,7 @@ class PlayState extends MusicBeatState
 		dadGroup.add(dad);
 		startCharacterLua(dad.curCharacter);
 
-		boyfriend = new Boyfriend(0, 0, SONG.player1);
+		boyfriend = new Character(0, 0, SONG.player1, true);
 		startCharacterPos(boyfriend);
 		boyfriendGroup.add(boyfriend);
 		startCharacterLua(boyfriend.curCharacter);
@@ -1112,7 +1112,7 @@ class PlayState extends MusicBeatState
 			case 0:
 				if (!boyfriendMap.exists(newCharacter))
 				{
-					var newBoyfriend:Boyfriend = new Boyfriend(0, 0, newCharacter);
+					var newBoyfriend:Character = new Character(0, 0, newCharacter, true);
 					boyfriendMap.set(newCharacter, newBoyfriend);
 					boyfriendGroup.add(newBoyfriend);
 					startCharacterPos(newBoyfriend);
@@ -2295,14 +2295,6 @@ class PlayState extends MusicBeatState
 			if (!cpuControlled)
 			{
 				keyShit();
-			}
-			else if (boyfriend.animation.curAnim != null
-				&& boyfriend.holdTimer > Conductor.stepCrochet * (0.0011 / FlxG.sound.music.pitch) * boyfriend.singDuration
-					&& boyfriend.animation.curAnim.name.startsWith('sing')
-					&& !boyfriend.animation.curAnim.name.endsWith('miss'))
-			{
-				boyfriend.dance();
-				// boyfriend.animation.curAnim.finish();
 			}
 
 			if (startedCountdown)
@@ -3744,8 +3736,8 @@ class PlayState extends MusicBeatState
 
 			if (char != null)
 			{
-				char.playAnim(animToPlay, true);
 				char.holdTimer = 0;
+				char.playAnim(animToPlay, true);
 
 				if (!note.isSustainNote && noteRows[note.mustPress ? 0 : 1][note.row] != null && noteRows[note.mustPress ? 0 : 1][note.row].length > 1)
 				{
