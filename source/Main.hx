@@ -114,7 +114,7 @@ class Main extends Sprite
 		compilationInformation.mouseEnabled = false;
 		compilationInformation.alpha = 0.675;
 		//Comment out this if you don't want to leaking your(or your mod team's user) name!!!
-		addChild(compilationInformation);
+		//addChild(compilationInformation);
 		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);

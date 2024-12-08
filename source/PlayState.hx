@@ -983,7 +983,7 @@ class PlayState extends MusicBeatState
 			return new FlxRuntimeShader();
 
 		#if (!flash && MODS_ALLOWED && sys)
-		if (!runtimeShaders.exists(name) && !initLuaShader(name))
+		if (!runtimeShaders.exists(name) && !initCustomShader(name))
 		{
 			FlxG.log.warn('Shader $name is missing!');
 			return new FlxRuntimeShader();
@@ -997,16 +997,13 @@ class PlayState extends MusicBeatState
 		#end
 	}
 
-	public function initLuaShader(name:String, ?glslVersion:Int = 120)
+	public function initCustomShader(name:String, ?glslVersion:Int = 120):Bool
 	{
 		if (!ClientPrefs.shaders)
 			return false;
 
 		if (runtimeShaders.exists(name))
-		{
-			FlxG.log.warn('Shader $name was already initialized!');
 			return true;
-		}
 
 		var foldersToCheck:Array<String> = [Paths.mods('shaders/')];
 		if (Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
