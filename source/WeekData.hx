@@ -53,7 +53,7 @@ class WeekData
 
 	public static function createWeekFile():WeekFile
 	{
-		var weekFile:WeekFile = {
+		return {
 			songs: [
 				["Bopeebo", "dad", [146, 113, 253]],
 				["Fresh", "dad", [146, 113, 253]],
@@ -71,7 +71,6 @@ class WeekData
 			hideFreeplay: false,
 			difficulties: ''
 		};
-		return weekFile;
 	}
 
 	// HELP: Is there any way to convert a WeekFile to WeekData without having to put all variables there manually? I'm kind of a noob in haxe lmao

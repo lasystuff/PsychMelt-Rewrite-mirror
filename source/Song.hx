@@ -142,13 +142,25 @@ class Song
 		return swagShit;
 	}
 
-	public static function getSongMetadata(songName:String):Dynamic
+	public static function getSongMetadata(songName:String):SongMeta
 	{
-		var metadata:Dynamic = null;
-		var moddyFile:String = Paths.modsJson('${Paths.formatToSongPath(songName)}/metadata');
+		var metadata:SongMeta = {
+			displayName: songName,
+			artists: "???"
+		};
+
+		var moddyFile:String = Paths.json('${Paths.formatToSongPath(songName)}/metadata');
 		if(FileSystem.exists(moddyFile)) {
-			metadata = haxe.Json.parse(sys.io.File.getContent(moddyFile));
+			final shit = haxe.Json.parse(sys.io.File.getContent(moddyFile));
+
+			if (shit.displayName != null) metadata.displayName = shit.displayName;
+			if (shit.artists != null) metadata.artists = shit.artists;
 		}
 		return metadata;
 	}
+}
+
+typedef SongMeta = {
+	var displayName:String;
+	var artists:String;
 }

@@ -206,7 +206,7 @@ class StoryMenuState extends MusicBeatState
 		if (Math.abs(intendedScore - lerpScore) < 10)
 			lerpScore = intendedScore;
 
-		scoreText.text = "WEEK SCORE:" + lerpScore;
+		scoreText.text = "LEVEL SCORE:" + lerpScore;
 
 		// FlxG.watch.addQuick('font', scoreText.font);
 
