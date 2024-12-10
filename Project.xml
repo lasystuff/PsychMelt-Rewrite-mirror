@@ -117,6 +117,9 @@
 	<haxelib name="compiletime"/>
 	<haxelib name="flxanimate"/>
 
+	<compilerflag name="--macro" value="include('flixel', true, [ 'flixel.addons.editors.spine.*', 'flixel.addons.nape.*', 'flixel.system.macros.*' ])" />
+	<compilerflag name="--macro" value="include('hxcodec', true)" />
+
 	<!-- <haxelib name="markdown" /> -->
 	<!-- <haxelib name="HtmlParser" /> -->
 

@@ -2144,6 +2144,7 @@ class PlayState extends MusicBeatState
 
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
+			callOnHScript('onPause');
 			var ret:Dynamic = callOnLuas('onPause', [], false);
 			if (ret != FunkinLua.Function_Stop)
 			{

@@ -88,7 +88,6 @@ class FreeplayState extends MusicBeatState
 			for (song in leWeek.songs)
 			{
 				var metadata = Song.getSongMetadata(song[0]);
-				trace(song[0]);
 				//i have no idea why it not working...
 				var displayName = StringTools.replace(song[0], "-", " ");
 

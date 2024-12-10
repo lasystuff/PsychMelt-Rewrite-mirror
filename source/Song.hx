@@ -149,7 +149,7 @@ class Song
 			artists: "???"
 		};
 
-		var moddyFile:String = Paths.json('${Paths.formatToSongPath(songName)}/metadata');
+		var moddyFile:String = Paths.modsJson('${Paths.formatToSongPath(songName)}/metadata');
 		if(FileSystem.exists(moddyFile)) {
 			final shit = haxe.Json.parse(sys.io.File.getContent(moddyFile));
 

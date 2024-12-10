@@ -57,7 +57,7 @@ class TitleState extends MusicBeatState
 	public static var muteKeys:Array<FlxKey> = [FlxKey.ZERO];
 	public static var volumeDownKeys:Array<FlxKey> = [FlxKey.NUMPADMINUS, FlxKey.MINUS];
 	public static var volumeUpKeys:Array<FlxKey> = [FlxKey.NUMPADPLUS, FlxKey.PLUS];
-
+	
 	public static var initialized:Bool = false;
 
 	var blackScreen:FlxSprite;
@@ -87,15 +87,6 @@ class TitleState extends MusicBeatState
 
 	override public function create():Void
 	{
-		Paths.clearStoredMemory();
-		Paths.clearUnusedMemory();
-
-		#if LUA_ALLOWED
-		Paths.pushGlobalMods();
-		#end
-		// Just to load a mod on start up if ya got one. For mods that change the menu music and bg
-		WeekData.loadTheFirstEnabledMod();
-
 		// trace(path, FileSystem.exists(path));
 
 		/*#if (polymod && !html5)
@@ -113,14 +104,6 @@ class TitleState extends MusicBeatState
 			}
 			#end */
 
-		FlxG.game.focusLostFramerate = 60;
-		FlxG.sound.muteKeys = muteKeys;
-		FlxG.sound.volumeDownKeys = volumeDownKeys;
-		FlxG.sound.volumeUpKeys = volumeUpKeys;
-		FlxG.keys.preventDefaultKeys = [TAB];
-
-		PlayerSettings.init();
-
 		curWacky = FlxG.random.getObject(getIntroTextShit());
 
 		// DEBUG BULLSHIT
@@ -128,12 +111,6 @@ class TitleState extends MusicBeatState
 		super.create();
 
 		swagShader = new ColorSwap();
-
-		FlxG.save.bind('funkin', 'ninjamuffin99');
-
-		ClientPrefs.loadPrefs();
-
-		Highscore.load();
 
 		// IGNORE THIS!!!
 		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
@@ -160,21 +137,10 @@ class TitleState extends MusicBeatState
 
 		if (!initialized)
 		{
-			if (FlxG.save.data != null && FlxG.save.data.fullscreen)
-			{
-				FlxG.fullscreen = FlxG.save.data.fullscreen;
-				// trace('LOADED FULLSCREEN SETTING!!');
-			}
 			persistentUpdate = true;
 			persistentDraw = true;
 		}
 
-		if (FlxG.save.data.weekCompleted != null)
-		{
-			StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
-		}
-
-		FlxG.mouse.visible = false;
 		#if FREEPLAY
 		MusicBeatState.switchState(new FreeplayState());
 		#elseif CHARTING
@@ -188,17 +154,6 @@ class TitleState extends MusicBeatState
 		}
 		else
 		{
-			#if desktop
-			if (!DiscordClient.isInitialized)
-			{
-				DiscordClient.initialize();
-				Application.current.onExit.add(function(exitCode)
-				{
-					DiscordClient.shutdown();
-				});
-			}
-			#end
-
 			startIntro();
 		}
 		#end
