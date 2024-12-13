@@ -1525,6 +1525,25 @@ class PlayState extends MusicBeatState
 		insert(members.indexOf(dadGroup), obj);
 	}
 
+	public function clearNotesBefore(time:Float)
+	{
+		var i = notes.length - 1;
+		while (i >= 0)
+		{
+			var daNote:Note = notes.members[i];
+			if (daNote.strumTime - 350 < time)
+			{
+				daNote.active = false;
+				daNote.visible = false;
+				daNote.ignoreNote = true;
+				daNote.kill();
+				notes.remove(daNote, true);
+				daNote.destroy();
+			}
+			--i;
+		}
+	}
+
 	public function updateScore(miss:Bool = false)
 	{
 		scoreTxt.text = 'Score: '
@@ -1615,6 +1634,7 @@ class PlayState extends MusicBeatState
 		if (startOnTime > 0)
 		{
 			setSongTime(startOnTime - 500);
+			clearNotesBefore(startOnTime);
 		}
 		startOnTime = 0;
 
