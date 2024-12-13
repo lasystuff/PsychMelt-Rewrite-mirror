@@ -2108,7 +2108,6 @@ class PlayState extends MusicBeatState
 	override public function update(elapsed:Float)
 	{
 		callOnLuas('onUpdate', [elapsed]);
-		callOnHScript('update', [elapsed]);
 
 		if (!inCutscene)
 		{
@@ -2423,7 +2422,7 @@ class PlayState extends MusicBeatState
 		setOnLuas('cameraY', camFollowPos.y);
 		setOnLuas('botPlay', cpuControlled);
 		callOnLuas('onUpdatePost', [elapsed]);
-		callOnHScript('updatePost', [elapsed]);
+		callOnHScript("updatePost", [elapsed]);
 
 		grpNoteSplashes.forEachDead(function(splash:NoteSplash) {
 			if (grpNoteSplashes.length > 1) {
@@ -3982,10 +3981,9 @@ class PlayState extends MusicBeatState
 
 		for (hscript in hscriptArray)
 		{
-			hscript.callFunc('destroy');
-			hscript.stop();
+			hscript = null;
 		}
-		luaArray = [];
+		hscriptArray = [];
 
 		if (!ClientPrefs.controllerMode)
 		{
@@ -4025,7 +4023,6 @@ class PlayState extends MusicBeatState
 		lastStepHit = curStep;
 		setOnLuas('curStep', curStep);
 		callOnLuas('onStepHit', []);
-		callOnHScript('stepHit');
 	}
 
 	var lightningStrikeBeat:Int = 0;
@@ -4080,7 +4077,6 @@ class PlayState extends MusicBeatState
 
 		setOnLuas('curBeat', curBeat); // DAWGG?????
 		callOnLuas('onBeatHit', []);
-		callOnHScript('beatHit', []);
 	}
 
 	override function sectionHit()
@@ -4114,7 +4110,6 @@ class PlayState extends MusicBeatState
 
 		setOnLuas('curSection', curSection);
 		callOnLuas('onSectionHit', []);
-		callOnHScript('sectionHit');
 	}
 
 	public function callOnLuas(event:String, args:Array<Dynamic>, ignoreStops = true, exclusions:Array<String> = null):Dynamic

@@ -15,7 +15,11 @@ class HScriptState extends MusicBeatState
 
 	override public function create()
 	{
+		Paths.clearStoredMemory();
+		Paths.clearUnusedMemory();
+		
 		super.create();
+
 		script = new FunkinHScript(Paths.modFolders('states/$state.hx'), this);
 		
 		callOnHScript("createPost");
@@ -26,18 +30,13 @@ class HScriptState extends MusicBeatState
 		if (controls.RESET)
 			FlxG.switchState(new HScriptState(state));
 
-		callOnHScript("update", [elapsed]);
-
 		super.update(elapsed);
-		//HOT RELOADING SHIT
-
-		callOnHScript("updatePost", [elapsed]);
 	}
 
-	override public function beatHit()
+	override public function destroy()
 	{
-		super.beatHit();
-		callOnHScript("beatHit");
+		script = null;
+		super.destroy();
 	}
 
 

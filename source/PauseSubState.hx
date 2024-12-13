@@ -81,7 +81,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		var levelInfo:FlxText = new FlxText(20, 15, 0, "", 32);
 
-		var metadata = Song.getSongMetadata(PlayState.SONG.song);
+		var metadata = Song.getSongMetadata(PlayState.SONG.song, CoolUtil.difficulties[PlayState.storyDifficulty]);
 
 		if (metadata != null)
 			levelInfo.text = metadata.displayName;

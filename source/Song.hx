@@ -142,16 +142,19 @@ class Song
 		return swagShit;
 	}
 
-	public static function getSongMetadata(songName:String):SongMeta
+	public static function getSongMetadata(songName:String, difficulty:String = "normal"):SongMeta
 	{
 		var metadata:SongMeta = {
 			displayName: songName,
 			artists: "???"
 		};
+		var thepath:String = '${Paths.formatToSongPath(songName)}/metadata';
 
-		var moddyFile:String = Paths.modsJson('${Paths.formatToSongPath(songName)}/metadata');
-		if(FileSystem.exists(moddyFile)) {
-			final shit = haxe.Json.parse(sys.io.File.getContent(moddyFile));
+		if (difficulty.toLowerCase() != "normal" && FileSystem.exists(Paths.modsJson(thepath + "-" + difficulty.toLowerCase())))
+			thepath += "-" + difficulty.toLowerCase();
+
+		if(FileSystem.exists(Paths.modsJson(thepath))) {
+			final shit = haxe.Json.parse(sys.io.File.getContent(Paths.modsJson(thepath)));
 
 			if (shit.displayName != null) metadata.displayName = shit.displayName;
 			if (shit.artists != null) metadata.artists = shit.artists;
