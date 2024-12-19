@@ -5,6 +5,7 @@ import flixel.FlxG;
 class HScriptState extends MusicBeatState
 {
 	public var state:String = "";
+	public static var staticVar:Map<String, Map<Dynamic, Dynamic>> = [];
 	public static var script:FunkinHScript;
 
 	override public function new(state:String)
@@ -21,6 +22,7 @@ class HScriptState extends MusicBeatState
 		super.create();
 
 		script = new FunkinHScript(Paths.modFolders('states/$state.hx'), this);
+		script.variables.set("global", staticVar[state]);
 		
 		callOnHScript("createPost");
 	}

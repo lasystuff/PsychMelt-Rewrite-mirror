@@ -257,7 +257,7 @@ class CreditsState extends MusicBeatState
 		descBox.sprTracker = descText;
 		add(descText);
 
-		bg.color = getCurrentBGColor();
+		bg.color = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		intendedColor = bg.color;
 		changeSelection();
 		super.create();
@@ -359,7 +359,7 @@ class CreditsState extends MusicBeatState
 		}
 		while (unselectableCheck(curSelected));
 
-		var newColor:Int = getCurrentBGColor();
+		var newColor:Int = CoolUtil.colorFromString(creditsStuff[curSelected][4]);
 		if (newColor != intendedColor)
 		{
 			if (colorTween != null)

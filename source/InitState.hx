@@ -37,7 +37,7 @@ class InitState extends FlxState
 
 		PlayerSettings.init();
 
-		FlxG.save.bind('funkin', 'ninjamuffin99');
+		FlxG.save.bind('PsychMelt', 'ShadowMario');
 
 		ClientPrefs.loadPrefs();
 
