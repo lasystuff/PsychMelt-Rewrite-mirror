@@ -1157,7 +1157,7 @@ class CharacterEditorState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!sys.FileSystem.isDirectory(path) && file.endsWith('.json'))

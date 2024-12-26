@@ -526,7 +526,7 @@ class ChartingState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -600,7 +600,7 @@ class ChartingState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
@@ -1005,7 +1005,7 @@ class ChartingState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file.endsWith('.lua'))
@@ -1086,7 +1086,7 @@ class ChartingState extends MusicBeatState
 			var directory:String = directories[i];
 			if (FileSystem.exists(directory))
 			{
-				for (file in FileSystem.readDirectory(directory))
+				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
 					if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith('.txt'))
