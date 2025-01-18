@@ -13,6 +13,7 @@ import lime.utils.AssetLibrary;
 import lime.utils.AssetManifest;
 import melt.data.StageData;
 import haxe.io.Path;
+import melt.gameplay.PlayState;
 
 class LoadingState extends MusicBeatState
 {

@@ -1,4 +1,4 @@
-package melt;
+package melt.gameplay.notes;
 
 import flixel.FlxG;
 import flixel.FlxSprite;

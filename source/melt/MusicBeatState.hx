@@ -6,6 +6,7 @@ import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
 import flixel.FlxCamera;
 import melt.scripting.*;
+import melt.gameplay.*;
 import melt.Conductor;
 
 class MusicBeatState extends FlxUIState

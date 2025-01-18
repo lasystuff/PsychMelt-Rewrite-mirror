@@ -28,6 +28,7 @@ import melt.DialogueBoxPsych;
 #if desktop
 import melt.Discord;
 #end
+import melt.gameplay.PlayState;
 
 using StringTools;
 

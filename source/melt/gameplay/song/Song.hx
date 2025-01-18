@@ -1,6 +1,6 @@
-package melt;
+package melt.gameplay.song;
 
-import melt.Section.SwagSection;
+import melt.gameplay.song.Section;
 import haxe.Json;
 import haxe.format.JsonParser;
 import lime.utils.Assets;

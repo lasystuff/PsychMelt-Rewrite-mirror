@@ -9,6 +9,7 @@ import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
+import melt.gameplay.PlayState;
 
 class GameOverSubstate extends MusicBeatSubstate
 {

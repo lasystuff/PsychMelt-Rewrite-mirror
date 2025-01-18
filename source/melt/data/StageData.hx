@@ -8,7 +8,7 @@ import openfl.utils.Assets;
 #end
 import haxe.Json;
 import haxe.format.JsonParser;
-import melt.Song.SwagSong;
+import melt.gameplay.song.Song.SwagSong;
 
 using StringTools;
 

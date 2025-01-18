@@ -1,10 +1,10 @@
 package melt.modchart.modifiers;
+
+import melt.gameplay.*;
 import flixel.math.FlxRect;
 import melt.modchart.Modifier.ModifierOrder;
 import flixel.FlxSprite;
 import flixel.FlxG;
-import ui.*;
-import modchart.*;
 import flixel.math.FlxPoint;
 import flixel.math.FlxMath;
 using StringTools;

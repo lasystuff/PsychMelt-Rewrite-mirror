@@ -1,4 +1,4 @@
-package melt;
+package melt.gameplay.notes;
 
 import melt.math.Vector3;
 import flixel.math.FlxPoint;

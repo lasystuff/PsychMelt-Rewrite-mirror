@@ -61,7 +61,7 @@ class FunkinHScript extends Interp
         importClass("melt.CoolUtil");
         importClass("melt.MusicBeatState");
         importClass("melt.Conductor");
-        importClass("melt.PlayState");
+        importClass("melt.gameplay.PlayState");
         importClass("melt.Math");
         importClass("StringTools");
         importClass("melt.BGSprite");

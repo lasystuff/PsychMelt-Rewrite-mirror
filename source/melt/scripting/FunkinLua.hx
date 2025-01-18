@@ -34,6 +34,9 @@ import flixel.util.FlxSave;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.system.FlxAssets.FlxShader;
 import melt.data.WeekData;
+import melt.gameplay.*;
+import melt.gameplay.song.*;
+import melt.gameplay.notes.*;
 
 #if (!flash && sys)
 import flixel.addons.display.FlxRuntimeShader;

@@ -7,8 +7,8 @@ import flash.geom.Rectangle;
 import haxe.Json;
 import haxe.io.Bytes;
 import melt.Conductor.BPMChangeEvent;
-import melt.Section.SwagSection;
-import melt.Song.SwagSong;
+import melt.gameplay.song.Section.SwagSection;
+import melt.gameplay.song.Song.SwagSong;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -38,6 +38,10 @@ import openfl.media.Sound;
 import openfl.net.FileReference;
 import openfl.utils.Assets as OpenFlAssets;
 import flixel.util.FlxStringUtil;
+import melt.gameplay.PlayState;
+import melt.gameplay.notes.StrumNote;
+import melt.gameplay.notes.Note;
+import melt.gameplay.song.Song;
 
 using StringTools;
 

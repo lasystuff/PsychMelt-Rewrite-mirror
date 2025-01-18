@@ -1,6 +1,8 @@
 package melt;
 
-import melt.Song.SwagSong;
+import melt.gameplay.song.Song.SwagSong;
+import melt.gameplay.PlayState;
+import melt.gameplay.notes.Note;
 
 /**
  * ...

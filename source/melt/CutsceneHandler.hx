@@ -14,6 +14,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxTimer;
 import flixel.group.FlxSpriteGroup;
 import flixel.util.FlxSort;
+import melt.gameplay.PlayState;
 
 class CutsceneHandler extends FlxBasic
 {

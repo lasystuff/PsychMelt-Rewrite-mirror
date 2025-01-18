@@ -1,4 +1,4 @@
-package melt;
+package melt.gameplay;
 
 import melt.Controls.Control;
 import flixel.FlxG;
@@ -12,6 +12,7 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxStringUtil;
 import flixel.math.FlxMath;
+import melt.gameplay.song.Song;
 import melt.data.WeekData;
 
 class PauseSubState extends MusicBeatSubstate

@@ -1,7 +1,12 @@
 package melt.editors;
 
-import melt.Section.SwagSection;
-import melt.Song.SwagSong;
+import melt.scripting.*;
+import melt.gameplay.*;
+import melt.gameplay.song.*;
+import melt.gameplay.notes.*;
+
+import melt.gameplay.song.Section.SwagSection;
+import melt.gameplay.song.Song.SwagSong;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.util.FlxColor;
@@ -18,7 +23,6 @@ import flixel.util.FlxSort;
 import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
-import melt.scripting.*;
 
 using StringTools;
 

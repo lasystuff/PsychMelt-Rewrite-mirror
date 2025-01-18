@@ -1,11 +1,16 @@
-package melt;
+package melt.gameplay;
 
-import flixel.graphics.FlxGraphic;
+import melt.gameplay.notes.*;
+import melt.gameplay.notes.Note.EventNote;
+import melt.gameplay.song.*;
+import melt.gameplay.song.Song.SwagSong;
+import melt.gameplay.song.Section.SwagSection;
+
+import melt.data.PlayData;
+
 #if desktop
 import melt.Discord.DiscordClient;
 #end
-import melt.Section.SwagSection;
-import melt.Song.SwagSong;
 import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.FlxGame;
@@ -32,7 +37,6 @@ import melt.editors.ChartingState;
 import melt.editors.CharacterEditorState;
 import flixel.group.FlxSpriteGroup;
 import flixel.input.keyboard.FlxKey;
-import melt.Note.EventNote;
 import openfl.events.KeyboardEvent;
 import flixel.util.FlxSave;
 import melt.Achievements;
@@ -195,6 +199,8 @@ class PlayState extends MusicBeatState
 	public static var changedDifficulty:Bool = false;
 	public static var chartingMode:Bool = false;
 
+	public static var data:PlayData = null;
+
 	// Gameplay settings
 	public var healthGain:Float = 1;
 	public var healthLoss:Float = 1;
@@ -212,7 +218,6 @@ class PlayState extends MusicBeatState
 	public var camOther:FlxCamera;
 	public var cameraSpeed:Float = 1;
 
-	var dialogue:Array<String> = ['blah blah blah', 'coolswag'];
 	var dialogueJson:DialogueFile = null;
 
 	var heyTimer:Float;
@@ -286,6 +291,13 @@ class PlayState extends MusicBeatState
 	public static var lastCombo:FlxSprite;
 	// stores the last combo score objects in an array
 	public static var lastScore:Array<FlxSprite> = [];
+
+	public function new(?_data:PlayData)
+	{
+		if(_data != null)
+			data = _data;
+		super();
+	}
 
 	override public function create()
 	{

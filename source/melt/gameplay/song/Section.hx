@@ -1,4 +1,4 @@
-package melt;
+package melt.gameplay.song;
 
 typedef SwagSection =
 {

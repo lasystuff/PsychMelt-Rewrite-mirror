@@ -18,9 +18,11 @@ import lime.utils.Assets;
 import flixel.sound.FlxSound;
 import openfl.utils.Assets as OpenFlAssets;
 import melt.data.WeekData;
+import melt.gameplay.PlayState;
 #if MODS_ALLOWED
 import sys.FileSystem;
 #end
+import melt.gameplay.song.Song;
 
 using StringTools;
 

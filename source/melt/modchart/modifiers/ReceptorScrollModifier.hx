@@ -1,6 +1,6 @@
 package melt.modchart.modifiers;
 
-
+import melt.gameplay.*;
 import modchart.*;
 import flixel.math.FlxPoint;
 import flixel.math.FlxMath;

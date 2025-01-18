@@ -1242,7 +1242,7 @@ class CharacterEditorState extends MusicBeatState
 			{
 				if (goToPlayState)
 				{
-					MusicBeatState.switchState(new PlayState());
+					MusicBeatState.switchState(new melt.gameplay.PlayState());
 				}
 				else
 				{

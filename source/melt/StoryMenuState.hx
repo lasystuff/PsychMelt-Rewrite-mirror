@@ -18,6 +18,8 @@ import flixel.util.FlxTimer;
 import lime.net.curl.CURLCode;
 import flixel.graphics.FlxGraphic;
 import melt.data.WeekData;
+import melt.gameplay.PlayState;
+import melt.gameplay.song.Song;
 
 using StringTools;
 
