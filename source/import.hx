@@ -1,3 +1,3 @@
-import Paths;
+import melt.Paths;
 
-import FuckScorp;
+import melt.FuckScorp;
