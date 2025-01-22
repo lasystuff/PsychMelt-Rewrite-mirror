@@ -1,4 +1,4 @@
-package melt.gameplay;
+package melt.data;
 
 // Cool PlayState data stuff lol
 @:structInit class PlayData
