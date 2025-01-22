@@ -10,7 +10,7 @@ TBA
 
 ### Get Pre-Compiled Engine
 You can download latest build of this engine at Nightly.link!
-https://nightly.link/soushimiya/PsychMelt-Rewrite/workflows/main/main/windowsBuild.zip
+https://nightly.link/soushimiya/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip
 
 #### Unique features of this engine
 - Fairly advanced HScript support (more advanced than NightmareVision, lower level than Codename Engine)
