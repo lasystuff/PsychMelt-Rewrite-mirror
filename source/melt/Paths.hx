@@ -270,8 +270,8 @@ class Paths
 				localTrackedAssets.push(file);
 				return currentTrackedAssets.get(file);
 			}
-			else if (OpenFlAssets.exists(file, IMAGE))
-				bitmap = OpenFlAssets.getBitmapData(file);
+			else if (FileSystem.exists(file))
+				bitmap = BitmapData.fromFile(file);
 		}
 
 		if (bitmap != null)
@@ -291,9 +291,10 @@ class Paths
 				bitmap.image = null;
 				bitmap.readable = true;
 			}
-			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file, false);
+			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
 			newGraphic.persist = true;
 			currentTrackedAssets.set(file, newGraphic);
+			trace("cached " + file);
 			return newGraphic;
 		}
 
@@ -399,16 +400,13 @@ class Paths
 	public static function returnSound(path:Null<String>, key:String, ?library:String) {
 		#if MODS_ALLOWED
 		var modLibPath:String = '';
-		if (library != null) modLibPath = '$library/';
+		if (library != null) modLibPath = '$library';
 		if (path != null) modLibPath += '$path';
 
 		var file:String = modsSounds(modLibPath, key);
 		if(FileSystem.exists(file)) {
 			if(!currentTrackedSounds.exists(file))
-			{
 				currentTrackedSounds.set(file, Sound.fromFile(file));
-				//trace('precached mod sound: $file');
-			}
 			localTrackedAssets.push(file);
 			return currentTrackedSounds.get(file);
 		}
@@ -419,7 +417,7 @@ class Paths
 		if(path != null) gottenPath = '$path/$gottenPath';
 		gottenPath = getPath(gottenPath, SOUND, library);
 		gottenPath = gottenPath.substring(gottenPath.indexOf(':') + 1, gottenPath.length);
-		// trace(gottenPath);
+
 		if(!currentTrackedSounds.exists(gottenPath))
 		{
 			var retKey:String = (path != null) ? '$path/$key' : key;
@@ -427,7 +425,6 @@ class Paths
 			if(OpenFlAssets.exists(retKey, SOUND))
 			{
 				currentTrackedSounds.set(gottenPath, OpenFlAssets.getSound(retKey));
-				//trace('precached vanilla sound: $retKey');
 			}
 		}
 		localTrackedAssets.push(gottenPath);
