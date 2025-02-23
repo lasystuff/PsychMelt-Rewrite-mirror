@@ -248,12 +248,12 @@ class Paths
 
 	public static var currentTrackedAssets:Map<String, FlxGraphic> = [];
 
+	@:access(openfl.display.BitmapData)
 	public static function image(key:String, ?library:String)
 	{
 		var bitmap:BitmapData = null;
 		var file:String = null;
 
-		#if MODS_ALLOWED
 		file = modsImages(key);
 		if (currentTrackedAssets.exists(file))
 		{
@@ -262,9 +262,8 @@ class Paths
 		}
 		else if (FileSystem.exists(file))
 			bitmap = BitmapData.fromFile(file);
-		else
-		#end
-		{
+		else {
+			// from Assets fuck
 			file = getPath('images/$key.png', IMAGE, library);
 			if (currentTrackedAssets.exists(file))
 			{
@@ -280,16 +279,20 @@ class Paths
 			localTrackedAssets.push(file);
 			if (ClientPrefs.cacheOnGPU)
 			{
-				var texture:RectangleTexture = FlxG.stage.context3D.createRectangleTexture(bitmap.width, bitmap.height, BGRA, true);
-				texture.uploadFromBitmapData(bitmap);
-				bitmap.image.data = null;
-				bitmap.dispose();
+				bitmap.lock();
+				if (bitmap.__texture == null)
+				{
+					bitmap.image.premultiplied = true;
+					bitmap.getTexture(FlxG.stage.context3D);
+				}
+				bitmap.getSurface();
 				bitmap.disposeImage();
-				bitmap = BitmapData.fromTexture(texture);
+				bitmap.image.data = null;
+				bitmap.image = null;
+				bitmap.readable = true;
 			}
-			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
+			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file, false);
 			newGraphic.persist = true;
-			newGraphic.destroyOnNoUse = false;
 			currentTrackedAssets.set(file, newGraphic);
 			return newGraphic;
 		}
