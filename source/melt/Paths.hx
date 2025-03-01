@@ -294,7 +294,6 @@ class Paths
 			var newGraphic:FlxGraphic = FlxGraphic.fromBitmapData(bitmap, false, file);
 			newGraphic.persist = true;
 			currentTrackedAssets.set(file, newGraphic);
-			trace("cached " + file);
 			return newGraphic;
 		}
 
