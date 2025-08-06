@@ -22,7 +22,8 @@ class HScriptState extends MusicBeatState
 		super.create();
 
 		script = new FunkinHScript(Paths.modFolders('states/$state.hx'), this);
-		script.variables.set("global", staticVar[state]);
+		@:privateAccess
+		script.rule.variables.set("global", staticVar[state]);
 		
 		callOnHScript("createPost");
 	}

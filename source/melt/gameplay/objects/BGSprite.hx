@@ -1,4 +1,4 @@
-package melt;
+package melt.gameplay.objects;
 
 import flixel.FlxSprite;
 import flixel.graphics.frames.FlxAtlasFrames;

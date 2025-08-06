@@ -5,6 +5,7 @@ import melt.gameplay.notes.Note.EventNote;
 import melt.gameplay.song.*;
 import melt.gameplay.song.Song.SwagSong;
 import melt.gameplay.song.Section.SwagSection;
+import melt.gameplay.objects.*;
 
 import melt.data.PlayData;
 
@@ -140,6 +141,8 @@ class PlayState extends MusicBeatState
 
 	public var vocals:FlxSound;
 	public var opponentVocals:FlxSound;
+
+	public var stage:Stage;
 
 	public var dad:Character = null;
 	public var gf:Character = null;
@@ -481,6 +484,9 @@ class PlayState extends MusicBeatState
 			introSoundsSuffix = '-pixel';
 		}
 
+		stage = new Stage(curStage);
+		add(stage);
+
 		add(gfGroup);
 		add(dadGroup);
 		add(boyfriendGroup);
@@ -526,39 +532,6 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		// STAGE SCRIPTS
-		#if (MODS_ALLOWED && LUA_ALLOWED)
-		var doPush:Bool = false;
-		var luaFile:String = 'stages/' + curStage + '.lua';
-		var hscriptFile:String = 'stages/' + curStage + '.hx';
-		if (FileSystem.exists(Paths.modFolders(luaFile)))
-		{
-			luaFile = Paths.modFolders(luaFile);
-			luaArray.push(new FunkinLua(luaFile));
-		}
-		else
-		{
-			luaFile = Paths.getSharedPath(luaFile);
-			if (FileSystem.exists(luaFile))
-			{
-				luaArray.push(new FunkinLua(luaFile));
-			}
-		}
-		if (FileSystem.exists(Paths.modFolders(hscriptFile)))
-		{
-			hscriptFile = Paths.modFolders(hscriptFile);
-			hscriptArray.push(new FunkinHScript(hscriptFile, this));
-		}
-		else
-		{
-			hscriptFile = Paths.getSharedPath(hscriptFile);
-			if (FileSystem.exists(hscriptFile))
-			{
-				hscriptArray.push(new FunkinHScript(hscriptFile, this));
-			}
-		}
-		#end
-
 		var gfVersion:String = SONG.gfVersion;
 		if (gfVersion == null || gfVersion.length < 1)
 		{
@@ -599,6 +572,8 @@ class PlayState extends MusicBeatState
 			if (gf != null)
 				gf.visible = false;
 		}
+
+		add(stage.foreground);
 
 		var file:String = Paths.json(songName + '/dialogue'); // Checks for json/Psych Engine dialogue
 		if (OpenFlAssets.exists(file))

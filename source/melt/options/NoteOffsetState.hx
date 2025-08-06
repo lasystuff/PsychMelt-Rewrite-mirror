@@ -13,6 +13,7 @@ import flixel.FlxCamera;
 import flixel.FlxG;
 import flixel.ui.FlxBar;
 import flixel.math.FlxPoint;
+import melt.gameplay.objects.BGSprite;
 
 using StringTools;
 

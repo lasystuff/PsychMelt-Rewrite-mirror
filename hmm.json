@@ -51,11 +51,6 @@
 		"url": "https://github.com/FunkinCrew/hxCodec"
 	  },
 	  {
-		"name": "hscript",
-		"type": "haxelib",
-		"version": null
-	  },
-	  {
 		"name": "hxcpp-debug-server",
 		"type": "haxelib",
 		"version": null
@@ -73,9 +68,9 @@
 		"url": "https://github.com/superpowers04/linc_luajit"
 	  },
 	  {
-		"name": "hscript-improved",
-		"type": "git",
-		"url": "https://github.com/FNF-CNE-Devs/hscript-improved"
+		"name": "rulescript",
+		"type": "haxelib",
+		"version": null
 	  },
 	  {
 		"name": "compiletime",

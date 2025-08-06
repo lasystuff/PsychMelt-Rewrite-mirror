@@ -35,6 +35,7 @@ import melt.Character;
 #if MODS_ALLOWED
 import sys.FileSystem;
 #end
+import melt.gameplay.objects.BGSprite;
 
 using StringTools;
 
