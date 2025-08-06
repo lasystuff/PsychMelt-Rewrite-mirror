@@ -20,7 +20,7 @@ import flixel.util.FlxColor; //You can import abstracts/enums!
 
 function createPost()
 {
-    //You don't need "FlxG.state.instance"(or game or something) to change current Instance
+    //You don't need "FlxG.state"(or game or something) to change current Instance
     boyfriend.color = FlxColor.RED;
     boyfriend.alpha = 0.5;
     return Function_Stop; //also you can return "Function_" thing like doing in lua!
