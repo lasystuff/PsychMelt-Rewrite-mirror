@@ -1,0 +1,212 @@
+package melt.gameplay.hud;
+
+// basically v-slice ui
+import flixel.ui.FlxBar;
+import flixel.util.FlxColor;
+import flixel.FlxG;
+import flixel.math.FlxMath;
+import flixel.text.FlxText;
+import flixel.tweens.FlxTween;
+import flixel.util.FlxStringUtil;
+import flixel.tweens.FlxEase;
+
+class PsychHUD extends BasicHUD
+{
+	public var healthBarBG:AttachedSprite;
+	public var healthBar:FlxBar;
+	public var iconP1:HealthIcon;
+	public var iconP2:HealthIcon;
+
+	public var scoreTxt:FlxText;
+
+	var scoreTxtTween:FlxTween;
+
+	var timeTxt:FlxText;
+	private var timeBarBG:AttachedSprite;
+	public var timeBar:FlxBar;
+	var songPercent:Float = 0;
+	var songTime:Float = 0;
+
+	override public function new()
+	{
+		super();
+
+		scoreTxt = new FlxText(0, healthBarBG.y + 36, FlxG.width, "", 20);
+		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		scoreTxt.scrollFactor.set();
+		scoreTxt.borderSize = 1.25;
+		scoreTxt.visible = !ClientPrefs.hideHud;
+		add(scoreTxt);
+
+		var showTime:Bool = (ClientPrefs.timeBarType != 'Disabled');
+		timeTxt = new FlxText(42 + (FlxG.width / 2) - 248, 19, 400, "", 32);
+		timeTxt.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
+		timeTxt.scrollFactor.set();
+		timeTxt.borderSize = 2;
+		timeTxt.visible = showTime;
+		timeTxt.alpha = 0;
+		if (ClientPrefs.downScroll)
+			timeTxt.y = FlxG.height - 44;
+
+		if (ClientPrefs.timeBarType == 'Song Name')
+			timeTxt.text = PlayState.SONG.song;
+
+		timeBarBG = new AttachedSprite('timeBar');
+		timeBarBG.x = timeTxt.x;
+		timeBarBG.y = timeTxt.y + (timeTxt.height / 4);
+		timeBarBG.scrollFactor.set();
+		timeBarBG.visible = showTime;
+		timeBarBG.color = FlxColor.BLACK;
+		timeBarBG.xAdd = -4;
+		timeBarBG.yAdd = -4;
+		add(timeBarBG);
+
+		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
+			'songPercent', 0, 1);
+		timeBar.scrollFactor.set();
+		timeBar.createFilledBar(0xFF000000, 0xFFFFFFFF);
+		timeBar.numDivisions = 800; // How much lag this causes?? Should i tone it down to idk, 400 or 200?
+		timeBar.visible = showTime;
+		timeBar.alpha = 0;
+		add(timeBar);
+		add(timeTxt);
+		timeBarBG.sprTracker = timeBar;
+
+		if (ClientPrefs.timeBarType == 'Song Name')
+		{
+			timeTxt.size = 24;
+			timeTxt.y += 3;
+		}
+	}
+
+	override public function reloadHealthBar()
+	{
+		var dad = PlayState.instance.dad;
+		var boyfriend = PlayState.instance.boyfriend;
+
+		healthBar.createFilledBar(FlxColor.fromRGB(dad.healthColorArray[0], dad.healthColorArray[1], dad.healthColorArray[2]),
+			FlxColor.fromRGB(boyfriend.healthColorArray[0], boyfriend.healthColorArray[1], boyfriend.healthColorArray[2]));
+
+		healthBar.updateBar();
+	}
+
+	override public function update(elapsed:Float)
+	{
+		super.update(elapsed);
+
+		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, CoolUtil.boundTo(1 - (elapsed * 9 * PlayState.instance.playbackRate), 0, 1));
+		iconP1.scale.set(mult, mult);
+		iconP1.updateHitbox();
+
+		var mult:Float = FlxMath.lerp(1, iconP2.scale.x, CoolUtil.boundTo(1 - (elapsed * 9 * PlayState.instance.playbackRate), 0, 1));
+		iconP2.scale.set(mult, mult);
+		iconP2.updateHitbox();
+
+		var iconOffset:Int = 26;
+
+		iconP1.x = healthBar.x
+			+ (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01))
+			+ (150 * iconP1.scale.x - 150) / 2
+			- iconOffset;
+		iconP2.x = healthBar.x
+			+ (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01))
+			- (150 * iconP2.scale.x) / 2
+			- iconOffset * 2;
+
+		if (healthBar.percent < 20)
+		{
+			iconP1.animation.curAnim.curFrame = 1;
+			iconP2.animation.curAnim.curFrame = 2;
+		}
+		else if (healthBar.percent > 80)
+		{
+			iconP1.animation.curAnim.curFrame = 2;
+			iconP2.animation.curAnim.curFrame = 1;
+		}
+		else
+		{
+			iconP1.animation.curAnim.curFrame = 0;
+			iconP2.animation.curAnim.curFrame = 0;
+		}
+
+		if (!PlayState.instance.paused && !PlayState.instance.startingSong)
+		{
+			songTime += FlxG.game.ticks - FlxG.game.ticks;
+
+			// Interpolation type beat
+			if (Conductor.lastSongPos != Conductor.songPosition)
+			{
+				songTime = (songTime + Conductor.songPosition) / 2;
+				Conductor.lastSongPos = Conductor.songPosition;
+				// Conductor.songPosition += FlxG.elapsed * 1000;
+				// trace('MISSED FRAME');
+			}
+
+			if (FlxG.sound.music.playing)
+			{
+				var curTime:Float = Conductor.songPosition - ClientPrefs.noteOffset;
+				if (curTime < 0)
+					curTime = 0;
+				songPercent = (curTime / FlxG.sound.music.length);
+
+				var songCalc:Float = (FlxG.sound.music.length - curTime);
+				if (ClientPrefs.timeBarType == 'Time Elapsed')
+					songCalc = curTime;
+
+				var secondsTotal:Int = Math.floor(songCalc / 1000);
+				if (secondsTotal < 0)
+					secondsTotal = 0;
+
+				if (ClientPrefs.timeBarType != 'Song Name')
+					timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
+			}
+		}
+	}
+
+	override public function beatHit(beat:Int)
+	{
+		super.beatHit(beat);
+		
+		iconP1.scale.set(1.2, 1.2);
+		iconP2.scale.set(1.2, 1.2);
+
+		iconP1.updateHitbox();
+		iconP2.updateHitbox();
+	}
+
+	override public function updateScore(miss:Bool)
+	{
+		super.updateScore(miss);
+		
+		scoreTxt.text = 'Score: '
+			+ FlxStringUtil.formatMoney(PlayState.instance.songScore, false)
+			+ ' | Misses: '
+			+ FlxStringUtil.formatMoney(PlayState.instance.songMisses, false)
+			+ ' | Rating: '
+			+ PlayState.instance.ratingName
+			+
+			(PlayState.instance.ratingName != '?' ? ' (${Highscore.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%) - ${PlayState.instance.ratingFC}' : '');
+
+		if (ClientPrefs.scoreZoom && !miss && !PlayState.instance.cpuControlled)
+		{
+			if (scoreTxtTween != null)
+			{
+				scoreTxtTween.cancel();
+			}
+			scoreTxt.scale.x = 1.075;
+			scoreTxt.scale.y = 1.075;
+			scoreTxtTween = FlxTween.tween(scoreTxt.scale, {x: 1, y: 1}, 0.2, {
+				onComplete: function(twn:FlxTween)
+				{
+					scoreTxtTween = null;
+				}
+			});
+		}
+	}
+
+	override public function startSong()
+	{
+		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
+	}
+}
