@@ -160,7 +160,7 @@ class MainMenuState extends MusicBeatState
 		}
 		#end
 
-		callOnHScript("createPost");
+		callOnScripts("onCreatePost");
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -236,7 +236,7 @@ class MainMenuState extends MusicBeatState
 							FlxFlicker.flicker(spr, 1, 0.06, false, false, function(flick:FlxFlicker)
 							{
 								var daChoice:String = optionShit[curSelected];
-								callOnHScript("menuSelected", [daChoice]);
+								callOnScripts("onMenuSelected", [daChoice]);
 
 								switch (daChoice)
 								{

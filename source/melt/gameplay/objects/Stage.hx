@@ -24,38 +24,41 @@ class Stage extends FlxGroup
 		if (FileSystem.exists(Paths.modFolders(luaFile)))
 		{
 			luaFile = Paths.modFolders(luaFile);
-			PlayState.instance.luaArray.push(new FunkinLua(luaFile));
+			createScript(luaFile);
 		}
 		else
 		{
 			luaFile = Paths.getSharedPath(luaFile);
-			if (FileSystem.exists(luaFile))
-			{
-				PlayState.instance.luaArray.push(new FunkinLua(luaFile));
-			}
+			createScript(luaFile);
 		}
 		if (FileSystem.exists(Paths.modFolders(hscriptFile)))
 		{
 			hscriptFile = Paths.modFolders(hscriptFile);
-			var scr = new FunkinHScript(hscriptFile, PlayState.instance, true);
-			@:privateAccess
-			addVariables(scr.rule);
-			scr.callFunc("create");
-			PlayState.instance.hscriptArray.push(scr);
+			createScript(hscriptFile);
 		}
 		else
 		{
 			hscriptFile = Paths.getSharedPath(hscriptFile);
 			if (FileSystem.exists(hscriptFile))
 			{
-				var scr = new FunkinHScript(hscriptFile, PlayState.instance, true);
-				@:privateAccess
-				addVariables(scr.rule);
-				scr.callFunc("create");
-				PlayState.instance.hscriptArray.push(scr);
+				createScript(hscriptFile);
 			}
 		}
 		#end
+	}
+
+	function createScript(path)
+	{
+		if (!FileSystem.exists(path))
+			return;
+		var script = FunkinRule.fromFile(path, PlayState.instance, true);
+		if (script != null)
+		{
+			@:privateAccess
+			addVariables(script.rule);
+			PlayState.instance.scriptArray.push(script);
+			script.callFunc("onCreate");
+		}
 	}
 
 	function build()

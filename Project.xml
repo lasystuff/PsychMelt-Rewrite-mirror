@@ -89,9 +89,10 @@
 	<!--<haxelib name="polymod"/> -->
 	<haxelib name="hxdiscord_rpc" if="desktop"/>
 	<!-- <haxelib name="hxcpp-debug-server" if="desktop"/> -->
-	<haxelib name="hscript"/>
+
 	<haxelib name="rulescript"/>
-	<define name="hscriptPos"/>
+	<haxedef name="hscriptPos"/>
+
 	<haxelib name="compiletime"/>
 	<haxelib name="flxanimate"/>
 

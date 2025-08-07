@@ -9,6 +9,7 @@ import lime.app.Application;
 import melt.data.WeekData;
 import rulescript.RuleScript;
 import melt.Discord.DiscordClient;
+import melt.plugin.*;
 
 
 class InitState extends FlxState
@@ -63,20 +64,8 @@ class InitState extends FlxState
 		}
 		#end
 
-		setRuleScriptImports();
+		DebugTextPlugin.init();
 		
 		MusicBeatState.switchState(new TitleState());
-	}
-
-	function setRuleScriptImports()
-	{
-		RuleScript.defaultImports[""].set("Paths", Paths);
-        RuleScript.defaultImports[""].set("Character", Character);
-        RuleScript.defaultImports[""].set("CoolUtil", CoolUtil);
-        RuleScript.defaultImports[""].set("MusicBeatState", MusicBeatState);
-        RuleScript.defaultImports[""].set("Conductor", Conductor);
-        RuleScript.defaultImports[""].set("PlayState", melt.gameplay.PlayState);
-        RuleScript.defaultImports[""].set("BGSprite", melt.gameplay.objects.BGSprite);
-		RuleScript.defaultImports[""].set("FunkinLua", melt.scripting.FunkinLua);
 	}
 }

@@ -9,10 +9,10 @@ This is a small fork of Psych 0.6.3 that I made for a mod I work on etc!
 TBA
 
 ### Get Pre-Compiled Engine
-You can download latest build of this engine at Nightly.link!
-https://nightly.link/soushimiya/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip
+You can download latest build of this engine at [Nightly.link](https://nightly.link/soushimiya/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip)!
 
 #### Unique features of this engine
+
 - Fairly advanced HScript support
 ```haxe
 //Template of Hscript Script
@@ -26,6 +26,7 @@ function createPost()
     return FunkinLua.Function_Stop; //also you can return "Function_" thing like doing in lua!
 }
 ```
+- Fully rewritten lua with shared backend (allows scripting at the same level as HScript)
 
 - Small but useful chart editor enhancements (Organizing the time display, Shift + Enter for instant preview, Ctrl + S shortcut)
 
@@ -40,3 +41,11 @@ function createPost()
 - Note splashes from Forever Engine
 
 - Double ghosts from Nebula's Psych Fork
+
+#### ToDo
+
+- More source restructuring
+
+- Lua parser rework
+
+- Scripted Classes (on lua and haxe)

@@ -1,17 +1,17 @@
 package melt;
 
+import flixel.group.FlxGroup;
 import flixel.FlxG;
 import flixel.addons.ui.FlxUIState;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.FlxState;
-import flixel.FlxCamera;
 import melt.scripting.*;
 import melt.gameplay.*;
 import melt.Conductor;
 
 class MusicBeatState extends FlxUIState
 {
-	public static var script:FunkinHScript;
+	public var scriptArray:Array<FunkinRule> = [];
 	
 	//states that don't allow scripting/overriding by hscripts!
 	static final excludeStates = ["LoadingState", "PlayState", "HScriptState"];
@@ -26,20 +26,18 @@ class MusicBeatState extends FlxUIState
 	private var curDecBeat:Float = 0;
 	public var controls(get, never):Controls;
 
-	public static var camBeat:FlxCamera;
-
 	inline function get_controls():Controls
 		return PlayerSettings.player1.controls;
 
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 
-		//State Script!
+		//State Script lets go lol
 		final statePath = Type.getClassName(Type.getClass(this)).split(".");
 		final stateString = statePath[statePath.length - 1];
 
 		if (sys.FileSystem.exists(Paths.modFolders('states/$stateString.hx')) && !excludeStates.contains(stateString))
-			script = new FunkinHScript(Paths.modFolders('states/$stateString.hx'), this);
+			scriptArray.push(new FunkinHScript(Paths.modFolders('states/$stateString.hx'), this));
 
 		super.create();
 
@@ -51,7 +49,7 @@ class MusicBeatState extends FlxUIState
 
 	override function update(elapsed:Float)
 	{
-		callOnHScript("update", [elapsed]);
+		callOnScripts("onUpdate", [elapsed]);
 		var oldStep:Int = curStep;
 
 		updateCurStep();
@@ -70,6 +68,16 @@ class MusicBeatState extends FlxUIState
 					rollbackSection();
 			}
 		}
+
+		setOnScripts('curBpm', Conductor.bpm);
+		setOnScripts('crochet', Conductor.crochet);
+		setOnScripts('stepCrochet', Conductor.stepCrochet);
+
+		setOnScripts('curStep', curStep);
+		setOnScripts('curBeat', curBeat);
+
+		setOnScripts('curDecStep', curDecStep);
+		setOnScripts('curDecBeat', curDecBeat);
 
 		if(FlxG.save.data != null) FlxG.save.data.fullscreen = FlxG.fullscreen;
 
@@ -147,27 +155,19 @@ class MusicBeatState extends FlxUIState
 
 	public function stepHit():Void
 	{
-		callOnHScript("stepHit");
+		callOnScripts("onStepHit");
 		if (curStep % 4 == 0)
 			beatHit();
 	}
 
-	function callOnHScript(func:String, ?args:Dynamic):Dynamic
-	{
-		if (script != null)
-			return script.callFunc(func, args);
-		
-		return null;
-	}
-
 	public function beatHit():Void
 	{
-		callOnHScript("beatHit");
+		callOnScripts("onBeatHit");
 	}
 
 	public function sectionHit():Void
 	{
-		callOnHScript("sectionHit");
+		callOnScripts("onSectionHit");
 	}
 
 	function getBeatsOnSection()
@@ -188,6 +188,26 @@ class MusicBeatState extends FlxUIState
 		FlxG.switchState(nextState);
 	}
 
+	public function setOnScripts(variable:String, arg:Dynamic)
+	{
+		for (script in scriptArray)
+		{
+			script.setVar(variable, arg);
+		}
+	}
+
+	public function callOnScripts(func:String, ?args:Dynamic):Dynamic
+	{
+		var returnThing:Dynamic = FunkinLua.Function_Continue;
+		for (script in scriptArray)
+		{
+			var scriptThing = script.callFunc(func, args);
+			if (scriptThing == FunkinLua.Function_Stop)
+				returnThing = scriptThing;
+		}
+		return returnThing;
+	}
+
 	public static function switchCustomState(nextState:String)
 	{
 		if (sys.FileSystem.exists(Paths.modFolders('states/$nextState.hx')) && !excludeStates.contains(nextState))
@@ -199,8 +219,9 @@ class MusicBeatState extends FlxUIState
 	}
 
 	override public function destroy() {
-		callOnHScript("destroy");
-		script = null;
+		callOnScripts("onDestroy");
+		for (script in scriptArray)
+			script = null;
 		super.destroy();
 	}
 }

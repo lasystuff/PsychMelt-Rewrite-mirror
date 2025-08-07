@@ -10,15 +10,8 @@ import flixel.tweens.FlxTween;
 import flixel.util.FlxStringUtil;
 import flixel.tweens.FlxEase;
 
-class PsychHUD extends BasicHUD
+class PsychHUD extends VanillaHUD
 {
-	public var healthBarBG:AttachedSprite;
-	public var healthBar:FlxBar;
-	public var iconP1:HealthIcon;
-	public var iconP2:HealthIcon;
-
-	public var scoreTxt:FlxText;
-
 	var scoreTxtTween:FlxTween;
 
 	var timeTxt:FlxText;
@@ -59,6 +52,7 @@ class PsychHUD extends BasicHUD
 		timeBarBG.color = FlxColor.BLACK;
 		timeBarBG.xAdd = -4;
 		timeBarBG.yAdd = -4;
+		timeBarBG.alpha = 0;
 		add(timeBarBG);
 
 		timeBar = new FlxBar(timeBarBG.x + 4, timeBarBG.y + 4, LEFT_TO_RIGHT, Std.int(timeBarBG.width - 8), Std.int(timeBarBG.height - 8), this,
@@ -94,42 +88,7 @@ class PsychHUD extends BasicHUD
 	{
 		super.update(elapsed);
 
-		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, CoolUtil.boundTo(1 - (elapsed * 9 * PlayState.instance.playbackRate), 0, 1));
-		iconP1.scale.set(mult, mult);
-		iconP1.updateHitbox();
-
-		var mult:Float = FlxMath.lerp(1, iconP2.scale.x, CoolUtil.boundTo(1 - (elapsed * 9 * PlayState.instance.playbackRate), 0, 1));
-		iconP2.scale.set(mult, mult);
-		iconP2.updateHitbox();
-
-		var iconOffset:Int = 26;
-
-		iconP1.x = healthBar.x
-			+ (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01))
-			+ (150 * iconP1.scale.x - 150) / 2
-			- iconOffset;
-		iconP2.x = healthBar.x
-			+ (healthBar.width * (FlxMath.remapToRange(healthBar.percent, 0, 100, 100, 0) * 0.01))
-			- (150 * iconP2.scale.x) / 2
-			- iconOffset * 2;
-
-		if (healthBar.percent < 20)
-		{
-			iconP1.animation.curAnim.curFrame = 1;
-			iconP2.animation.curAnim.curFrame = 2;
-		}
-		else if (healthBar.percent > 80)
-		{
-			iconP1.animation.curAnim.curFrame = 2;
-			iconP2.animation.curAnim.curFrame = 1;
-		}
-		else
-		{
-			iconP1.animation.curAnim.curFrame = 0;
-			iconP2.animation.curAnim.curFrame = 0;
-		}
-
-		if (!PlayState.instance.paused && !PlayState.instance.startingSong)
+		if (!PlayState.instance.paused)
 		{
 			songTime += FlxG.game.ticks - FlxG.game.ticks;
 
@@ -161,23 +120,12 @@ class PsychHUD extends BasicHUD
 					timeTxt.text = FlxStringUtil.formatTime(secondsTotal, false);
 			}
 		}
-	}
 
-	override public function beatHit(beat:Int)
-	{
-		super.beatHit(beat);
-		
-		iconP1.scale.set(1.2, 1.2);
-		iconP2.scale.set(1.2, 1.2);
-
-		iconP1.updateHitbox();
-		iconP2.updateHitbox();
+		timeBar.value = songPercent; // die
 	}
 
 	override public function updateScore(miss:Bool)
-	{
-		super.updateScore(miss);
-		
+	{	
 		scoreTxt.text = 'Score: '
 			+ FlxStringUtil.formatMoney(PlayState.instance.songScore, false)
 			+ ' | Misses: '
@@ -206,6 +154,8 @@ class PsychHUD extends BasicHUD
 
 	override public function startSong()
 	{
+		super.startSong();
+		FlxTween.tween(timeBarBG, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeBar, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 		FlxTween.tween(timeTxt, {alpha: 1}, 0.5, {ease: FlxEase.circOut});
 	}

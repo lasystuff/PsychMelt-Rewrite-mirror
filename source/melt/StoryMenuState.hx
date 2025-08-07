@@ -191,7 +191,7 @@ class StoryMenuState extends MusicBeatState
 		changeWeek();
 		changeDifficulty();
 
-		callOnHScript("createPost");
+		callOnScripts("onCreatePost");
 	}
 
 	override function closeSubState()

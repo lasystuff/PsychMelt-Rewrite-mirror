@@ -535,7 +535,6 @@ class DialogueCharacterEditorState extends MusicBeatState
 
 	override function update(elapsed:Float)
 	{
-		MusicBeatState.camBeat = FlxG.camera;
 		if (transitioning)
 		{
 			super.update(elapsed);

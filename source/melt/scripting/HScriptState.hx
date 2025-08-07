@@ -6,7 +6,6 @@ class HScriptState extends MusicBeatState
 {
 	public var state:String = "";
 	public static var staticVar:Map<String, Map<Dynamic, Dynamic>> = [];
-	public static var script:FunkinHScript;
 
 	override public function new(state:String)
 	{
@@ -21,11 +20,10 @@ class HScriptState extends MusicBeatState
 		
 		super.create();
 
-		script = new FunkinHScript(Paths.modFolders('states/$state.hx'), this);
-		@:privateAccess
-		script.rule.variables.set("global", staticVar[state]);
+		scriptArray.push(new FunkinHScript(Paths.modFolders('states/$state.hx'), this));
+		setOnScripts("global", staticVar[state]);
 		
-		callOnHScript("createPost");
+		callOnScripts("onCreatePost");
 	}
 
 	override public function update(elapsed:Float)
@@ -34,20 +32,5 @@ class HScriptState extends MusicBeatState
 			FlxG.switchState(new HScriptState(state));
 
 		super.update(elapsed);
-	}
-
-	override public function destroy()
-	{
-		script = null;
-		super.destroy();
-	}
-
-
-	override public function callOnHScript(func:String, ?args:Dynamic):Dynamic
-	{
-		if (script != null)
-			script.callFunc(func, args);
-
-		return null;
 	}
 }
