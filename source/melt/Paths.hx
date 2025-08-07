@@ -433,6 +433,33 @@ class Paths
 		return file;
 	}
 
+	inline static public function readDirectoryRecursive(path:String)
+	{
+		var result:Array<String> = [];
+		var directories:Array<String> = [
+			Paths.mods('$path/'),
+			Paths.mods(Paths.currentModDirectory + '/$path/'),
+			Paths.getSharedPath('$path/')
+		];
+		for (mod in Paths.getGlobalMods())
+			directories.push(Paths.mods(mod + '/$path/'));
+
+		for (directory in directories)
+		{
+			if (FileSystem.exists(directory))
+			{
+				for (file in CoolUtil.recursivelyReadFolders(directory))
+				{
+					var path = haxe.io.Path.join([directory, file]);
+					if (!FileSystem.isDirectory(path))
+					{
+						result.push(path);
+					}
+				}
+			}
+		}
+	}
+
 	#if MODS_ALLOWED
 	inline static public function mods(key:String = '')
 	{
