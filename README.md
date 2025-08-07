@@ -18,7 +18,7 @@ You can download latest build of this engine at [Nightly.link](https://nightly.l
 //Template of Hscript Script
 import flixel.util.FlxColor; //You can import abstracts/enums!
 
-function createPost()
+function onCreatePost()
 {
     //You don't need "FlxG.state"(or game or something) to change current Instance
     boyfriend.color = FlxColor.RED;
@@ -42,7 +42,9 @@ function createPost()
 
 - Double ghosts from Nebula's Psych Fork
 
-#### ToDo
+#### ToDo (by priority)
+
+- Redo abstract macros to not dependence RuleScriptAbstracts.txt
 
 - More source restructuring
 

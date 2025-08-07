@@ -53,7 +53,12 @@ class FunkinRule
         rule.variables.set("Conductor", Conductor);
         rule.variables.set("PlayState", melt.gameplay.PlayState);
         rule.variables.set("BGSprite", melt.gameplay.objects.BGSprite);
+
+		rule.variables.set("FunkinRule", melt.scripting.FunkinRule);
+		rule.variables.set("FunkinHScript", melt.scripting.FunkinHScript);
 		rule.variables.set("FunkinLua", melt.scripting.FunkinLua);
+
+		rule.variables.set("Paths", Paths);
 	}
 
     //call function in Interp
