@@ -433,7 +433,7 @@ class Paths
 		return file;
 	}
 
-	inline static public function readDirectoryRecursive(path:String)
+	inline static public function readDirectoryRecursive(path:String):Array<String>
 	{
 		var result:Array<String> = [];
 		var directories:Array<String> = [
@@ -458,6 +458,8 @@ class Paths
 				}
 			}
 		}
+
+		return result;
 	}
 
 	#if MODS_ALLOWED

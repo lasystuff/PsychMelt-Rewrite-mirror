@@ -10,6 +10,8 @@ using StringTools;
 
 class FunkinRule
 {
+	public static var resolveScriptState:ResolveScriptState;
+
 	public var scriptType:String = "Unknown Script"; // for trace
     private var rule:RuleScript;
 
@@ -24,7 +26,7 @@ class FunkinRule
 	}
 
     public function new(path:String, parentInstance:Dynamic = null, skipCreate:Bool = false){
-        rule = new RuleScript();
+        rule = new RuleScript(new RuleScriptInterpEx());
         rule.scriptName = path;
         rule.errorHandler = onError;
 
@@ -96,4 +98,26 @@ class FunkinRule
         rule.interp = null;
         rule.variables.clear();
     }
+}
+ 
+// RuleScript with some extra variables for better custom classes handling
+class RuleScriptInterpEx extends RuleScriptInterp
+{
+	override function cnew(cl:String, args:Array<Dynamic>):Dynamic
+	{
+		FunkinRule.resolveScriptState = {owner: this, mode: "cnew", args: args};
+		return super.cnew(cl, args);
+	}
+
+	override function resolveType(path:String):Dynamic
+	{
+		FunkinRule.resolveScriptState = {owner: this, mode: "resolve"};
+		return super.resolveType(path);
+	}
+}
+
+typedef ResolveScriptState = {
+	var owner:RuleScriptInterpEx;
+	var mode:String; // resolve or cnew
+	var ?args:Array<Dynamic>; // only 4 cnew ig
 }

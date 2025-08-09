@@ -65,6 +65,7 @@ class InitState extends FlxState
 		#end
 
 		DebugTextPlugin.init();
+		ScriptClassManager.init();
 		
 		MusicBeatState.switchState(new TitleState());
 	}

@@ -50,4 +50,4 @@ function onCreatePost()
 
 - Lua parser rework
 
-- Scripted Classes (on lua and haxe)
+- Scripted Classes "as" importing support
