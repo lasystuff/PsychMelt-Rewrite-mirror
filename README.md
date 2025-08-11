@@ -11,7 +11,7 @@ TBA
 ### Get Pre-Compiled Engine
 You can download latest build of this engine at [Nightly.link](https://nightly.link/soushimiya/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip)!
 
-#### Unique features of this engine
+#### Features
 
 - Fairly advanced HScript support
 ```haxe
@@ -27,6 +27,8 @@ function onCreatePost()
 }
 ```
 - Fully rewritten lua with shared backend (allows scripting at the same level as HScript)
+
+- Scripted Classes! (Supports many features such as direct instantiation with new() function)
 
 - Small but useful chart editor enhancements (Organizing the time display, Shift + Enter for instant preview, Ctrl + S shortcut)
 
