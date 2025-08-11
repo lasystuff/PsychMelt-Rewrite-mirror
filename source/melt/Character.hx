@@ -70,6 +70,7 @@ class Character extends FlxSprite
 	public var hasMissAnimations:Bool = false;
 
 	public var lastSingAnim:String = "";
+	public var lastSingPosition:Float = -100;
 
 	// Used on Character Editor
 	public var imageFile:String = '';
