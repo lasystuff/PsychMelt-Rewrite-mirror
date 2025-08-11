@@ -4,6 +4,7 @@ import flixel.FlxG;
 import flixel.group.FlxGroup;
 import flixel.util.FlxColor;
 import flixel.text.FlxText;
+import melt.gameplay.PlayState;
 
 class DebugTextPlugin extends FlxTypedGroup<DebugText>
 {
@@ -20,6 +21,8 @@ class DebugTextPlugin extends FlxTypedGroup<DebugText>
 
 	public static function addTextToDebug(text:String, color:FlxColor)
 	{
+		if (PlayState.instance != null)
+			instance.cameras = [PlayState.instance.camOther];
 		instance.forEachAlive(function(spr:DebugText)
 		{
 			spr.y += 20;

@@ -19,13 +19,26 @@ class ScriptClassManager
 		MusicBeatState => ScriptedMusicBeatState
 	];
 
+
 	public static var classes:Map<String, ScriptClassRef> = [];
 
 	public static function init():Void
-	{
+	{	
 		RuleScript.resolveScript = __resolveScript;
 		RuleScriptedClassUtil.buildBridge = __buildRuleScript;
+		FlxG.signals.postUpdate.add(function(){
+			if (FlxG.keys.justPressed.F5)
+			{
+				reloadScriptedClasses();
+				FlxG.resetState();
+			}
+		});
 
+		reloadScriptedClasses();
+	}
+
+	public static function reloadScriptedClasses():Void
+	{
 		var parser = new HxParser();
 		parser.allowAll();
 		parser.mode = MODULE;
@@ -137,7 +150,7 @@ typedef ScriptClassRef =
 	var expr:Expr;
 }
 
-// for scripts that not extends anything
+// for scripts that extends nothing
 class DummyClass
 {
 	public function new()

@@ -134,7 +134,7 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, 'Psych Melt (Psych Engine v 0.6.3)', 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, 'PsychMelt (Psych Engine v 0.6.3)', 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
 		add(versionShit);
