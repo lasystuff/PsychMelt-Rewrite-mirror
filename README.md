@@ -9,7 +9,7 @@ This is a small fork of Psych 0.6.3 that I made for a mod I work on etc!
 TBA
 
 ### Get Pre-Compiled Engine
-You can download latest build of this engine at [Nightly.link](https://nightly.link/soushimiya/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip)!
+You can download latest build of this engine at [Nightly.link](https://nightly.link/lasystuff/PsychMelt-Rewrite-mirror/workflows/main/main/windowsBuild.zip)!
 
 #### Features
 
