@@ -66,43 +66,7 @@ class ChartingState extends MusicBeatState
 	var undos = [];
 	var redos = [];
 	var eventStuff:Array<Dynamic> = [
-		['', "Nothing. Yep, that's right."],
-		[
-			'Hey!',
-			"Plays the \"Hey!\" animation from Bopeebo,\nValue 1: BF = Only Boyfriend, GF = Only Girlfriend,\nSomething else = Both.\nValue 2: Custom animation duration,\nleave it blank for 0.6s"
-		],
-		[
-			'Set GF Speed',
-			"Sets GF head bopping speed,\nValue 1: 1 = Normal speed,\n2 = 1/2 speed, 4 = 1/4 speed etc.\nUsed on Fresh during the beatbox parts.\n\nWarning: Value must be integer!"
-		],
-		[
-			'Add Camera Zoom',
-			"Used on MILF on that one \"hard\" part\nValue 1: Camera zoom add (Default: 0.015)\nValue 2: UI zoom add (Default: 0.03)\nLeave the values blank if you want to use Default."
-		],
-		[
-			'Play Animation',
-			"Plays an animation on a Character,\nonce the animation is completed,\nthe animation changes to Idle\n\nValue 1: Animation to play.\nValue 2: Character (Dad, BF, GF)"
-		],
-		[
-			'Camera Follow Pos',
-			"Value 1: X\nValue 2: Y\n\nThe camera won't change the follow point\nafter using this, for getting it back\nto normal, leave both values blank."
-		],
-		[
-			'Alt Idle Animation',
-			"Sets a specified suffix after the idle animation name.\nYou can use this to trigger 'idle-alt' if you set\nValue 2 to -alt\n\nValue 1: Character to set (Dad, BF or GF)\nValue 2: New suffix (Leave it blank to disable)"
-		],
-		[
-			'Screen Shake',
-			"Value 1: Camera shake\nValue 2: HUD shake\n\nEvery value works as the following example: \"1, 0.05\".\nThe first number (1) is the duration.\nThe second number (0.05) is the intensity."
-		],
-		[
-			'Change Character',
-			"Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"
-		],
-		[
-			'Change Scroll Speed',
-			"Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."
-		]
+		['', "Nothing. Yep, that's right."]
 	];
 
 	var _file:FileReference;
@@ -1069,6 +1033,7 @@ class ChartingState extends MusicBeatState
 		var directories:Array<String> = [];
 
 		#if MODS_ALLOWED
+		directories.push(Paths.getSharedPath('events/'));
 		directories.push(Paths.mods('events/'));
 		directories.push(Paths.mods(Paths.currentModDirectory + '/events/'));
 		for (mod in Paths.getGlobalMods())
@@ -1083,7 +1048,7 @@ class ChartingState extends MusicBeatState
 				for (file in CoolUtil.recursivelyReadFolders(directory))
 				{
 					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file != 'readme.txt' && file.endsWith('.txt'))
+					if (!FileSystem.isDirectory(path) && file != 'events-go-here.txt' && file.endsWith('.txt'))
 					{
 						var fileToCheck:String = file.substr(0, file.length - 4);
 						if (!eventPushedMap.exists(fileToCheck))

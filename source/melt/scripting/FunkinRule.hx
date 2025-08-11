@@ -53,6 +53,7 @@ class FunkinRule
         rule.variables.set("CoolUtil", CoolUtil);
         rule.variables.set("MusicBeatState", MusicBeatState);
         rule.variables.set("Conductor", Conductor);
+		rule.variables.set("ClientPrefs", melt.ClientPrefs);
         rule.variables.set("PlayState", melt.gameplay.PlayState);
         rule.variables.set("BGSprite", melt.gameplay.objects.BGSprite);
 

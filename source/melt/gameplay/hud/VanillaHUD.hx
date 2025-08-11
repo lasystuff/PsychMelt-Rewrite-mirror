@@ -70,6 +70,16 @@ class VanillaHUD extends BasicHUD
 		healthBar.updateBar();
 	}
 
+	override public function changeIcon(target:Character, name:String)
+	{
+		super.changeIcon(target, name);
+		
+		if (target == PlayState.instance.dad)
+			iconP2.changeIcon(name);
+		else
+			iconP1.changeIcon(name);
+	}
+
 	override public function update(elapsed:Float)
 	{
 		super.update(elapsed);
