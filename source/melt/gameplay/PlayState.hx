@@ -2416,11 +2416,17 @@ class PlayState extends MusicBeatState
 								addCharacterToList(value2, charType);
 							}
 
+							for (ghost in ghostMap.get(boyfriend))
+								ghost.destroy();
+
 							var lastAlpha:Float = boyfriend.alpha;
-							boyfriend.alpha = 0.00001;
+							boyfriend.alpha = 0;
 							boyfriend = boyfriendMap.get(value2);
 							boyfriend.alpha = lastAlpha;
 							hud.changeIcon(boyfriend, boyfriend.healthIcon);
+							ghostMap.set(boyfriend, boyfriend.createGhosts());
+							for (ghost in ghostMap.get(boyfriend))
+									ghostGroup.add(ghost);
 						}
 						setOnScripts('boyfriendName', boyfriend.curCharacter);
 
@@ -2432,9 +2438,12 @@ class PlayState extends MusicBeatState
 								addCharacterToList(value2, charType);
 							}
 
+							for (ghost in ghostMap.get(dad))
+								ghost.destroy();
+
 							var wasGf:Bool = dad.curCharacter.startsWith('gf');
 							var lastAlpha:Float = dad.alpha;
-							dad.alpha = 0.00001;
+							dad.alpha = 0;
 							dad = dadMap.get(value2);
 							if (!dad.curCharacter.startsWith('gf'))
 							{
@@ -2449,6 +2458,9 @@ class PlayState extends MusicBeatState
 							}
 							dad.alpha = lastAlpha;
 							hud.changeIcon(dad, dad.healthIcon);
+							ghostMap.set(dad, dad.createGhosts());
+							for (ghost in ghostMap.get(dad))
+									ghostGroup.add(ghost);
 						}
 						setOnScripts('dadName', dad.curCharacter);
 
@@ -2462,10 +2474,16 @@ class PlayState extends MusicBeatState
 									addCharacterToList(value2, charType);
 								}
 
+								for (ghost in ghostMap.get(gf))
+									ghost.destroy();
+
 								var lastAlpha:Float = gf.alpha;
-								gf.alpha = 0.00001;
+								gf.alpha = 0;
 								gf = gfMap.get(value2);
 								gf.alpha = lastAlpha;
+								ghostMap.set(gf, gf.createGhosts());
+								for (ghost in ghostMap.get(gf))
+									ghostGroup.add(ghost);
 							}
 							setOnScripts('gfName', gf.curCharacter);
 						}

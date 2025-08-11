@@ -46,13 +46,13 @@ class CharacterGhost extends FlxSprite
 		{
 			if (alphaTween != null)
 				alphaTween.cancel();
-			this.alpha = 0.6;
+			this.alpha = parent.alpha - 0.4;
 			var animOff = parent.animOffsets.get(anim);
 			offset.set(animOff[0], animOff[1]);
 
 			animation.play(anim, true);
 
-			alphaTween = FlxTween.tween(this, {alpha: 0}, (Conductor.crochet / 1000)*2, {ease: FlxEase.quadOut});
+			alphaTween = FlxTween.tween(this, {alpha: 0}, (Conductor.crochet / 1000)*1.5, {ease: FlxEase.quadOut});
 		}
 	}
 }
