@@ -1,6 +1,6 @@
 # PsychMelt (Rewrite)
 
-"Troll Engine but Evil or something idk"
+"Troll Engine but Evil or something idk" (ts just an inside joke soo don't take it seriously btw!!!!)
 
 This is a small fork of Psych 0.6.3 that I made for a mod I work on etc!
 
@@ -38,11 +38,9 @@ function onCreatePost()
 
 #### This engine borrows a lot from various engines:
 
-- Modchart backend, "Epic!" rating from Andromeda Engine
+- Modchart from Andromeda Engine
 
 - Note splashes from Forever Engine
-
-- Double ghosts from Nebula's Psych Fork
 
 #### ToDo (by priority)
 

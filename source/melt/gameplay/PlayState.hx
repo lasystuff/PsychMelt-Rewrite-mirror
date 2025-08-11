@@ -111,6 +111,7 @@ class PlayState extends MusicBeatState
 
 	public var playbackRate(default, set):Float = 1;
 
+	public var ghostGroup:FlxTypedGroup<CharacterGhost>;
 	public var boyfriendGroup:FlxSpriteGroup;
 	public var dadGroup:FlxSpriteGroup;
 	public var gfGroup:FlxSpriteGroup;
@@ -133,6 +134,8 @@ class PlayState extends MusicBeatState
 	public var dad:Character = null;
 	public var gf:Character = null;
 	public var boyfriend:Character = null;
+
+	var ghostMap:Map<Character, Array<CharacterGhost>> = [];
 
 	public var notes:FlxTypedGroup<Note>;
 	public var eventNotes:Array<EventNote> = [];
@@ -165,7 +168,7 @@ class PlayState extends MusicBeatState
 	public var hud:BasicHUD;
 
 	public var ratingsData:Array<Rating> = [];
-	public var epics:Int = 0;
+	public var killers:Int = 0;
 	public var sicks:Int = 0;
 	public var goods:Int = 0;
 	public var bads:Int = 0;
@@ -291,7 +294,7 @@ class PlayState extends MusicBeatState
 		controlArray = ['NOTE_LEFT', 'NOTE_DOWN', 'NOTE_UP', 'NOTE_RIGHT'];
 
 		// Ratings
-		var rating:Rating = new Rating('epic');
+		var rating:Rating = new Rating('killer');
 		rating.ratingMod = 1;
 		rating.score = 500;
 		rating.noteSplash = true;
@@ -435,6 +438,7 @@ class PlayState extends MusicBeatState
 		if (girlfriendCameraOffset == null)
 			girlfriendCameraOffset = [0, 0];
 
+		ghostGroup = new FlxTypedGroup();
 		boyfriendGroup = new FlxSpriteGroup(BF_X, BF_Y);
 		dadGroup = new FlxSpriteGroup(DAD_X, DAD_Y);
 		gfGroup = new FlxSpriteGroup(GF_X, GF_Y);
@@ -452,6 +456,8 @@ class PlayState extends MusicBeatState
 
 		stage = new Stage(curStage);
 		add(stage);
+
+		add(ghostGroup);
 
 		add(gfGroup);
 		add(dadGroup);
@@ -502,19 +508,33 @@ class PlayState extends MusicBeatState
 		{
 			gf = new Character(0, 0, gfVersion);
 			startCharacterPos(gf);
-			gfGroup.add(gf);
 			startCharacterLua(gf.curCharacter);
 		}
 
 		dad = new Character(0, 0, SONG.player2);
 		startCharacterPos(dad, true);
-		dadGroup.add(dad);
 		startCharacterLua(dad.curCharacter);
 
 		boyfriend = new Character(0, 0, SONG.player1, true);
 		startCharacterPos(boyfriend);
-		boyfriendGroup.add(boyfriend);
 		startCharacterLua(boyfriend.curCharacter);
+
+		ghostMap.set(boyfriend, boyfriend.createGhosts());
+		ghostMap.set(dad, dad.createGhosts());
+		ghostMap.set(gf, gf.createGhosts());
+
+		for (key => objs in ghostMap)
+		{
+			for (ghost in objs)
+			{
+				ghostGroup.add(ghost);
+			}
+		}
+
+
+		gfGroup.add(gf);
+		dadGroup.add(dad);
+		boyfriendGroup.add(boyfriend);
 
 		var camPos:FlxPoint = new FlxPoint(girlfriendCameraOffset[0], girlfriendCameraOffset[1]);
 		if (gf != null)
@@ -1720,15 +1740,6 @@ class PlayState extends MusicBeatState
 			if (songSpeedTween != null)
 				songSpeedTween.active = false;
 
-			var chars:Array<Character> = [boyfriend, gf, dad];
-			for (char in chars)
-			{
-				if (char != null && char.colorTween != null)
-				{
-					char.colorTween.active = false;
-				}
-			}
-
 			for (tween in modchartTweens)
 			{
 				tween.active = false;
@@ -1757,15 +1768,6 @@ class PlayState extends MusicBeatState
 				finishTimer.active = true;
 			if (songSpeedTween != null)
 				songSpeedTween.active = true;
-
-			var chars:Array<Character> = [boyfriend, gf, dad];
-			for (char in chars)
-			{
-				if (char != null && char.colorTween != null)
-				{
-					char.colorTween.active = true;
-				}
-			}
 
 			for (tween in modchartTweens)
 			{
@@ -3380,37 +3382,19 @@ class PlayState extends MusicBeatState
 			var char:Character = dad;
 			var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))] + altAnim;
 			if (note.gfNote)
-			{
 				char = gf;
-			}
 
 			if (char != null)
 			{
-				char.holdTimer = 0;
-				char.playAnim(animToPlay, true);
-
-				if (!note.isSustainNote && noteRows[note.mustPress ? 0 : 1][note.row] != null && noteRows[note.mustPress ? 0 : 1][note.row].length > 1)
+				if (char.lastSingAnim != "" && char.lastSingAnim != animToPlay && char.holdTimer > 0)
 				{
-					// potentially have jump anims?
-					var chord = noteRows[note.mustPress ? 0 : 1][note.row];
-					var animNote = chord[0];
-					var realAnim = singAnimations[Std.int(Math.abs(animNote.noteData))] + altAnim;
-					if (char.mostRecentRow != note.row)
-						char.playAnim(realAnim, true);
-
-					if(note.nextNote != null && note.prevNote != null){
-						if (note != animNote && !note.nextNote.isSustainNote) {
-							char.playGhostAnim(chord.indexOf(note), animToPlay, true);
-						}else if(note.nextNote.isSustainNote){
-							char.playAnim(realAnim, true);
-							char.playGhostAnim(chord.indexOf(note), animToPlay, true);
-
-						}
-					}
-					char.mostRecentRow = note.row;
+					ghostMap.get(char)[note.noteData].play(animToPlay);
 				}
-				else{
+				else
+				{
+					char.holdTimer = 0;
 					char.playAnim(animToPlay, true);
+					char.lastSingAnim = animToPlay;
 				}
 			}
 		}
@@ -3493,7 +3477,7 @@ class PlayState extends MusicBeatState
 
 			if (!note.noAnimation)
 			{
-				var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))];
+				var animToPlay:String = singAnimations[Std.int(Math.abs(note.noteData))] + note.animSuffix;
 
 				var char:Character = boyfriend;
 
@@ -3505,21 +3489,18 @@ class PlayState extends MusicBeatState
 					}
 				}
 				
-				char.holdTimer = 0;
-				char.playAnim(animToPlay + note.animSuffix, true);
-
-				if (!note.isSustainNote && noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row]!=null && noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row].length > 1)
+				if (char != null)
 				{
-					// potentially have jump anims?
-					var chord = noteRows[note.gfNote ? 2 : note.mustPress ? 0 : 1][note.row];
-					var animNote = chord[0];
-					var realAnim = singAnimations[Std.int(Math.abs(animNote.noteData))] + note.animSuffix;
-
-					if (note != animNote && chord.indexOf(note) != animNote.noteData)
-						char.playGhostAnim(chord.indexOf(note), animToPlay + note.animSuffix, true);
-						// doGhostAnim('bf', animToPlay);
-
-					char.mostRecentRow = note.row;
+					if (char.lastSingAnim != "" && char.lastSingAnim != animToPlay && char.holdTimer > 0)
+					{
+						ghostMap.get(char)[note.noteData].play(animToPlay);
+					}
+					else
+					{
+						char.holdTimer = 0;
+						char.playAnim(animToPlay, true);
+						char.lastSingAnim = animToPlay;
+					}
 				}
 
 				if (note.noteType == 'Hey!')
@@ -3792,6 +3773,8 @@ class PlayState extends MusicBeatState
 
 			// Rating FC
 			ratingFC = "";
+			if (killers > 0)
+				ratingFC = "KFC";
 			if (sicks > 0)
 				ratingFC = "SFC";
 			if (goods > 0)

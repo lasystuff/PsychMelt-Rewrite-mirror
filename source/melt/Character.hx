@@ -13,6 +13,7 @@ import openfl.utils.AssetType;
 import openfl.utils.Assets;
 import haxe.Json;
 import flixel.util.FlxColor;
+import melt.gameplay.objects.CharacterGhost;
 import flixel.tweens.FlxEase;
 
 using StringTools;
@@ -45,19 +46,15 @@ typedef AnimArray =
 
 class Character extends FlxSprite
 {
-	public var mostRecentRow:Int = 0; // for ghost anims n shit
-
 	public var animOffsets:Map<String, Array<Dynamic>>;
 	public var debugMode:Bool = false;
 
 	public var isPlayer:Bool = false;
 	public var curCharacter:String = DEFAULT_CHARACTER;
 
-	public var colorTween:FlxTween;
 	public var holdTimer:Float = 0;
 	public var heyTimer:Float = 0;
 	public var specialAnim:Bool = false;
-	public var animationNotes:Array<Dynamic> = [];
 	public var stunned:Bool = false;
 	public var singDuration:Float = 4; // Multiplier of how long a character holds the sing pose
 	public var idleSuffix:String = '';
@@ -70,12 +67,9 @@ class Character extends FlxSprite
 	public var positionArray:Array<Float> = [0, 0];
 	public var cameraPosition:Array<Float> = [0, 0];
 
-	public var doubleGhosts:Array<FlxSprite> = [];
-	public var ghostID:Int = 0;
-	public var ghostAnim:String = '';
-	public var ghostTweenGRP:Array<FlxTween> = [];
-
 	public var hasMissAnimations:Bool = false;
+
+	public var lastSingAnim:String = "";
 
 	// Used on Character Editor
 	public var imageFile:String = '';
@@ -98,13 +92,6 @@ class Character extends FlxSprite
 		curCharacter = character;
 		this.isPlayer = isPlayer;
 		antialiasing = ClientPrefs.globalAntialiasing;
-
-		for(i in 0...4){
-			var ghost = new FlxSprite();
-			ghost.visible = false;
-			ghost.alpha = 0.6;
-			doubleGhosts.push(ghost);
-		}
 
 		switch (curCharacter)
 		{
@@ -281,23 +268,6 @@ class Character extends FlxSprite
 				dance();
 			}
 
-			switch (curCharacter)
-			{
-				case 'pico-speaker':
-					if (animationNotes.length > 0 && Conductor.songPosition > animationNotes[0][0])
-					{
-						var noteData:Int = 1;
-						if (animationNotes[0][1] > 2)
-							noteData = 3;
-
-						noteData += FlxG.random.int(0, 1);
-						playAnim('shoot' + noteData, true);
-						animationNotes.shift();
-					}
-					if (animation.curAnim.finished)
-						playAnim(animation.curAnim.name, false, false, animation.curAnim.frames.length - 3);
-			}
-
 			if (animation.curAnim.name.startsWith('sing'))
 			{
 				holdTimer += elapsed;
@@ -315,18 +285,7 @@ class Character extends FlxSprite
 			}
 		}
 
-		for (ghost in doubleGhosts)
-			ghost.update(elapsed);
 		super.update(elapsed);
-	}
-
-	override function draw(){
-		for(ghost in doubleGhosts){
-			if(ghost.visible)
-				ghost.draw();
-		}
-		
-		super.draw();
 	}
 
 	public var danced:Bool = false;
@@ -425,58 +384,15 @@ class Character extends FlxSprite
 		animation.addByPrefix(name, anim, 24, false);
 	}
 
-	public function playGhostAnim(ghostID = 0, animName:String, force:Bool = false, reversed:Bool = false, frame:Int = 0){
+	public function createGhosts():Array<CharacterGhost>
+	{
+		var results:Array<CharacterGhost> = [];
+		for (i in 0...4)
+		{
+			var ghost = new CharacterGhost(this);
+			results.push(ghost);
+		}
 
-		var ghost:FlxSprite = doubleGhosts[ghostID];
-		ghost.scale.copyFrom(scale);
-		ghost.frames = frames;
-		ghost.animation.copyFrom(animation);
-		// ghost.shader = shader;
-		ghost.x = x;
-		ghost.y = y;
-		ghost.flipX = flipX;
-		ghost.flipY = flipY;
-		ghost.alpha = alpha * 0.6;
-		ghost.antialiasing = antialiasing;
-		ghost.visible = true;
-		ghost.color = FlxColor.fromRGB(healthColorArray[0], healthColorArray[1], healthColorArray[2]);
-		ghost.animation.play(animName, force, reversed, frame);
-		if (ghostTweenGRP[ghostID] != null)
-			ghostTweenGRP[ghostID].cancel();
-
-		var direction:String = animName.substring(4);
-
-		var directionMap:Map<String, Array<Float>> = [//Uh idk but it like position offset
-			'UP' => [0, -45],
-			'DOWN' => [0, 45],
-			'RIGHT' => [45, 0],
-			'LEFT' => [-45, 0],
-			'UP-alt' => [0, -45],
-			'DOWN-alt' => [0, 45],
-			'RIGHT-alt' => [45, 0],
-			'LEFT-alt' => [-45, 0],
-		];
-		//had to add alt cuz it kept crashing on room code LOL
-
-		var moveDirections:Array<Float> = [
-			x + (directionMap.get(direction)[0]),
-			y + (directionMap.get(direction)[1])
-		];
-
-		ghostTweenGRP[ghostID] = FlxTween.tween(ghost, {alpha: 0, x: moveDirections[0], y: moveDirections[1]}, 0.75, {
-			ease: FlxEase.linear,
-			onComplete: function(twn:FlxTween)
-			{
-				ghost.visible = false;
-				ghostTweenGRP[ghostID].destroy(); // maybe?
-				ghostTweenGRP[ghostID] = null;
-			}
-		});
-
-		var daOffset = animOffsets.get(animName);
-		if (animOffsets.exists(animName))
-			ghost.offset.set(daOffset[0], daOffset[1]);
-		else
-			ghost.offset.set(0, 0);
+		return results;
 	}
 }
