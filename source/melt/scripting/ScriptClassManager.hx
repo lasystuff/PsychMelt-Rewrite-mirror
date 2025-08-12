@@ -16,6 +16,7 @@ class ScriptClassManager
 	public static final SCRIPTABLE_CLASSES:Map<Dynamic, Dynamic> = [
 		DummyClass => ScriptedDummyClass, 
 		MusicBeatState => ScriptedMusicBeatState,
+		MusicBeatSubstate => ScriptedMusicBeatSubstate,
 
 		melt.gameplay.hud.BasicHUD => ScriptedHUD,
 		melt.gameplay.hud.VanillaHUD => ScriptedHUD.ScriptedVanillaHUD,
