@@ -42,6 +42,8 @@ class ScriptClassManager
 
 	public static function reloadScriptedClasses():Void
 	{
+		classes.clear();
+
 		var parser = new HxParser();
 		parser.allowAll();
 		parser.mode = MODULE;
@@ -89,7 +91,7 @@ class ScriptClassManager
 								var ref:ScriptClassRef = {
 									path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
 									scriptedClass: parentCls,
-									baseClass: baseCls,
+									extend: baseCls,
 									expr: expr
 								}
 
@@ -135,7 +137,7 @@ class ScriptClassManager
 		return null;
 	}
 
-	public static function createInstance(path:String, ?args:Array<Dynamic>)
+	public static function createInstance(path:String, ?args:Array<Dynamic>):Dynamic
 	{
 		if (!classes.exists(path))
 			return null;
@@ -150,7 +152,7 @@ class ScriptClassManager
 	{
 		var result:Array<String> = [];
 		for (key => scriptClass in classes)
-			if (scriptClass.baseClass == cls)
+			if (scriptClass.extend == cls)
 				result.push(key);
 
 		return result;
@@ -160,7 +162,7 @@ class ScriptClassManager
 typedef ScriptClassRef =
 {
 	var path:String; // for datamining from imports
-	var baseClass:Null<Dynamic>;
+	var extend:Null<Dynamic>;
 	var scriptedClass:Dynamic;
 	var expr:Expr;
 }

@@ -9,6 +9,8 @@ import melt.scripting.*;
 import melt.gameplay.*;
 import melt.Conductor;
 
+using StringTools;
+
 class MusicBeatState extends FlxUIState
 {
 	public var scriptArray:Array<FunkinRule> = [];
@@ -178,13 +180,12 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static function switchState(nextState:FlxState, ?noOverride:Bool = false) {
-		
-		final statePath = Type.getClassName(Type.getClass(nextState)).split(".");
-		final stateString = statePath[statePath.length - 1];
-
-		if (sys.FileSystem.exists(Paths.modFolders('states/override/$stateString.hx')) && !excludeStates.contains(stateString))
-			nextState = new HScriptState('override/$stateString');
-
+		final statePath = Type.getClassName(Type.getClass(nextState));
+		for (key => scriptCls in ScriptClassManager.classes)
+		{
+			if (key == statePath)
+				nextState = ScriptClassManager.createInstance(key);
+		}
 		FlxG.switchState(nextState);
 	}
 
@@ -206,12 +207,6 @@ class MusicBeatState extends FlxUIState
 				returnThing = scriptThing;
 		}
 		return returnThing;
-	}
-
-	public static function switchCustomState(nextState:String)
-	{
-		if (sys.FileSystem.exists(Paths.modFolders('states/$nextState.hx')) && !excludeStates.contains(nextState))
-			FlxG.switchState(new HScriptState(nextState));
 	}
 
 	public static function resetState() {
