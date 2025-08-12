@@ -146,18 +146,20 @@ class Song
 	{
 		var metadata:SongMeta = {
 			displayName: songName,
-			artists: "???"
+			artists: Constants.DEFAULT_SONG_ARTIST,
+			hud: Constants.DEFAULT_HUD_CLASS
 		};
 		var thepath:String = '${Paths.formatToSongPath(songName)}/metadata';
 
-		if (difficulty.toLowerCase() != "normal" && FileSystem.exists(Paths.modsJson(thepath + "-" + difficulty.toLowerCase())))
+		if (difficulty.toLowerCase() != "normal" && FileSystem.exists(Paths.getFolderNeeds("data/" + thepath + "-" + difficulty.toLowerCase() + ".json")))
 			thepath += "-" + difficulty.toLowerCase();
 
-		if(FileSystem.exists(Paths.modsJson(thepath))) {
-			final shit = haxe.Json.parse(sys.io.File.getContent(Paths.modsJson(thepath)));
+		if(FileSystem.exists(Paths.getFolderNeeds("data/" + thepath + ".json"))) {
+			final shit = haxe.Json.parse(sys.io.File.getContent(Paths.getFolderNeeds("data/" + thepath + ".json")));
 
 			if (shit.displayName != null) metadata.displayName = shit.displayName;
 			if (shit.artists != null) metadata.artists = shit.artists;
+			if (shit.hud != null) metadata.hud = shit.hud;
 		}
 		return metadata;
 	}
@@ -166,4 +168,5 @@ class Song
 typedef SongMeta = {
 	var displayName:String;
 	var artists:String;
+	var hud:String;
 }

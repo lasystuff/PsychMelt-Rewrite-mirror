@@ -142,9 +142,7 @@ class PlayState extends MusicBeatState
 
 	private var strumLine:FlxSprite;
 
-	// Handles the new epic mega sexy cam code that i've done
 	public var camFollowPos:FlxObject;
-
 	private static var prevCamFollowPos:FlxPoint;
 
 	public var strumLineNotes:FlxTypedGroup<StrumNote>;
@@ -586,7 +584,15 @@ class PlayState extends MusicBeatState
 		FlxG.fixedTimestep = false;
 		moveCameraSection();
 
-		hud = new PsychHUD();
+		var metadata = Song.getSongMetadata(SONG.song, CoolUtil.difficulties[storyDifficulty]);
+		// this fucking shit
+
+		hud = ScriptClassManager.createInstance(metadata.hud);
+		if (hud == null)
+			hud = Type.createInstance(Type.resolveClass(metadata.hud), []); // try using hardcoded one
+		if (hud == null) // if hud is still null, use default
+			hud = Type.createInstance(Type.resolveClass(Constants.DEFAULT_HUD_CLASS), []);
+
 		hud.cameras = [camHUD];
 		add(hud);
 

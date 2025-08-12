@@ -1,4 +1,4 @@
-package melt.plugin;
+package melt.scripting;
 
 import flixel.FlxG;
 import rulescript.*;
@@ -7,7 +7,6 @@ import rulescript.scriptedClass.*;
 import hscript.Expr;
 import hscript.Parser;
 import sys.io.File;
-import melt.scripting.FunkinRule;
 import melt.scripting.base.*;
 
 using StringTools;
@@ -16,7 +15,11 @@ class ScriptClassManager
 {
 	public static final SCRIPTABLE_CLASSES:Map<Dynamic, Dynamic> = [
 		DummyClass => ScriptedDummyClass, 
-		MusicBeatState => ScriptedMusicBeatState
+		MusicBeatState => ScriptedMusicBeatState,
+
+		melt.gameplay.hud.BasicHUD => ScriptedHUD,
+		melt.gameplay.hud.VanillaHUD => ScriptedHUD.ScriptedVanillaHUD,
+		melt.gameplay.hud.PsychHUD => ScriptedHUD.ScriptedPsychHUD
 	];
 
 
@@ -47,10 +50,10 @@ class ScriptClassManager
 		{
 			if (file.endsWith(".hx"))
 			{
-				trace("creating scripted class from " + file);
 				// using base parser for getting stuff
 				var ogExpr = new Parser().parseModule(File.getContent(file));
 				var parentCls:Class<Dynamic> = ScriptedDummyClass;
+				var baseCls = null;
 				var imports:Map<String, String> = [];
 				for (e in ogExpr)
 				{
@@ -58,8 +61,10 @@ class ScriptClassManager
 					{
 						default:
 						// case DPackage(path): package will auto generated so yeah
-						case DImport(path, everything):
+						case DImport(path, everything, alias, func):
 							var name = path[path.length - 1];
+							if (alias != null)
+								name = alias;
 							imports.set(name, path.join("."));
 						case DClass(c):
 							if (c.extend != null)
@@ -71,7 +76,7 @@ class ScriptClassManager
 										var p = path.join(".");
 										if (imports.get(p) != null)
 											p = imports.get(p);
-										var baseCls = Type.resolveClass(p);
+										baseCls = Type.resolveClass(p);
 										if (!SCRIPTABLE_CLASSES.exists(baseCls))
 										{
 											trace("[ERROR] Class " + p + " is not scriptable!");
@@ -84,6 +89,7 @@ class ScriptClassManager
 								var ref:ScriptClassRef = {
 									path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
 									scriptedClass: parentCls,
+									baseClass: baseCls,
 									expr: expr
 								}
 
@@ -91,15 +97,13 @@ class ScriptClassManager
 							}
 					}
 				}
-
-				trace(classes);
 			}
 		}
 	}
 
 	static function __buildRuleScript(typeName:String, superInstance:Dynamic)
 	{
-		var rulescript = new RuleScript(new RuleScriptInterpEx(), new HxParser());
+		var rulescript = new RuleScript(new FunkinRule.RuleScriptInterpEx(), new HxParser());
 		rulescript.superInstance = superInstance;
 		rulescript.interp.skipNextRestore = true;
 		rulescript.execute(classes.get(typeName).expr);
@@ -141,11 +145,22 @@ class ScriptClassManager
 		var instance = Type.createInstance(ref.scriptedClass, [path, args]);
 		return instance;
 	}
+
+	public static function listScriptClassesExtends(cls:Class<Dynamic>):Array<String>
+	{
+		var result:Array<String> = [];
+		for (key => scriptClass in classes)
+			if (scriptClass.baseClass == cls)
+				result.push(key);
+
+		return result;
+	}
 }
 
 typedef ScriptClassRef =
 {
 	var path:String; // for datamining from imports
+	var baseClass:Null<Dynamic>;
 	var scriptedClass:Dynamic;
 	var expr:Expr;
 }

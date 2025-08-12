@@ -1,3 +1,3 @@
 package melt.scripting.base;
 
-class ScriptedMusicBeatState implements rulescript.scriptedClass.RuleScriptedClass extends MusicBeatState{}
+class ScriptedMusicBeatState extends MusicBeatState implements rulescript.scriptedClass.RuleScriptedClass{}

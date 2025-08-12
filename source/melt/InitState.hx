@@ -7,9 +7,9 @@ import flixel.input.keyboard.FlxKey;
 import flixel.addons.transition.FlxTransitionableState;
 import lime.app.Application;
 import melt.data.WeekData;
-import rulescript.RuleScript;
 import melt.Discord.DiscordClient;
 import melt.plugin.*;
+import melt.scripting.ScriptClassManager;
 
 
 class InitState extends FlxState

@@ -951,6 +951,7 @@ class ChartingState extends MusicBeatState
 		#if LUA_ALLOWED
 		var directories:Array<String> = [];
 
+		directories.push(Paths.getSharedPath('notetypes/'));
 		#if MODS_ALLOWED
 		directories.push(Paths.mods('notetypes/'));
 		directories.push(Paths.mods(Paths.currentModDirectory + '/notetypes/'));
