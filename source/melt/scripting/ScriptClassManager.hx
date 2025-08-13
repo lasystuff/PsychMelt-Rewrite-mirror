@@ -91,8 +91,17 @@ class ScriptClassManager
 								}
 							}
 
+							var ref:ScriptClassRef = {
+								path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
+								scriptedClass: parentCls,
+								extend: baseCls,
+								expr: expr,
+
+								staticFields: []
+							}
+
+							// doing this after generationg ref to do funnt shit
 							var _staticFieldNames:Array<String> = [];
-							var staticFields:Map<String, Dynamic> = [];
 
 							for (field in c.fields)
 							{
@@ -103,25 +112,37 @@ class ScriptClassManager
 							// execute script once to transfer static fields to ref
 							if ((_staticFieldNames.length > 0))
 							{
-								var rulescript = new RuleScript(new FunkinRule.RuleScriptInterpEx(), new HxParser());
+								var rulescript = new RuleScript(new RuleScriptInterpEx(), new HxParser());
+								cast(rulescript.interp, RuleScriptInterpEx).ref = ref;
 								rulescript.execute(expr);
 
 								for (key => data in rulescript.variables)
 								{
 									if (_staticFieldNames.contains(key))
 									{
-										staticFields.set(key, data); // copy stuff
+										ref.staticFields.set(key, data); // copy stuff
 									}
 								}
 							}
-
-							var ref:ScriptClassRef = {
-								path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
-								scriptedClass: parentCls,
-								extend: baseCls,
-								expr: expr,
-
-								staticFields: staticFields
+							
+							// cleanup static from expr
+							switch(expr.e)
+							{
+								default:
+								case EBlock(fields):
+									for (field in fields)
+									{
+										switch(field.e)
+										{
+											default:
+											case EFunction(a, e, n, r):
+												if (_staticFieldNames.contains(n))
+													fields.remove(field);
+											case EVar(n, t, e):
+												if (_staticFieldNames.contains(n))
+													fields.remove(field);
+										}
+									}
 							}
 
 							classes.set(ref.path, ref);
