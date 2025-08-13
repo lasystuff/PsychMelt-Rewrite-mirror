@@ -8,6 +8,7 @@ import hscript.Expr;
 import hscript.Parser;
 import sys.io.File;
 import melt.scripting.base.*;
+import melt.scripting.FunkinRule.RuleScriptInterpEx;
 
 using StringTools;
 
@@ -53,6 +54,7 @@ class ScriptClassManager
 		{
 			if (file.endsWith(".hx"))
 			{
+				var expr = parser.parse(File.getContent(file));
 				// using base parser for getting stuff
 				var ogExpr = new Parser().parseModule(File.getContent(file));
 				var parentCls:Class<Dynamic> = ScriptedDummyClass;
@@ -87,26 +89,55 @@ class ScriptClassManager
 										}
 										parentCls = SCRIPTABLE_CLASSES.get(baseCls);
 								}
-
-								var expr = parser.parse(File.getContent(file));
-								var ref:ScriptClassRef = {
-									path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
-									scriptedClass: parentCls,
-									extend: baseCls,
-									expr: expr
-								}
-
-								classes.set(ref.path, ref);
 							}
+
+							var _staticFieldNames:Array<String> = [];
+							var staticFields:Map<String, Dynamic> = [];
+
+							for (field in c.fields)
+							{
+								if (field.access.contains(AStatic))
+									_staticFieldNames.push(field.name);
+							}
+
+							// execute script once to transfer static fields to ref
+							if ((_staticFieldNames.length > 0))
+							{
+								var rulescript = new RuleScript(new FunkinRule.RuleScriptInterpEx(), new HxParser());
+								rulescript.execute(expr);
+
+								for (key => data in rulescript.variables)
+								{
+									if (_staticFieldNames.contains(key))
+									{
+										staticFields.set(key, data); // copy stuff
+									}
+								}
+							}
+
+							var ref:ScriptClassRef = {
+								path: file.split("/source/")[1].replace(".hx", "").replace("/", "."),
+								scriptedClass: parentCls,
+								extend: baseCls,
+								expr: expr,
+
+								staticFields: staticFields
+							}
+
+							classes.set(ref.path, ref);
 					}
 				}
 			}
 		}
+
+		trace(classes);
 	}
 
 	static function __buildRuleScript(typeName:String, superInstance:Dynamic)
 	{
-		var rulescript = new RuleScript(new FunkinRule.RuleScriptInterpEx(), new HxParser());
+		var interp = new FunkinRule.RuleScriptInterpEx();
+		interp.ref = classes.get(typeName);
+		var rulescript = new RuleScript(interp, new HxParser());
 		rulescript.superInstance = superInstance;
 		rulescript.interp.skipNextRestore = true;
 		rulescript.execute(classes.get(typeName).expr);
@@ -116,7 +147,7 @@ class ScriptClassManager
 
 	static function __resolveScript(path:String):Dynamic
 	{
-		var state = FunkinRule.resolveScriptState;
+		var state = RuleScriptInterpEx.resolveScriptState;
 		var clsName = path.split(".")[path.split(".").length - 1];
 
 		switch (state.mode)
@@ -160,12 +191,14 @@ class ScriptClassManager
 	}
 }
 
-typedef ScriptClassRef =
+@:structInit class ScriptClassRef
 {
-	var path:String; // for datamining from imports
-	var extend:Null<Dynamic>;
-	var scriptedClass:Dynamic;
-	var expr:Expr;
+	public var path:String; // for datamining from imports
+	public var extend:Null<Dynamic>;
+	public var scriptedClass:Dynamic;
+	public var expr:Expr;
+
+	public var staticFields:Map<String, Dynamic>;
 }
 
 // for scripts that extends nothing
@@ -176,6 +209,4 @@ class DummyClass
 	}
 }
 
-class ScriptedDummyClass implements rulescript.scriptedClass.RuleScriptedClass extends MusicBeatState
-{
-}
+class ScriptedDummyClass implements rulescript.scriptedClass.RuleScriptedClass extends DummyClass{}

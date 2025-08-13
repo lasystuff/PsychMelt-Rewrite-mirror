@@ -28,7 +28,7 @@ function onCreatePost()
 ```
 - Fully rewritten lua with shared backend (allows scripting at the same level as HScript)
 
-- Scripted Classes! (Supports many features such as direct instantiation with new() function)
+- Scripted Classes! (Supports many features such as direct instantiation with new() function, static fields and etc!!!!)
 
 - Small but useful chart editor enhancements (Organizing the time display, Shift + Enter for instant preview, Ctrl + S shortcut)
 

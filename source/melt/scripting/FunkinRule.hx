@@ -6,12 +6,12 @@ import flixel.util.FlxColor;
 import rulescript.*;
 import rulescript.parsers.*;
 
+import melt.scripting.ScriptClassManager.ScriptClassRef;
+
 using StringTools;
 
 class FunkinRule
 {
-	public static var resolveScriptState:ResolveScriptState;
-
 	public var scriptType:String = "Unknown Script"; // for trace
     private var rule:RuleScript;
 
@@ -104,16 +104,61 @@ class FunkinRule
 // RuleScript with some extra variables for better custom classes handling
 class RuleScriptInterpEx extends RuleScriptInterp
 {
+	public static var resolveScriptState:ResolveScriptState;
+	public var ref:ScriptClassRef;
+	
 	override function cnew(cl:String, args:Array<Dynamic>):Dynamic
 	{
-		FunkinRule.resolveScriptState = {owner: this, mode: "cnew", args: args};
+		resolveScriptState = {owner: this, mode: "cnew", args: args};
 		return super.cnew(cl, args);
 	}
 
 	override function resolveType(path:String):Dynamic
 	{
-		FunkinRule.resolveScriptState = {owner: this, mode: "resolve"};
+		resolveScriptState = {owner: this, mode: "resolve"};
 		return super.resolveType(path);
+	}
+
+	override function get(o:Dynamic, f:String):Dynamic
+	{
+		if (o == this)
+		{
+			if (this.ref.staticFields.exists(f))
+				return this.ref.staticFields.get(f);
+		}
+
+		if (o is ScriptClassRef)
+		{
+			var cls = cast(o, ScriptClassRef);
+			if (cls.staticFields.exists(f))
+				return cls.staticFields.get(f);
+		}
+
+		return super.get(o, f);
+	}
+
+	override function set(o:Dynamic, f:String, v:Dynamic):Dynamic
+	{
+		if (o == this)
+		{
+			if (this.ref.staticFields.exists(f))
+			{
+				this.ref.staticFields.set(f, v);
+				return this.ref.staticFields.get(f);
+			}
+		}
+
+		if (o is ScriptClassRef)
+		{
+			var cls = cast(o, ScriptClassRef);
+			if (cls.staticFields.exists(f))
+			{
+				cls.staticFields.set(f, v);
+				return cls.staticFields.get(f);
+			}
+		}
+
+		return super.set(o, f, v);
 	}
 }
 
