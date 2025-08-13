@@ -10,10 +10,6 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 
-import openfl.text.TextField;
-import openfl.text.TextFormat;
-import flixel.util.FlxColor;
-
 import melt.ClientPrefs;
 import melt.InitState;
 
@@ -28,6 +24,7 @@ import sys.FileSystem;
 import sys.io.File;
 import sys.io.Process;
 #end
+import melt.debug.FPS;
 
 using StringTools;
 
@@ -40,7 +37,7 @@ class Main extends Sprite
 	var framerate:Int = 60; // How many frames per second the game should run at.
 	var skipSplash:Bool = true; // Whether to skip the flixel splash screen that appears in release mode.
 	var startFullscreen:Bool = false; // Whether to start the game in fullscreen on desktop targets
-	public static var fpsVar:melt.FPS;
+	public static var fpsVar:FPS;
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
@@ -91,7 +88,7 @@ class Main extends Sprite
 		addChild(new FlxGame(gameWidth, gameHeight, initialState, framerate, framerate, skipSplash, startFullscreen));
 
 		#if !mobile
-		fpsVar = new melt.FPS(10, 3, 0xFFFFFF);
+		fpsVar = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsVar);
 		Lib.current.stage.align = "tl";
 		Lib.current.stage.scaleMode = StageScaleMode.NO_SCALE;
@@ -104,20 +101,6 @@ class Main extends Sprite
 		FlxG.autoPause = false;
 		FlxG.mouse.visible = false;
 		#end
-
-		final usrName = #if windows Sys.environment()["USERNAME"]; #elseif (linux || macos) Sys.environment()["USER"]; #end
-
-		var compilationInformation = new TextField();
-		compilationInformation.y = (FlxG.height / 4) * 3;
-		compilationInformation.defaultTextFormat = new TextFormat("_sans", 24, FlxColor.fromRGB(255, 125, 125));
-		compilationInformation.text = 'Build Compilation Date: ${CompileTime.buildDateString()}\nBuild open date: ${Date.now().toString()}\nYou are: ${usrName}!! Dont Leak Pls!!';
-		compilationInformation.multiline = true;
-		compilationInformation.selectable = false;
-		compilationInformation.autoSize = LEFT;
-		compilationInformation.mouseEnabled = false;
-		compilationInformation.alpha = 0.675;
-		//Comment out this if you don't want to leaking your(or your mod team's user) name!!!
-		//addChild(compilationInformation);
 		
 		#if CRASH_HANDLER
 		Lib.current.loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, onCrash);

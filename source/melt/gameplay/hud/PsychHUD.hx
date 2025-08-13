@@ -1,6 +1,6 @@
 package melt.gameplay.hud;
 
-// basically v-slice ui
+// classic thing
 import flixel.ui.FlxBar;
 import flixel.util.FlxColor;
 import flixel.FlxG;
@@ -28,7 +28,6 @@ class PsychHUD extends VanillaHUD
 		scoreTxt.setFormat(Paths.font("vcr.ttf"), 20, FlxColor.WHITE, CENTER, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		scoreTxt.scrollFactor.set();
 		scoreTxt.borderSize = 1.25;
-		scoreTxt.visible = !ClientPrefs.hideHud;
 		add(scoreTxt);
 
 		var showTime:Bool = (ClientPrefs.timeBarType != 'Disabled');

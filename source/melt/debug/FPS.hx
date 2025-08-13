@@ -1,4 +1,4 @@
-package melt;
+package melt.debug;
 
 import haxe.Timer;
 import openfl.events.Event;
@@ -46,7 +46,7 @@ class FPS extends TextField
 		currentFPS = 0;
 		selectable = false;
 		mouseEnabled = false;
-		defaultTextFormat = new TextFormat("_sans", 14, color);
+		defaultTextFormat = new TextFormat(Paths.font("vcr.ttf"), 14, color);
 		autoSize = LEFT;
 		multiline = true;
 		text = "FPS: ";
@@ -78,18 +78,11 @@ class FPS extends TextField
 
 		if (currentCount != cacheCount /*&& visible*/)
 		{
-			text = 'FPS: ${currentFPS}';
-			
-			#if openfl
-			memoryMegas = cast(System.totalMemory, UInt);
-			text += '\nMEMORY: ${flixel.util.FlxStringUtil.formatBytes(memoryMegas)}';
-			#end
+			text = 'FPS: $currentFPS • Memory: ${flixel.util.FlxStringUtil.formatBytes(cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE))}';
 
 			textColor = 0xFFFFFFFF;
 			if (currentFPS <= ClientPrefs.framerate / 2)
 				textColor = 0xFFFF0000;
-
-			text += "\n";
 		}
 
 		cacheCount = currentCount;
