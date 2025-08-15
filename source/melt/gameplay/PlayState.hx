@@ -41,7 +41,6 @@ import flixel.input.keyboard.FlxKey;
 import openfl.events.KeyboardEvent;
 import flixel.util.FlxSave;
 import melt.Achievements;
-import melt.data.StageData;
 import melt.scripting.*;
 import melt.DialogueBoxPsych;
 import melt.Conductor.Rating;
@@ -267,7 +266,6 @@ class PlayState extends MusicBeatState
 	override public function create()
 	{
 		// trace('Playback Rate: ' + playbackRate);
-		Paths.clearStoredMemory();
 
 		// for lua
 		instance = this;
@@ -376,7 +374,7 @@ class PlayState extends MusicBeatState
 		#end
 
 		GameOverSubstate.resetVariables();
-		var songName:String = Paths.formatToSongPath(SONG.song);
+		var songName:String = Song.formatName(SONG.song);
 
 		curStage = SONG.stage;
 		// trace('stage is: ' + curStage);
@@ -387,25 +385,9 @@ class PlayState extends MusicBeatState
 
 		SONG.stage = curStage;
 
-		var stageData:StageFile = StageData.getStageFile(curStage);
-		if (stageData == null)
-		{ // Stage couldn't be found, create a dummy stage for preventing a crash
-			stageData = {
-				directory: "",
-				defaultZoom: 0.9,
-				isPixelStage: false,
-
-				boyfriend: [770, 100],
-				girlfriend: [400, 130],
-				opponent: [100, 100],
-				hide_girlfriend: false,
-
-				camera_boyfriend: [0, 0],
-				camera_opponent: [0, 0],
-				camera_girlfriend: [0, 0],
-				camera_speed: 1
-			};
-		}
+		stage = new Stage(curStage);
+		add(stage);
+		var stageData = stage.data;
 
 		defaultCamZoom = stageData.defaultZoom;
 		isPixelStage = stageData.isPixelStage;
@@ -436,7 +418,7 @@ class PlayState extends MusicBeatState
 		dadGroup = new FlxSpriteGroup(DAD_X, DAD_Y);
 		gfGroup = new FlxSpriteGroup(GF_X, GF_Y);
 
-		switch (Paths.formatToSongPath(SONG.song))
+		switch (Song.formatName(SONG.song))
 		{
 			case 'stress':
 				GameOverSubstate.characterName = 'bf-holding-gf-dead';
@@ -447,9 +429,6 @@ class PlayState extends MusicBeatState
 			introSoundsSuffix = '-pixel';
 		}
 
-		stage = new Stage(curStage);
-		add(stage);
-
 		add(ghostGroup);
 
 		add(gfGroup);
@@ -457,38 +436,15 @@ class PlayState extends MusicBeatState
 		add(boyfriendGroup);
 
 		// "GLOBAL" SCRIPTS
-		#if LUA_ALLOWED
-		var filesPushed:Array<String> = [];
-		var foldersToCheck:Array<String> = [Paths.getSharedPath('scripts/')];
 
-		#if MODS_ALLOWED
-		foldersToCheck.insert(0, Paths.mods('scripts/'));
-		if (Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
-			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/scripts/'));
-
-		for (mod in Paths.getGlobalMods())
-			foldersToCheck.insert(0, Paths.mods(mod + '/scripts/'));
-		#end
-
-		for (folder in foldersToCheck)
+		for (file in AssetUtil.readDirectory("scripts"))
 		{
-			if (FileSystem.exists(folder))
+			var script = FunkinRule.fromFile(Paths.getPath("scripts/" + file), this);
+			if (script != null)
 			{
-				for (file in FileSystem.readDirectory(folder))
-				{
-					if (!filesPushed.contains(file))
-					{
-						var script = FunkinRule.fromFile(folder + file, this);
-						if (script != null)
-						{
-							scriptArray.push(script);
-							filesPushed.push(file);
-						}
-					}
-				}
+				scriptArray.push(script);
 			}
 		}
-		#end
 
 		var gfVersion:String = SONG.gfVersion;
 		if (gfVersion == null || gfVersion.length < 1)
@@ -591,7 +547,7 @@ class PlayState extends MusicBeatState
 		if (hud == null)
 			hud = Type.createInstance(Type.resolveClass(metadata.hud), []); // try using hardcoded one
 		if (hud == null) // if hud is still null, use default
-			hud = Type.createInstance(Type.resolveClass(Constants.DEFAULT_HUD_CLASS), []);
+			hud = Type.createInstance(Type.resolveClass(Constants.SONG_DEFAULT_HUD), []);
 
 		hud.cameras = [camHUD];
 		hud.visible = !ClientPrefs.hideHud;
@@ -621,79 +577,24 @@ class PlayState extends MusicBeatState
 		#if LUA_ALLOWED
 		for (notetype in noteTypeMap.keys())
 		{
-			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('notetypes/' + notetype + '.lua');
-			if (FileSystem.exists(luaToLoad))
-			{
+			var luaToLoad = Paths.getPath('events/' + notetype + '.lua');
+			if (luaToLoad != null)
 				scriptArray.push(new FunkinLua(luaToLoad, this));
-			}
-			else
-			{
-				luaToLoad = Paths.getSharedPath('notetypes/' + notetype + '.lua');
-				if (FileSystem.exists(luaToLoad))
-				{
-					scriptArray.push(new FunkinLua(luaToLoad, this));
-				}
-			}
 
-			var hxToLoad:String = Paths.modFolders('notetypes/' + notetype + '.hx');
-			if (FileSystem.exists(hxToLoad))
-			{
+			var hxToLoad = Paths.getPath('events/' + notetype + '.hx');
+			if (hxToLoad != null)
 				scriptArray.push(new FunkinHScript(hxToLoad, this));
-			}
-			else
-			{
-				hxToLoad = Paths.getSharedPath('notetypes/' + notetype + '.hx');
-				if (FileSystem.exists(hxToLoad))
-				{
-					scriptArray.push(new FunkinHScript(hxToLoad, this));
-				}
-			}
-			#elseif sys
-			var luaToLoad:String = Paths.getSharedPath('notetypes/' + notetype + '.lua');
-			if (OpenFlAssets.exists(luaToLoad))
-			{
-				scriptArray.push(new FunkinLua(luaToLoad, this));
-			}
-			#end
 		}
+
 		for (event in eventPushedMap.keys())
 		{
-			#if MODS_ALLOWED
-			var luaToLoad:String = Paths.modFolders('events/' + event + '.lua');
-			if (FileSystem.exists(luaToLoad))
-			{
+			var luaToLoad = Paths.getPath('events/' + event + '.lua');
+			if (luaToLoad != null)
 				scriptArray.push(new FunkinLua(luaToLoad, this));
-			}
-			else
-			{
-				luaToLoad = Paths.getSharedPath('events/' + event + '.lua');
-				if (FileSystem.exists(luaToLoad))
-				{
-					scriptArray.push(new FunkinLua(luaToLoad, this));
-				}
-			}
 
-			var hxToLoad:String = Paths.modFolders('events/' + event + '.hx');
-			if (FileSystem.exists(hxToLoad))
-			{
+			var hxToLoad = Paths.getPath('events/' + event + '.hx');
+			if (hxToLoad != null)
 				scriptArray.push(new FunkinHScript(hxToLoad, this));
-			}
-			else
-			{
-				hxToLoad = Paths.getSharedPath('events/' + event + '.hx');
-				if (FileSystem.exists(hxToLoad))
-				{
-					scriptArray.push(new FunkinHScript(hxToLoad, this));
-				}
-			}
-			#elseif sys
-			var luaToLoad:String = Paths.getSharedPath('events/' + event + '.lua');
-			if (OpenFlAssets.exists(luaToLoad))
-			{
-				scriptArray.push(new FunkinLua(luaToLoad));
-			}
-			#end
 		}
 		#end
 		noteTypeMap.clear();
@@ -702,42 +603,17 @@ class PlayState extends MusicBeatState
 		eventPushedMap = null;
 
 		// SONG SPECIFIC SCRIPTS
-		#if LUA_ALLOWED
-		var filesPushed:Array<String> = [];
-		var foldersToCheck:Array<String> = [Paths.getSharedPath('data/' + Paths.formatToSongPath(SONG.song) + '/')];
-
-		#if MODS_ALLOWED
-		foldersToCheck.insert(0, Paths.mods('data/' + Paths.formatToSongPath(SONG.song) + '/'));
-		if (Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
-			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/data/' + Paths.formatToSongPath(SONG.song) + '/'));
-
-		for (mod in Paths.getGlobalMods())
-			foldersToCheck.insert(0,
-				Paths.mods(mod + '/data/' + Paths.formatToSongPath(SONG.song) +
-					'/')); // using push instead of insert because these should run after everything else
-		#end
-
-		for (folder in foldersToCheck)
+		var scriptsToLoad = AssetUtil.readDirectory('data/' + Song.formatName(curSong));
+		for (scr in scriptsToLoad)
 		{
-			if (FileSystem.exists(folder))
-			{
-				for (file in FileSystem.readDirectory(folder))
-				{
-					if (!filesPushed.contains(file))
-					{
-						var script = FunkinRule.fromFile(folder + file, this);
-						if (script != null)
-						{
-							scriptArray.push(script);
-							filesPushed.push(file);
-						}
-					}
-				}
-			}
+			var path = Paths.getPath('data/' + Song.formatName(curSong) + "/" + scr);
+			if (scr.endsWith(".lua"))
+				scriptArray.push(new FunkinLua(path, this));
+			if (scr.endsWith(".hx"))
+				scriptArray.push(new FunkinHScript(path, this));
 		}
-		#end
 
-		var daSong:String = Paths.formatToSongPath(curSong);
+		var daSong:String = Song.formatName(curSong);
 		if (isStoryMode && !seenCutscene)
 		{
 			switch (daSong)
@@ -767,7 +643,7 @@ class PlayState extends MusicBeatState
 		}
 		else if (ClientPrefs.pauseMusic != 'None')
 		{
-			precacheList.set(Paths.formatToSongPath(ClientPrefs.pauseMusic), 'music');
+			precacheList.set(Song.formatName(ClientPrefs.pauseMusic), 'music');
 		}
 
 		precacheList.set('alphabet', 'image');
@@ -802,85 +678,9 @@ class PlayState extends MusicBeatState
 					Paths.music(key);
 			}
 		}
-		
-		Paths.clearUnusedMemory();
 
 		CustomFadeTransition.nextCamera = camOther;
 	}
-
-	#if (!flash && sys)
-	public var runtimeShaders:Map<String, Array<String>> = new Map<String, Array<String>>();
-
-	public function createRuntimeShader(name:String):FlxRuntimeShader
-	{
-		if (!ClientPrefs.shaders)
-			return new FlxRuntimeShader();
-
-		#if (!flash && MODS_ALLOWED && sys)
-		if (!runtimeShaders.exists(name) && !initCustomShader(name))
-		{
-			FlxG.log.warn('Shader $name is missing!');
-			return new FlxRuntimeShader();
-		}
-
-		var arr:Array<String> = runtimeShaders.get(name);
-		return new FlxRuntimeShader(arr[0], arr[1]);
-		#else
-		FlxG.log.warn("Platform unsupported for Runtime Shaders!");
-		return null;
-		#end
-	}
-
-	public function initCustomShader(name:String, ?glslVersion:Int = 120):Bool
-	{
-		if (!ClientPrefs.shaders)
-			return false;
-
-		if (runtimeShaders.exists(name))
-			return true;
-
-		var foldersToCheck:Array<String> = [Paths.mods('shaders/')];
-		if (Paths.currentModDirectory != null && Paths.currentModDirectory.length > 0)
-			foldersToCheck.insert(0, Paths.mods(Paths.currentModDirectory + '/shaders/'));
-
-		for (mod in Paths.getGlobalMods())
-			foldersToCheck.insert(0, Paths.mods(mod + '/shaders/'));
-
-		for (folder in foldersToCheck)
-		{
-			if (FileSystem.exists(folder))
-			{
-				var frag:String = folder + name + '.frag';
-				var vert:String = folder + name + '.vert';
-				var found:Bool = false;
-				if (FileSystem.exists(frag))
-				{
-					frag = File.getContent(frag);
-					found = true;
-				}
-				else
-					frag = null;
-
-				if (FileSystem.exists(vert))
-				{
-					vert = File.getContent(vert);
-					found = true;
-				}
-				else
-					vert = null;
-
-				if (found)
-				{
-					runtimeShaders.set(name, [frag, vert]);
-					// trace('Found shader $name!');
-					return true;
-				}
-			}
-		}
-		FlxG.log.warn('Missing shader $name .frag AND .vert files!');
-		return false;
-	}
-	#end
 
 	function set_songSpeed(value:Float):Float
 	{
@@ -912,42 +712,14 @@ class PlayState extends MusicBeatState
 
 	function startCharacterLua(name:String)
 	{
-		#if LUA_ALLOWED
 		var doPush:Bool = false;
 		var luaFile:String = 'characters/' + name + '.lua';
-		#if MODS_ALLOWED
-		if (FileSystem.exists(Paths.modFolders(luaFile)))
-		{
-			luaFile = Paths.modFolders(luaFile);
-			doPush = true;
-		}
-		else
-		{
-			luaFile = Paths.getSharedPath(luaFile);
-			if (FileSystem.exists(luaFile))
-			{
-				doPush = true;
-			}
-		}
-		#else
-		luaFile = Paths.getSharedPath(luaFile);
-		if (Assets.exists(luaFile))
-		{
-			doPush = true;
-		}
-		#end
+		if (AssetUtil.exists(luaFile))
+			scriptArray.push(new FunkinLua(Paths.getPath(luaFile), this));
 
-		if (doPush)
-		{
-			for (script in scriptArray)
-			{
-				@:privateAccess
-				if (script.rule.scriptName == luaFile)
-					return;
-			}
-			scriptArray.push(new FunkinLua(luaFile, this));
-		}
-		#end
+		var hxFile:String = 'characters/' + name + '.hx';
+		if (AssetUtil.exists(hxFile))
+			scriptArray.push(new FunkinHScript(Paths.getPath(hxFile), this));
 	}
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false)
@@ -1453,15 +1225,11 @@ class PlayState extends MusicBeatState
 
 		var daBeats:Int = 0; // Not exactly representative of 'daBeats' lol, just how much it has looped
 
-		var songName:String = Paths.formatToSongPath(SONG.song);
+		var songName:String = Song.formatName(SONG.song);
 		var file:String = Paths.json(songName + '/events');
-		#if MODS_ALLOWED
-		if (FileSystem.exists(Paths.modsJson(songName + '/events')) || FileSystem.exists(file))
+		
+		if (file != null)
 		{
-		#else
-		if (OpenFlAssets.exists(file))
-		{
-		#end
 			var eventsData:Array<Dynamic> = Song.loadFromJson('events', songName).events;
 			for (event in eventsData) // Event Notes
 			{
@@ -2342,7 +2110,6 @@ class PlayState extends MusicBeatState
 
 				if (storyPlaylist.length <= 0)
 				{
-					WeekData.loadTheFirstEnabledMod();
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 
 					cancelMusicFadeTween();
@@ -2359,7 +2126,7 @@ class PlayState extends MusicBeatState
 
 						if (SONG.validScore)
 						{
-							Highscore.saveWeekScore(WeekData.getWeekFileName(), campaignScore, storyDifficulty);
+							Highscore.saveWeekScore(WeekData.weeksList[storyWeek], campaignScore, storyDifficulty);
 						}
 
 						FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
@@ -2371,7 +2138,7 @@ class PlayState extends MusicBeatState
 				{
 					var difficulty:String = CoolUtil.getDifficultyFilePath();
 
-					trace(Paths.formatToSongPath(PlayState.storyPlaylist[0]) + difficulty);
+					trace(Song.formatName(PlayState.storyPlaylist[0]) + difficulty);
 
 					FlxTransitionableState.skipNextTransIn = true;
 					FlxTransitionableState.skipNextTransOut = true;
@@ -2384,7 +2151,6 @@ class PlayState extends MusicBeatState
 			}
 			else
 			{
-				WeekData.loadTheFirstEnabledMod();
 				cancelMusicFadeTween();
 				if (FlxTransitionableState.skipNextTransIn)
 				{
@@ -2958,7 +2724,7 @@ class PlayState extends MusicBeatState
 			totalPlayed++;
 			RecalculateRating(true);
 
-			FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+			FlxG.sound.play(Paths.sound('missnote' + Std.string(FlxG.random.int(1, 3))), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
 			// FlxG.log.add('played imss note');
 
@@ -3426,7 +3192,7 @@ class PlayState extends MusicBeatState
 			{
 				var unlock:Bool = false;
 
-				if (achievementName.contains(WeekData.getWeekFileName())
+				if (achievementName.contains(WeekData.weeksList[storyWeek])
 					&& achievementName.endsWith('nomiss')) // any FC achievements, name should be "weekFileName_nomiss", e.g: "weekd_nomiss";
 				{
 					if (isStoryMode
@@ -3485,7 +3251,7 @@ class PlayState extends MusicBeatState
 							unlock = true;
 						}
 					case 'debugger':
-						if (Paths.formatToSongPath(SONG.song) == 'test' && !usedPractice)
+						if (Song.formatName(SONG.song) == 'test' && !usedPractice)
 						{
 							unlock = true;
 						}

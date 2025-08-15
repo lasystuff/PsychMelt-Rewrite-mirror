@@ -11,7 +11,6 @@ import openfl.utils.Assets;
 import lime.utils.Assets as LimeAssets;
 import lime.utils.AssetLibrary;
 import lime.utils.AssetManifest;
-import melt.data.StageData;
 import haxe.io.Path;
 import melt.gameplay.PlayState;
 
@@ -44,7 +43,7 @@ class LoadingState extends MusicBeatState
 	{
 		var bg:FlxSprite = new FlxSprite().makeGraphic(FlxG.width, FlxG.height, 0xffcaff4d);
 		add(bg);
-		funkay = new FlxSprite(0, 0).loadGraphic(Paths.getPath('images/funkay.png', IMAGE));
+		funkay = new FlxSprite(0, 0).loadGraphic(Paths.image('/funkay'));
 		funkay.setGraphicSize(0, FlxG.height);
 		funkay.updateHitbox();
 		funkay.antialiasing = ClientPrefs.globalAntialiasing;
@@ -156,14 +155,6 @@ class LoadingState extends MusicBeatState
 	static function getNextState(target:FlxState, stopMusic = false):FlxState
 	{
 		var directory:String = 'shared';
-		var weekDir:String = StageData.forceNextDirectory;
-		StageData.forceNextDirectory = null;
-
-		if (weekDir != null && weekDir.length > 0 && weekDir != '')
-			directory = weekDir;
-
-		Paths.setCurrentLevel(directory);
-		trace('Setting asset folder to ' + directory);
 
 		#if NO_PRELOAD_ALL
 		var loaded:Bool = false;

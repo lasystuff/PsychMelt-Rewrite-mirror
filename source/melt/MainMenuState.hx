@@ -37,7 +37,6 @@ class MainMenuState extends MusicBeatState
 		'story_mode',
 		'freeplay',
 		#if ACHIEVEMENTS_ALLOWED 'awards', #end
-		'credits',
 		#if !switch 'donate', #end
 		'options'
 	];
@@ -49,11 +48,6 @@ class MainMenuState extends MusicBeatState
 
 	override function create()
 	{
-		#if MODS_ALLOWED
-		Paths.pushGlobalMods();
-		#end
-		WeekData.loadTheFirstEnabledMod();
-
 		super.create();
 
 		#if desktop
@@ -76,7 +70,7 @@ class MainMenuState extends MusicBeatState
 		persistentUpdate = persistentDraw = true;
 
 		var yScroll:Float = Math.max(0.25 - (0.05 * (optionShit.length - 4)), 0.1);
-		var bg:FlxSprite = new FlxSprite(-80, Paths.image('menuBG'));
+		var bg:FlxSprite = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		bg.scrollFactor.set(0, yScroll);
 		bg.setGraphicSize(Std.int(bg.width * 1.175));
 		bg.updateHitbox();
@@ -89,7 +83,7 @@ class MainMenuState extends MusicBeatState
 		add(camFollow);
 		add(camFollowPos);
 
-		magenta = new FlxSprite(-80, Paths.image('menuDesat'));
+		magenta = new FlxSprite(-80).loadGraphic(Paths.image('menuBG'));
 		magenta.scrollFactor.set(0, yScroll);
 		magenta.setGraphicSize(Std.int(magenta.width * 1.175));
 		magenta.updateHitbox();
@@ -246,8 +240,6 @@ class MainMenuState extends MusicBeatState
 										MusicBeatState.switchState(new FreeplayState());
 									case 'awards':
 										MusicBeatState.switchState(new AchievementsMenuState());
-									case 'credits':
-										MusicBeatState.switchState(new CreditsState());
 									case 'options':
 										LoadingState.loadAndSwitchState(new melt.options.OptionsState());
 								}

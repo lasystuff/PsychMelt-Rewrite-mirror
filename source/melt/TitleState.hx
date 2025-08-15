@@ -113,7 +113,7 @@ class TitleState extends MusicBeatState
 		swagShader = new ColorSwap();
 
 		// IGNORE THIS!!!
-		titleJSON = Json.parse(Paths.getTextFromFile('images/gfDanceTitle.json'));
+		titleJSON = Json.parse(AssetUtil.getText('images/gfDanceTitle.json'));
 
 		#if TITLE_SCREEN_EASTER_EGG
 		if (FlxG.save.data.psychDevsEasterEgg == null)
@@ -260,43 +260,10 @@ class TitleState extends MusicBeatState
 		logoBl.shader = swagShader.shader;
 
 		titleText = new FlxSprite(titleJSON.startx, titleJSON.starty);
-		#if (desktop && MODS_ALLOWED)
-		var path = "content/" + Paths.currentModDirectory + "/images/titleEnter.png";
-		// trace(path, FileSystem.exists(path));
-		if (!FileSystem.exists(path))
-		{
-			path = "content/images/titleEnter.png";
-		}
-		// trace(path, FileSystem.exists(path));
-		if (!FileSystem.exists(path))
-		{
-			path = "assets/images/titleEnter.png";
-		}
-		// trace(path, FileSystem.exists(path));
-		titleText.frames = FlxAtlasFrames.fromSparrow(BitmapData.fromFile(path), File.getContent(StringTools.replace(path, ".png", ".xml")));
-		#else
-		titleText.frames = Paths.getSparrowAtlas('titleEnter');
-		#end
-		var animFrames:Array<FlxFrame> = [];
-		@:privateAccess {
-			titleText.animation.findByPrefix(animFrames, "ENTER IDLE");
-			titleText.animation.findByPrefix(animFrames, "ENTER FREEZE");
-		}
+		titleText.frames = AssetUtil.getSparrow("titleEnter");
 
-		if (animFrames.length > 0)
-		{
-			newTitle = true;
-
-			titleText.animation.addByPrefix('idle', "ENTER IDLE", 24);
-			titleText.animation.addByPrefix('press', ClientPrefs.flashing ? "ENTER PRESSED" : "ENTER FREEZE", 24);
-		}
-		else
-		{
-			newTitle = false;
-
-			titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
-			titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
-		}
+		titleText.animation.addByPrefix('idle', "Press Enter to Begin", 24);
+		titleText.animation.addByPrefix('press', "ENTER PRESSED", 24);
 
 		titleText.antialiasing = ClientPrefs.globalAntialiasing;
 		titleText.animation.play('idle');
@@ -348,7 +315,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = Paths.getTextFromFile("data/introText.txt");
+		var fullText:String = AssetUtil.getText("data/introText.txt", MERGE);
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];
@@ -365,7 +332,6 @@ class TitleState extends MusicBeatState
 
 	private static var playJingle:Bool = false;
 
-	var newTitle:Bool = false;
 	var titleTimer:Float = 0;
 
 	override function update(elapsed:Float)
@@ -399,29 +365,10 @@ class TitleState extends MusicBeatState
 			#end
 		}
 
-		if (newTitle)
-		{
-			titleTimer += CoolUtil.boundTo(elapsed, 0, 1);
-			if (titleTimer > 2)
-				titleTimer -= 2;
-		}
-
 		// EASTER EGG
 
 		if (initialized && !transitioning && skippedIntro)
 		{
-			if (newTitle && !pressedEnter)
-			{
-				var timer:Float = titleTimer;
-				if (timer >= 1)
-					timer = (-timer) + 2;
-
-				timer = FlxEase.quadInOut(timer);
-
-				titleText.color = FlxColor.interpolate(titleTextColors[0], titleTextColors[1], timer);
-				titleText.alpha = FlxMath.lerp(titleTextAlphas[0], titleTextAlphas[1], timer);
-			}
-
 			if (pressedEnter)
 			{
 				titleText.color = FlxColor.WHITE;

@@ -33,7 +33,7 @@ class InitState extends FlxState
 		FlxG.mouse.visible = false;
 		FlxG.cameras.useBufferLocking = true;
 
-		ContentPack.load();
+		Content.load();
 
 		PlayerSettings.init();
 
@@ -66,11 +66,10 @@ class InitState extends FlxState
 		FlxG.signals.postUpdate.add(function(){
 			if (FlxG.keys.justPressed.F5)
 			{
-				melt.cache.ImageCache.clearAll();
-
-				ContentPack.load();
+				Content.load();
 				ScriptClassManager.reloadScriptedClasses();
 				FlxG.resetState();
+				// melt.cache.ImageCache.clearAll(); HOW??????
 			}
 		});
 		

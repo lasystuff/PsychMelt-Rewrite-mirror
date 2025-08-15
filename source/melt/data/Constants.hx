@@ -8,7 +8,7 @@ class Constants
     public static inline final CONTENT_ROOT_FOLDER:String = "content";
 
     public static inline final SONG_DEFAULT_ARTIST:String = "????";
-    public static inline var SONG_DEFAULT_HUD(get, never):String = "melt.gameplay.hud.PsychHUD";
+    @:isVar public static var SONG_DEFAULT_HUD(get, never):String;
     static inline function get_SONG_DEFAULT_HUD():String
-        return Content.getFlag("DEFAULT_HUD", SONG_DEFAULT_HUD);
+        return Content.getFlag("DEFAULT_HUD", "melt.gameplay.hud.PsychHUD");
 }

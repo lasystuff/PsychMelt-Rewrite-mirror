@@ -90,47 +90,21 @@ class Song
 	{
 		var rawJson = null;
 		
-		var formattedFolder:String = Paths.formatToSongPath(folder);
-		var formattedSong:String = Paths.formatToSongPath(jsonInput);
-		#if MODS_ALLOWED
-		var moddyFile:String = Paths.modsJson(formattedFolder + '/' + formattedSong);
-		if(FileSystem.exists(moddyFile)) {
-			rawJson = File.getContent(moddyFile).trim();
-		}
-		#end
+		var formattedFolder:String = formatName(folder);
+		var formattedSong:String = formatName(jsonInput);
 
-		if(rawJson == null) {
-			#if sys
-			rawJson = File.getContent(Paths.json(formattedFolder + '/' + formattedSong)).trim();
-			#else
-			rawJson = Assets.getText(Paths.json(formattedFolder + '/' + formattedSong)).trim();
-			#end
+		var file = Paths.json(formattedFolder + '/' + formattedSong);
+		if (file != null)
+		{
+			rawJson = File.getContent(file).trim();
 		}
 
 		while (!rawJson.endsWith("}"))
 		{
 			rawJson = rawJson.substr(0, rawJson.length - 1);
-			// LOL GOING THROUGH THE BULLSHIT TO CLEAN IDK WHATS STRANGE
 		}
 
-		// FIX THE CASTING ON WINDOWS/NATIVE
-		// Windows???
-		// trace(songData);
-
-		// trace('LOADED FROM JSON: ' + songData.notes);
-		/* 
-			for (i in 0...songData.notes.length)
-			{
-				trace('LOADED FROM JSON: ' + songData.notes[i].sectionNotes);
-				// songData.notes[i].sectionNotes = songData.notes[i].sectionNotes
-			}
-
-				daNotes = songData.notes;
-				daSong = songData.song;
-				daBpm = songData.bpm; */
-
 		var songJson:Dynamic = parseJSONshit(rawJson);
-		if(jsonInput != 'events') melt.data.StageData.loadDirectory(songJson);
 		onLoadJson(songJson);
 		return songJson;
 	}
@@ -149,19 +123,25 @@ class Song
 			artists: Constants.SONG_DEFAULT_ARTIST,
 			hud: Constants.SONG_DEFAULT_HUD
 		};
-		var thepath:String = '${Paths.formatToSongPath(songName)}/metadata';
+		var thepath:String = Paths.json('${formatName(songName)}/metadata-$difficulty');
 
-		if (difficulty.toLowerCase() != "normal" && FileSystem.exists(Paths.getFolderNeeds("data/" + thepath + "-" + difficulty.toLowerCase() + ".json")))
-			thepath += "-" + difficulty.toLowerCase();
+		if (difficulty.toLowerCase() == "normal" || thepath == null)
+			thepath = Paths.json('${formatName(songName)}/metadata');
 
-		if(FileSystem.exists(Paths.getFolderNeeds("data/" + thepath + ".json"))) {
-			final shit = haxe.Json.parse(sys.io.File.getContent(Paths.getFolderNeeds("data/" + thepath + ".json")));
+		if(thepath != null)
+		{
+			final shit = haxe.Json.parse(sys.io.File.getContent(thepath));
 
 			if (shit.displayName != null) metadata.displayName = shit.displayName;
 			if (shit.artists != null) metadata.artists = shit.artists;
 			if (shit.hud != null) metadata.hud = shit.hud;
 		}
 		return metadata;
+	}
+
+	public static function formatName(key:String):String
+	{
+		return key.replace(' ', '-').toLowerCase();
 	}
 }
 

@@ -246,7 +246,7 @@ class ChartingState extends MusicBeatState
 
 		// sections = _song.notes;
 
-		currentSongName = Paths.formatToSongPath(_song.song);
+		currentSongName = Song.formatName(_song.song);
 		loadSong();
 		reloadGridLayer();
 		Conductor.changeBPM(_song.bpm);
@@ -388,7 +388,7 @@ class ChartingState extends MusicBeatState
 
 		var reloadSong:FlxButton = new FlxButton(saveButton.x + 90, saveButton.y, "Reload Audio", function()
 		{
-			currentSongName = Paths.formatToSongPath(UI_songTitle.text);
+			currentSongName = Song.formatName(UI_songTitle.text);
 			loadSong();
 			updateWaveform();
 		});
@@ -409,13 +409,9 @@ class ChartingState extends MusicBeatState
 
 		var loadEventJson:FlxButton = new FlxButton(loadAutosaveBtn.x, loadAutosaveBtn.y + 30, 'Load Events', function()
 		{
-			var songName:String = Paths.formatToSongPath(_song.song);
+			var songName:String = Song.formatName(_song.song);
 			var file:String = Paths.json(songName + '/events');
-			#if sys
-			if (#if MODS_ALLOWED FileSystem.exists(Paths.modsJson(songName + '/events')) || #end FileSystem.exists(file))
-			#else
-			if (OpenFlAssets.exists(file))
-			#end
+			if (Paths.json(songName + '/events') != null)
 			{
 				clearEvents();
 				var events:SwagSong = Song.loadFromJson('events', songName);
@@ -459,47 +455,14 @@ class ChartingState extends MusicBeatState
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
 		blockPressWhileTypingOnStepper.push(stepperSpeed);
-		#if MODS_ALLOWED
-		var directories:Array<String> = [
-			Paths.mods('characters/'),
-			Paths.mods(Paths.currentModDirectory + '/characters/'),
-			Paths.getSharedPath('characters/')
-		];
-		for (mod in Paths.getGlobalMods())
-			directories.push(Paths.mods(mod + '/characters/'));
-		#else
-		var directories:Array<String> = [Paths.getSharedPath('characters/')];
-		#end
 
-		var tempMap:Map<String, Bool> = new Map<String, Bool>();
-		var characters:Array<String> = CoolUtil.coolTextFile(Paths.txt('characterList'));
-		for (i in 0...characters.length)
-		{
-			tempMap.set(characters[i], true);
-		}
+		var characters:Array<String> = [];
 
-		#if MODS_ALLOWED
-		for (i in 0...directories.length)
+		for (file in AssetUtil.readDirectory("characters"))
 		{
-			var directory:String = directories[i];
-			if (FileSystem.exists(directory))
-			{
-				for (file in CoolUtil.recursivelyReadFolders(directory))
-				{
-					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
-					{
-						var charToCheck:String = file.substr(0, file.length - 5);
-						if (!charToCheck.endsWith('-dead') && !tempMap.exists(charToCheck))
-						{
-							tempMap.set(charToCheck, true);
-							characters.push(charToCheck);
-						}
-					}
-				}
-			}
+			if (!file.endsWith("-dead") && file.endsWith(".json"))
+				characters.push(file.split(".json")[0]);
 		}
-		#end
 
 		var player1DropDown = new FlxUIDropDownMenuCustom(10, stepperSpeed.y + 45, FlxUIDropDownMenuCustom.makeStrIdLabelArray(characters, true),
 			function(character:String)
@@ -528,52 +491,13 @@ class ChartingState extends MusicBeatState
 		player2DropDown.selectedLabel = _song.player2;
 		blockPressWhileScrolling.push(player2DropDown);
 
-		#if MODS_ALLOWED
-		var directories:Array<String> = [
-			Paths.mods('stages/'),
-			Paths.mods(Paths.currentModDirectory + '/stages/'),
-			Paths.getSharedPath('stages/')
-		];
-		for (mod in Paths.getGlobalMods())
-			directories.push(Paths.mods(mod + '/stages/'));
-		#else
-		var directories:Array<String> = [Paths.getSharedPath('stages/')];
-		#end
-
-		tempMap.clear();
-		var stageFile:Array<String> = CoolUtil.coolTextFile(Paths.txt('stageList'));
 		var stages:Array<String> = [];
-		for (i in 0...stageFile.length)
-		{ // Prevent duplicates
-			var stageToCheck:String = stageFile[i];
-			if (!tempMap.exists(stageToCheck))
-			{
-				stages.push(stageToCheck);
-			}
-			tempMap.set(stageToCheck, true);
-		}
-		#if MODS_ALLOWED
-		for (i in 0...directories.length)
+
+		for (file in AssetUtil.readDirectory("stages"))
 		{
-			var directory:String = directories[i];
-			if (FileSystem.exists(directory))
-			{
-				for (file in CoolUtil.recursivelyReadFolders(directory))
-				{
-					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file.endsWith('.json'))
-					{
-						var stageToCheck:String = file.substr(0, file.length - 5);
-						if (!tempMap.exists(stageToCheck))
-						{
-							tempMap.set(stageToCheck, true);
-							stages.push(stageToCheck);
-						}
-					}
-				}
-			}
+			if (file.endsWith(".json"))
+				stages.push(file.split(".json")[0]);
 		}
-		#end
 
 		if (stages.length < 1)
 			stages.push('stage');
@@ -948,51 +872,25 @@ class ChartingState extends MusicBeatState
 			key++;
 		}
 
-		#if LUA_ALLOWED
-		var directories:Array<String> = [];
-
-		directories.push(Paths.getSharedPath('notetypes/'));
-		#if MODS_ALLOWED
-		directories.push(Paths.mods('notetypes/'));
-		directories.push(Paths.mods(Paths.currentModDirectory + '/notetypes/'));
-		for (mod in Paths.getGlobalMods())
-			directories.push(Paths.mods(mod + '/notetypes/'));
-		#end
-
-		for (i in 0...directories.length)
+		
+		var key:Int = 0;
+		for (file in AssetUtil.readDirectory("notetypes"))
 		{
-			var directory:String = directories[i];
-			if (FileSystem.exists(directory))
+			var disp = file;
+			if (file.endsWith(".lua"))
+				disp = file.split(".lua")[0];
+			else if (file.endsWith(".hx"))
+				disp = file.split(".hx")[0];
+			else
+				continue;
+
+			if (!displayNameList.contains(disp))
 			{
-				for (file in CoolUtil.recursivelyReadFolders(directory))
-				{
-					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file.endsWith('.lua'))
-					{
-						var fileToCheck:String = file.substr(0, file.length - 4);
-						if (!noteTypeMap.exists(fileToCheck))
-						{
-							displayNameList.push(fileToCheck);
-							noteTypeMap.set(fileToCheck, key);
-							noteTypeIntMap.set(key, fileToCheck);
-							key++;
-						}
-					}
-					if (!FileSystem.isDirectory(path) && file.endsWith('.hx'))
-					{
-						var fileToCheck:String = file.substr(0, file.length - 3);
-						if (!noteTypeMap.exists(fileToCheck))
-						{
-							displayNameList.push(fileToCheck);
-							noteTypeMap.set(fileToCheck, key);
-							noteTypeIntMap.set(key, fileToCheck);
-							key++;
-						}
-					}
-				}
+				displayNameList.push(disp);
+				noteTypeMap.set(disp, key);
+				noteTypeIntMap.set(key, disp);
 			}
 		}
-		#end
 
 		for (i in 1...displayNameList.length)
 		{
@@ -1029,41 +927,11 @@ class ChartingState extends MusicBeatState
 		var tab_group_event = new FlxUI(null, UI_box);
 		tab_group_event.name = 'Events';
 
-		#if LUA_ALLOWED
-		var eventPushedMap:Map<String, Bool> = new Map<String, Bool>();
-		var directories:Array<String> = [];
-
-		#if MODS_ALLOWED
-		directories.push(Paths.getSharedPath('events/'));
-		directories.push(Paths.mods('events/'));
-		directories.push(Paths.mods(Paths.currentModDirectory + '/events/'));
-		for (mod in Paths.getGlobalMods())
-			directories.push(Paths.mods(mod + '/events/'));
-		#end
-
-		for (i in 0...directories.length)
+		for (file in AssetUtil.readDirectory("events"))
 		{
-			var directory:String = directories[i];
-			if (FileSystem.exists(directory))
-			{
-				for (file in CoolUtil.recursivelyReadFolders(directory))
-				{
-					var path = haxe.io.Path.join([directory, file]);
-					if (!FileSystem.isDirectory(path) && file != 'events-go-here.txt' && file.endsWith('.txt'))
-					{
-						var fileToCheck:String = file.substr(0, file.length - 4);
-						if (!eventPushedMap.exists(fileToCheck))
-						{
-							eventPushedMap.set(fileToCheck, true);
-							eventStuff.push([fileToCheck, File.getContent(path)]);
-						}
-					}
-				}
-			}
+			if (file != 'events-go-here.txt' && file.endsWith(".txt"))
+				eventStuff.push([file.split(".txt")[0], AssetUtil.getText("events/" + file)]);
 		}
-		eventPushedMap.clear();
-		eventPushedMap = null;
-		#end
 
 		descText = new FlxText(20, 200, 0, eventStuff[0][0]);
 
@@ -1802,11 +1670,13 @@ class ChartingState extends MusicBeatState
 
 		if (!blockInput)
 		{
+			/*
 			if (FlxG.keys.justPressed.ESCAPE)
 			{
 				autosaveSong();
 				LoadingState.loadAndSwitchState(new EditorPlayState(sectionStartTime()));
 			}
+			*/
 			if (FlxG.keys.justPressed.ENTER)
 			{
 				autosaveSong();
@@ -1822,7 +1692,6 @@ class ChartingState extends MusicBeatState
 					PlayState.startOnTime = Conductor.songPosition;
 
 				// if(_song.stage == null) _song.stage = stageDropDown.selectedLabel;
-				melt.data.StageData.loadDirectory(_song);
 				LoadingState.loadAndSwitchState(new PlayState());
 			}
 
@@ -2216,7 +2085,7 @@ class ChartingState extends MusicBeatState
 	
 			if ((data != null) && (data.length > 0))
 			{
-				File.saveContent(Paths.getFolderNeeds('data/${Paths.formatToSongPath(_song.song)}/${Paths.formatToSongPath(_song.song)}-${CoolUtil.difficulties[PlayState.storyDifficulty]}.json'), data.trim());
+				File.saveContent(Paths.getPath('data/${Song.formatName(_song.song)}/${Song.formatName(_song.song)}-${CoolUtil.difficulties[PlayState.storyDifficulty]}.json'), data.trim());
 			}
 		}
 		
@@ -2812,30 +2681,10 @@ class ChartingState extends MusicBeatState
 	function loadHealthIconFromCharacter(char:String)
 	{
 		var characterPath:String = 'characters/' + char + '.json';
-		#if MODS_ALLOWED
-		var path:String = Paths.modFolders(characterPath);
-		if (!FileSystem.exists(path))
-		{
-			path = Paths.getSharedPath(characterPath);
-		}
+		if (!AssetUtil.exists(characterPath))
+			characterPath = 'characters/' + Character.DEFAULT_CHARACTER + '.json';
 
-		if (!FileSystem.exists(path))
-		#else
-		var path:String = Paths.getSharedPath(characterPath);
-		if (!OpenFlAssets.exists(path))
-		#end
-		{
-			path = Paths.getSharedPath('characters/' + Character.DEFAULT_CHARACTER +
-				'.json'); // If a character couldn't be found, change him to BF just to prevent a crash
-		}
-
-		#if MODS_ALLOWED
-		var rawJson = File.getContent(path);
-		#else
-		var rawJson = OpenFlAssets.getText(path);
-		#end
-
-		var json:Character.CharacterFile = cast Json.parse(rawJson);
+		var json:Character.CharacterFile = cast Json.parse(AssetUtil.getText(characterPath));
 		return json.healthicon;
 	}
 
@@ -3343,7 +3192,7 @@ class ChartingState extends MusicBeatState
 			_file.addEventListener(Event.COMPLETE, onSaveComplete);
 			_file.addEventListener(Event.CANCEL, onSaveCancel);
 			_file.addEventListener(IOErrorEvent.IO_ERROR, onSaveError);
-			_file.save(data.trim(), Paths.formatToSongPath(_song.song) + ".json");
+			_file.save(data.trim(), Song.formatName(_song.song) + ".json");
 		}
 	}
 

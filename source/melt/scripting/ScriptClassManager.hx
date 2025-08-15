@@ -9,7 +9,6 @@ import hscript.Parser;
 import sys.io.File;
 import melt.scripting.base.*;
 import melt.scripting.FunkinRule.RuleScriptInterpEx;
-import melt.util.AssetUtil;
 
 using StringTools;
 

@@ -8,7 +8,7 @@ import melt.cache.ImageCache;
 
 using StringTools;
 
-class ContentPack
+class Content
 {
 	public static var packs:Array<Content> = [];
 	private static var initalizedFirst:Bool = false;
@@ -22,6 +22,10 @@ class ContentPack
 
 		for (folder in FileSystem.readDirectory(Constants.CONTENT_ROOT_FOLDER))
 			new Content(folder);
+
+		// TODO: do dependencies check
+
+
 		// do not preload stuff when hot-reload
 		if (!initalizedFirst)
 		{
@@ -30,7 +34,7 @@ class ContentPack
 			{
 				for (graphic in content.config.preload)
 				{
-					var path = content.getPath("images/" + graphic);
+					var path = content.getPath("images/" + graphic + ".png");
 					ImageCache.preload(path);
 				}
 			}
@@ -54,21 +58,27 @@ class ContentPack
 
 		if (FileSystem.exists(this.getPath("config.json")))
 		{
-			var configFile = Json.parse(File.getContent(this.getPath("config.json")));
-			this.config = cast(configFile, ContentConfig);
+			this.config = cast Json.parse(File.getContent(this.getPath("config.json")));
 
-			packs.add(this);
+			if (this.config.dependencies == null)
+				this.config.dependencies = [];
+			if (this.config.preload == null)
+				this.config.preload = [];
+			if (this.config.flags == null)
+				this.config.flags = {};
+
+			packs.push(this);
 			trace("loaded content from " + folder);
 		}
 	}
 
-	public function getPath(path:String):String
+	public function getPath(path:String):Null<String>
 	{
 		var thing = '${Constants.CONTENT_ROOT_FOLDER}/$folder/$path';
 		if (FileSystem.exists(thing))
 			return thing;
 
-		return "";
+		return null;
 	}
 }
 

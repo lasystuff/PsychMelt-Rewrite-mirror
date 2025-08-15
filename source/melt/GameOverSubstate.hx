@@ -99,7 +99,6 @@ class GameOverSubstate extends MusicBeatSubstate
 			PlayState.seenCutscene = false;
 			PlayState.chartingMode = false;
 
-			melt.data.WeekData.loadTheFirstEnabledMod();
 			if (PlayState.isStoryMode)
 				MusicBeatState.switchState(new StoryMenuState());
 			else

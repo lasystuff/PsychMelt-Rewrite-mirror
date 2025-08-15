@@ -56,29 +56,12 @@ class MenuCharacter extends FlxSprite
 				visible = false;
 				dontPlayAnim = true;
 			default:
-				var characterPath:String = 'images/menucharacters/' + character + '.json';
+				var characterPath = Paths.json(character + '.json', "images/menucharacters");
 				var rawJson = null;
 
-				#if MODS_ALLOWED
-				var path:String = Paths.modFolders(characterPath);
-				if (!FileSystem.exists(path))
-				{
-					path = Paths.getSharedPath(characterPath);
-				}
-
-				if (!FileSystem.exists(path))
-				{
-					path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-				rawJson = File.getContent(path);
-				#else
-				var path:String = Paths.getSharedPath(characterPath);
-				if (!Assets.exists(path))
-				{
-					path = Paths.getSharedPath('images/menucharacters/' + DEFAULT_CHARACTER + '.json');
-				}
-				rawJson = Assets.getText(path);
-				#end
+				if (characterPath == null)
+					characterPath = 'images/menucharacters/' + DEFAULT_CHARACTER + '.json';
+				rawJson = File.getContent(characterPath);
 
 				var charFile:MenuCharacterFile = cast Json.parse(rawJson);
 				frames = Paths.getSparrowAtlas('menucharacters/' + charFile.image);

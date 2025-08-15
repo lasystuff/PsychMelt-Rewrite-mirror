@@ -1,4 +1,4 @@
-package melt;
+package melt.util;
 
 import flixel.FlxBasic;
 import flixel.math.FlxPoint;
@@ -16,6 +16,7 @@ import openfl.utils.Assets;
 #end
 import flixel.util.FlxColor;
 import melt.gameplay.PlayState;
+import melt.gameplay.song.Song;
 
 using StringTools;
 
@@ -76,7 +77,7 @@ class CoolUtil
 		{
 			fileSuffix = '';
 		}
-		return Paths.formatToSongPath(fileSuffix);
+		return Song.formatName(fileSuffix);
 	}
 
 	inline public static function difficultyString():String

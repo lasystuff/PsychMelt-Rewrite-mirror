@@ -34,13 +34,6 @@ class MusicBeatState extends FlxUIState
 	override function create() {
 		var skip:Bool = FlxTransitionableState.skipNextTransOut;
 
-		//State Script lets go lol
-		final statePath = Type.getClassName(Type.getClass(this)).split(".");
-		final stateString = statePath[statePath.length - 1];
-
-		if (sys.FileSystem.exists(Paths.modFolders('states/$stateString.hx')) && !excludeStates.contains(stateString))
-			scriptArray.push(new FunkinHScript(Paths.modFolders('states/$stateString.hx'), this));
-
 		super.create();
 
 		if(!skip) {

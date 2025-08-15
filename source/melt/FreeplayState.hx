@@ -86,7 +86,6 @@ class FreeplayState extends MusicBeatState
 				leChars.push(leWeek.songs[j][1]);
 			}
 
-			WeekData.setDirectoryFromWeek(leWeek);
 			for (song in leWeek.songs)
 			{
 				var metadata = Song.getSongMetadata(song[0]);
@@ -104,7 +103,6 @@ class FreeplayState extends MusicBeatState
 				addSong(song[0], i, song[1], FlxColor.fromRGB(colors[0], colors[1], colors[2]), displayName);
 			}
 		}
-		WeekData.loadTheFirstEnabledMod();
 
 		bg = new FlxSprite(Paths.image('menuDesat'));
 		bg.antialiasing = ClientPrefs.globalAntialiasing;
@@ -128,7 +126,6 @@ class FreeplayState extends MusicBeatState
 			}
 			songText.snapToPosition();
 
-			Paths.currentModDirectory = songs[i].folder;
 			var icon:HealthIcon = new HealthIcon(songs[i].songCharacter);
 			icon.sprTracker = songText;
 
@@ -140,7 +137,6 @@ class FreeplayState extends MusicBeatState
 			// DONT PUT X IN THE FIRST PARAMETER OF new ALPHABET() !!
 			// songText.screenCenter(X);
 		}
-		WeekData.setDirectoryFromWeek();
 
 		scoreText = new FlxText(FlxG.width * 0.7, 5, 0, "", 32);
 		scoreText.setFormat(Paths.font("vcr.ttf"), 32, FlxColor.WHITE, RIGHT);
@@ -336,7 +332,6 @@ class FreeplayState extends MusicBeatState
 				#if PRELOAD_ALL
 				destroyFreeplayVocals();
 				FlxG.sound.music.volume = 0;
-				Paths.currentModDirectory = songs[curSelected].folder;
 				var poop:String = Highscore.formatSong(songs[curSelected].songName.toLowerCase(), curDifficulty);
 				PlayState.SONG = Song.loadFromJson(poop, songs[curSelected].songName.toLowerCase());
 				if (PlayState.SONG.needsVoices)
@@ -357,7 +352,7 @@ class FreeplayState extends MusicBeatState
 		else if (accepted)
 		{
 			persistentUpdate = false;
-			var songLowercase:String = Paths.formatToSongPath(songs[curSelected].songName);
+			var songLowercase:String = Song.formatName(songs[curSelected].songName);
 			var poop:String = Highscore.formatSong(songLowercase, curDifficulty);
 			/*#if MODS_ALLOWED
 				if(!sys.FileSystem.exists(Paths.modsJson(songLowercase + '/' + poop)) && !sys.FileSystem.exists(Paths.json(songLowercase + '/' + poop))) {
@@ -374,7 +369,6 @@ class FreeplayState extends MusicBeatState
 			PlayState.isStoryMode = false;
 			PlayState.storyDifficulty = curDifficulty;
 
-			trace('CURRENT WEEK: ' + WeekData.getWeekFileName());
 			if (colorTween != null)
 			{
 				colorTween.cancel();
@@ -482,7 +476,6 @@ class FreeplayState extends MusicBeatState
 			}
 		}
 
-		Paths.currentModDirectory = songs[curSelected].folder;
 		PlayState.storyWeek = songs[curSelected].week;
 
 		CoolUtil.difficulties = CoolUtil.defaultDifficulties.copy();
@@ -554,7 +547,6 @@ class SongMetadata
 		this.week = week;
 		this.songCharacter = songCharacter;
 		this.color = color;
-		this.folder = Paths.currentModDirectory;
 		if (this.folder == null)
 			this.folder = '';
 

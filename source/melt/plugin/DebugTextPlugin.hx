@@ -19,7 +19,7 @@ class DebugTextPlugin extends FlxTypedGroup<DebugText>
 		FlxG.plugins.addPlugin(instance);
 	}
 
-	public static function addTextToDebug(text:String, color:FlxColor)
+	public static function addTextToDebug(text:String, color:FlxColor = FlxColor.WHITE)
 	{
 		if (PlayState.instance != null)
 			instance.cameras = [PlayState.instance.camOther];

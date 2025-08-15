@@ -24,6 +24,7 @@ import flixel.util.FlxTimer;
 import flixel.input.keyboard.FlxKey;
 import flixel.graphics.FlxGraphic;
 import melt.Controls;
+import melt.gameplay.song.Song;
 
 using StringTools;
 
@@ -93,7 +94,7 @@ class VisualsUISubState extends BaseOptionsMenu
 		if (ClientPrefs.pauseMusic == 'None')
 			FlxG.sound.music.volume = 0;
 		else
-			FlxG.sound.playMusic(Paths.music(Paths.formatToSongPath(ClientPrefs.pauseMusic)));
+			FlxG.sound.playMusic(Paths.music(Song.formatName(ClientPrefs.pauseMusic)));
 
 		changedMusic = true;
 	}
