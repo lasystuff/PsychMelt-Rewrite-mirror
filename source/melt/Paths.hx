@@ -45,7 +45,7 @@ class Paths
 	public static inline function json(key:String, folder:String = "data"):Null<String>
 		return getPath('$folder/$key.json');
 
-	public static inline function image(key:String, folder:String = "images"):Dynamic
+	public static inline function image(key:String, folder:String = "images")
 	{
 		var path = getPath('$folder/$key.png');
 		if (path == null) // die

@@ -363,7 +363,6 @@ class FreeplayState extends MusicBeatState
 					curDifficulty = 1;
 					trace('Couldnt find file');
 			}*/
-			trace(poop);
 
 			PlayState.SONG = Song.loadFromJson(poop, songLowercase);
 			PlayState.isStoryMode = false;

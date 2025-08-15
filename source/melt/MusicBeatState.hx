@@ -16,7 +16,7 @@ class MusicBeatState extends FlxUIState
 	public var scriptArray:Array<FunkinRule> = [];
 	
 	//states that don't allow scripting/overriding by hscripts!
-	static final excludeStates = ["LoadingState", "PlayState", "HScriptState"];
+	static final excludeStates:Array<Dynamic> = [LoadingState, melt.gameplay.PlayState, ScriptedState];
 
 	private var curSection:Int = 0;
 	private var stepsToDo:Int = 0;
@@ -40,6 +40,17 @@ class MusicBeatState extends FlxUIState
 			openSubState(new CustomFadeTransition(0.6, true));
 		}
 		FlxTransitionableState.skipNextTransOut = false;
+
+		if (!excludeStates.contains(Type.getClass(this)))
+		{
+			final statePath = Type.getClassName(Type.getClass(this)).split(".");
+			final stateString = statePath[statePath.length - 1];
+
+			if (AssetUtil.exists('states/$stateString.hx') && !excludeStates.contains(stateString))
+				scriptArray.push(new FunkinHScript(Paths.hscript(stateString, "states"), this));
+			if (AssetUtil.exists('states/$stateString.lua') && !excludeStates.contains(stateString))
+				scriptArray.push(new FunkinHScript(Paths.hscript(stateString, "states"), this));	
+		}
 	}
 
 	override function update(elapsed:Float)
@@ -173,13 +184,20 @@ class MusicBeatState extends FlxUIState
 	}
 
 	public static function switchState(nextState:FlxState, ?noOverride:Bool = false) {
-		final statePath = Type.getClassName(Type.getClass(nextState));
-		for (key => scriptCls in ScriptClassManager.classes)
+		if (!noOverride && !excludeStates.contains(Type.getClass(nextState)))
 		{
-			if (key == statePath)
-				nextState = ScriptClassManager.createInstance(key);
+			final statePath = Type.getClassName(Type.getClass(nextState)).split(".");
+			final stateString = statePath[statePath.length - 1];
+
+			if ((AssetUtil.exists('states/override/$stateString.hx') || AssetUtil.exists('states/override/$stateString.lua')) && !excludeStates.contains(stateString))
+				nextState = new ScriptedState('override/$stateString');
 		}
 		FlxG.switchState(nextState);
+	}
+
+	public static function switchCustomState(path:String)
+	{
+		FlxG.switchState(new ScriptedState(path));
 	}
 
 	public function setOnScripts(variable:String, arg:Dynamic)
