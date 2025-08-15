@@ -9,6 +9,7 @@ import hscript.Parser;
 import sys.io.File;
 import melt.scripting.base.*;
 import melt.scripting.FunkinRule.RuleScriptInterpEx;
+import melt.util.AssetUtil;
 
 using StringTools;
 
@@ -31,13 +32,6 @@ class ScriptClassManager
 	{	
 		RuleScript.resolveScript = __resolveScript;
 		RuleScriptedClassUtil.buildBridge = __buildRuleScript;
-		FlxG.signals.postUpdate.add(function(){
-			if (FlxG.keys.justPressed.F5)
-			{
-				reloadScriptedClasses();
-				FlxG.resetState();
-			}
-		});
 
 		reloadScriptedClasses();
 	}
@@ -50,7 +44,7 @@ class ScriptClassManager
 		parser.allowAll();
 		parser.mode = MODULE;
 
-		for (file in Paths.readDirectoryRecursive("source"))
+		for (file in AssetUtil.readRecursive("source"))
 		{
 			if (file.endsWith(".hx"))
 			{

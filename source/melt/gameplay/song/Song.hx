@@ -146,8 +146,8 @@ class Song
 	{
 		var metadata:SongMeta = {
 			displayName: songName,
-			artists: Constants.DEFAULT_SONG_ARTIST,
-			hud: Constants.DEFAULT_HUD_CLASS
+			artists: Constants.SONG_DEFAULT_ARTIST,
+			hud: Constants.SONG_DEFAULT_HUD
 		};
 		var thepath:String = '${Paths.formatToSongPath(songName)}/metadata';
 

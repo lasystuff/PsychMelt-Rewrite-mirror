@@ -33,14 +33,7 @@ class InitState extends FlxState
 		FlxG.mouse.visible = false;
 		FlxG.cameras.useBufferLocking = true;
 
-		Paths.clearStoredMemory();
-		Paths.clearUnusedMemory();
-
-		#if LUA_ALLOWED
-		Paths.pushGlobalMods();
-		#end
-		// Just to load a mod on start up if ya got one. For mods that change the menu music and bg
-		WeekData.loadTheFirstEnabledMod();
+		ContentPack.load();
 
 		PlayerSettings.init();
 
@@ -68,6 +61,18 @@ class InitState extends FlxState
 
 		DebugTextPlugin.init();
 		ScriptClassManager.init();
+
+		// hotreload function
+		FlxG.signals.postUpdate.add(function(){
+			if (FlxG.keys.justPressed.F5)
+			{
+				melt.cache.ImageCache.clearAll();
+
+				ContentPack.load();
+				ScriptClassManager.reloadScriptedClasses();
+				FlxG.resetState();
+			}
+		});
 		
 		MusicBeatState.switchState(new TitleState());
 	}

@@ -1,0 +1,13 @@
+{
+    "credits": [
+        {"name": "Psych Engine Team"},
+        {
+            "name": "ShadowMario",
+            "icon": "shadowmario",
+            "description": "Main Programmer of Psych Engine",
+            "url": "https://twitter.com/Shadow_Mario_",
+            "color": "444444",
+            "extraData": {}
+        }
+    ]
+}

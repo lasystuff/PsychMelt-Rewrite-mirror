@@ -1,0 +1,13 @@
+{
+    "credits": [
+        {"name": "Template Mod Credits"},
+        {
+            "name": "Template",
+            "icon": "face",
+            "description": "Description goes here",
+            "url": "",
+            "color": "",
+            "extraData": {}
+        }
+    ]
+}

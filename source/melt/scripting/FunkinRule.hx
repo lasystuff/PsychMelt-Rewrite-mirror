@@ -61,6 +61,8 @@ class FunkinRule
 		rule.variables.set("FunkinHScript", melt.scripting.FunkinHScript);
 		rule.variables.set("FunkinLua", melt.scripting.FunkinLua);
 
+		rule.variables.set("AssetUtil", melt.uti.Assets);
+
 		rule.variables.set("Paths", Paths);
 	}
 
