@@ -28,7 +28,6 @@ import openfl.net.FileReference;
 import openfl.events.Event;
 import openfl.events.IOErrorEvent;
 import haxe.Json;
-import flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
 import lime.system.Clipboard;
 import flixel.animation.FlxAnimation;
 import melt.Character;
@@ -39,12 +38,8 @@ import melt.gameplay.objects.BGSprite;
 
 using StringTools;
 
-#if (FLX_DEBUG || flixel < version("5.7.0"))
-typedef PointerGraphic = flixel.system.debug.interaction.tools.Pointer.GraphicCursorCross;
-#else
 @:bitmap("assets/images/debugger/cursorCross.png")
 class PointerGraphic extends openfl.display.BitmapData {}
-#end
 
 /**
 	*DEBUG MODE

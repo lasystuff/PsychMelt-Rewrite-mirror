@@ -594,6 +594,7 @@ class PlayState extends MusicBeatState
 			hud = Type.createInstance(Type.resolveClass(Constants.DEFAULT_HUD_CLASS), []);
 
 		hud.cameras = [camHUD];
+		hud.visible = !ClientPrefs.hideHud;
 		add(hud);
 
 		botplayTxt = new FlxText(400, 74, FlxG.width - 800, "BOTPLAY", 32);

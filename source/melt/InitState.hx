@@ -9,6 +9,7 @@ import lime.app.Application;
 import melt.data.WeekData;
 import melt.Discord.DiscordClient;
 import melt.plugin.*;
+import flixel.util.FlxColor;
 import melt.scripting.ScriptClassManager;
 
 
@@ -28,6 +29,9 @@ class InitState extends FlxState
 		FlxG.sound.volumeDownKeys = TitleState.volumeDownKeys;
 		FlxG.sound.volumeUpKeys = TitleState.volumeUpKeys;
 		FlxG.keys.preventDefaultKeys = [TAB];
+
+		FlxG.mouse.visible = false;
+		FlxG.cameras.useBufferLocking = true;
 
 		Paths.clearStoredMemory();
 		Paths.clearUnusedMemory();
@@ -50,8 +54,6 @@ class InitState extends FlxState
 		{
 			StoryMenuState.weekCompleted = FlxG.save.data.weekCompleted;
 		}
-
-		FlxG.mouse.visible = false;
 
 		#if desktop
 		if (!DiscordClient.isInitialized)
