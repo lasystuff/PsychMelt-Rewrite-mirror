@@ -20,9 +20,7 @@ typedef EventNote = {
 }
 
 class Note extends FlxSprite
-{
-	public var row:Int = 0;
-	
+{	
 	public var vec3Cache:Vector3 = new Vector3(); // for vector3 operations in modchart code
 	public var defScale:FlxPoint = FlxPoint.get(); // for modcharts to keep the scaling
 
@@ -52,6 +50,7 @@ class Note extends FlxSprite
 	public var tooLate:Bool = false;
 	public var wasGoodHit:Bool = false;
 	public var ignoreNote:Bool = false;
+	public var missed:Bool = false;
 	public var hitByOpponent:Bool = false;
 	public var noteWasHit:Bool = false;
 	public var prevNote:Note;
