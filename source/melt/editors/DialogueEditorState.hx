@@ -69,7 +69,7 @@ class DialogueEditorState extends MusicBeatState
 		add(character);
 
 		box = new FlxSprite(70, 370);
-		box.frames = Paths.getSparrowAtlas('speech_bubble');
+		box.frames = AssetUtil.getSparrow('speech_bubble');
 		box.scrollFactor.set();
 		box.antialiasing = ClientPrefs.globalAntialiasing;
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);
@@ -214,7 +214,7 @@ class DialogueEditorState extends MusicBeatState
 
 	function reloadCharacter()
 	{
-		character.frames = Paths.getSparrowAtlas('dialogue/' + character.jsonFile.image);
+		character.frames = AssetUtil.getSparrow('dialogue/' + character.jsonFile.image);
 		character.jsonFile = character.jsonFile;
 		character.reloadAnimations();
 		character.setGraphicSize(Std.int(character.width * DialogueCharacter.DEFAULT_SCALE * character.jsonFile.scale));

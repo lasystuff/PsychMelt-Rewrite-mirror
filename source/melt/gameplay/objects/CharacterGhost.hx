@@ -23,7 +23,7 @@ class CharacterGhost extends FlxSprite
 	{
 		parent = value;
 
-		frames = Paths.getSparrowAtlas(parent.imageFile);
+		frames = AssetUtil.getSparrow(parent.imageFile);
 		animation.copyFrom(parent.animation);
 		color = FlxColor.fromRGB(parent.healthColorArray[0], parent.healthColorArray[1], parent.healthColorArray[2]);
 		

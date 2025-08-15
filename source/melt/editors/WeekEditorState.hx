@@ -63,7 +63,6 @@ class WeekEditorState extends MusicBeatState
 		txtWeekTitle.setFormat("VCR OSD Mono", 32, FlxColor.WHITE, RIGHT);
 		txtWeekTitle.alpha = 0.7;
 
-		var ui_tex = Paths.getSparrowAtlas('campaign_menu_UI_assets');
 		var bgYellow:FlxSprite = new FlxSprite(0, 56).makeGraphic(FlxG.width, 386, 0xFFF9CF51);
 		bgSprite = new FlxSprite(0, 56);
 		bgSprite.antialiasing = ClientPrefs.globalAntialiasing;
@@ -79,7 +78,7 @@ class WeekEditorState extends MusicBeatState
 		grpWeekCharacters = new FlxTypedGroup<MenuCharacter>();
 
 		lock = new FlxSprite();
-		lock.frames = ui_tex;
+		lock.frames = AssetUtil.getSparrow('campaign_menu_UI_assets');
 		lock.animation.addByPrefix('lock', 'lock');
 		lock.animation.play('lock');
 		lock.antialiasing = ClientPrefs.globalAntialiasing;

@@ -80,7 +80,7 @@ class DialogueCharacter extends FlxSprite
 		this.curCharacter = character;
 
 		reloadCharacterJson(character);
-		frames = Paths.getSparrowAtlas('dialogue/' + jsonFile.image);
+		frames = AssetUtil.getSparrow('dialogue/' + jsonFile.image);
 		reloadAnimations();
 
 		antialiasing = ClientPrefs.globalAntialiasing;
@@ -191,7 +191,7 @@ class DialogueBoxPsych extends FlxSpriteGroup
 		spawnCharacters();
 
 		box = new FlxSprite(70, 370);
-		box.frames = Paths.getSparrowAtlas('speech_bubble');
+		box.frames = AssetUtil.getSparrow('speech_bubble');
 		box.scrollFactor.set();
 		box.antialiasing = ClientPrefs.globalAntialiasing;
 		box.animation.addByPrefix('normal', 'speech bubble normal', 24);

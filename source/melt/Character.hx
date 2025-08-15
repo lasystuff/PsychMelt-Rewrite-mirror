@@ -116,10 +116,10 @@ class Character extends FlxSprite
 				switch (spriteType)
 				{
 					case "packer":
-						frames = Paths.getPackerAtlas(json.image);
+						frames = AssetUtil.getPacker(json.image);
 
 					case "sparrow":
-						frames = Paths.getSparrowAtlas(json.image);
+						frames = AssetUtil.getSparrow(json.image);
 				}
 				imageFile = json.image;
 

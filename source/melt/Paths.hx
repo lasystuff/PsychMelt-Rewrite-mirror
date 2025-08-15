@@ -98,8 +98,6 @@ class Paths
 
 
 	// deprecated stuff (remove later)
-	public static inline function fileExists(key:String, ?type:Dynamic)
-		return AssetUtil.exists(key);
 
 	public static inline function getSparrowAtlas(key:String, ?library:String)
 	{

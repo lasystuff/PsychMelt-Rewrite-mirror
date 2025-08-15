@@ -899,11 +899,11 @@ class CharacterEditorState extends MusicBeatState
 		//}
 		if (AssetUtil.exists('images/' + char.imageFile + '.txt'))
 		{
-			char.frames = Paths.getPackerAtlas(char.imageFile);
+			char.frames = AssetUtil.getPacker(char.imageFile);
 		}
 		else
 		{
-			char.frames = Paths.getSparrowAtlas(char.imageFile);
+			char.frames = AssetUtil.getSparrow(char.imageFile);
 		}
 
 		if (char.animationsArray != null && char.animationsArray.length > 0)

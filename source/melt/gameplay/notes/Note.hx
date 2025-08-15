@@ -327,7 +327,7 @@ class Note extends FlxSprite
 				}*/
 			}
 		} else {
-			frames = Paths.getSparrowAtlas(blahblah);
+			frames = AssetUtil.getSparrow(blahblah);
 			loadNoteAnims();
 			//antialiasing = ClientPrefs.globalAntialiasing;
 		}

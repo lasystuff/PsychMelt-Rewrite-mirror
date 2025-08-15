@@ -402,7 +402,7 @@ class AlphaCharacter extends FlxSprite
 			lastAnim = animation.name;
 		}
 		image = name;
-		frames = Paths.getSparrowAtlas(name);
+		frames = AssetUtil.getSparrow(name);
 		this.scale.x = parent.scaleX;
 		this.scale.y = parent.scaleY;
 		alignOffset = 0;
