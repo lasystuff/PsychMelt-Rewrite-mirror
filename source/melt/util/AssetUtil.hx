@@ -4,6 +4,7 @@ import sys.FileSystem;
 import sys.io.File;
 import haxe.io.Path;
 import flixel.graphics.frames.FlxAtlasFrames;
+import openfl.media.Sound;
 
 using StringTools;
 
@@ -63,13 +64,29 @@ class AssetUtil
 		return "";
 	}
 
+	private static var __audioCache:Map<String, Sound> = [];
+	public static function getSound(key:String):Sound
+	{
+		var path = Paths.getPath(key);
+		if (path == null)
+			return null;
+
+		if (!__audioCache.exists(key))
+			__audioCache.set(key, Sound.fromFile(path));
+		return __audioCache.get(key);
+	}
+
 	public static inline function getSparrow(key:String):FlxAtlasFrames
 	{
-		return FlxAtlasFrames.fromSparrow(Paths.image(key), Paths.xml(key));
+		var xmlText = getText("images/" + key + ".xml");
+		return FlxAtlasFrames.fromSparrow(Paths.image(key), xmlText);
 	}
 
 	public static inline function getPacker(key:String):FlxAtlasFrames
-		return FlxAtlasFrames.fromSpriteSheetPacker(Paths.image(key), Paths.text(key, "images"));
+	{
+		var packText = getText("images/" + key + ".txt");
+		return FlxAtlasFrames.fromSpriteSheetPacker(Paths.image(key), packText);
+	}
 }
 
 enum abstract GetTextType(String)

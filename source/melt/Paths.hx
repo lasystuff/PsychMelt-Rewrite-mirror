@@ -9,17 +9,17 @@ using StringTools;
 class Paths
 {
 	// well can't i just make these functions compiled on macro?? idk for now
-	public static inline function inst(song:String, postfix:String = ""):Null<String>
-		return getPath('songs/${Song.formatName(song)}/Inst$postfix.ogg');
+	public static inline function inst(song:String, postfix:String = "")
+		return AssetUtil.getSound('songs/${Song.formatName(song)}/Inst$postfix.ogg');
 
-	public static inline function voices(song:String, postfix:String = ""):Null<String>
-		return getPath('songs/${Song.formatName(song)}/Voices$postfix.ogg');
+	public static inline function voices(song:String, postfix:String = "")
+		return AssetUtil.getSound('songs/${Song.formatName(song)}/Voices$postfix.ogg');
 
-	public static inline function sound(key:String, folder:String = "sounds"):Null<String>
-		return getPath('$folder/$key.ogg');
+	public static inline function sound(key:String, folder:String = "sounds")
+		return AssetUtil.getSound('$folder/$key.ogg');
 
-	public static inline function music(key:String, folder:String = "music"):Null<String>
-		return getPath('$folder/$key.ogg');
+	public static inline function music(key:String, folder:String = "music")
+		return AssetUtil.getSound('$folder/$key.ogg');
 
 	public static inline function frag(key:String, folder:String = "shaders"):Null<String>
 		return getPath('$folder/$key.frag');
@@ -65,7 +65,7 @@ class Paths
 		{
 			for (content in Content.packs)
 			{
-				if (FileSystem.exists(content.getPath(path)))
+				if (content.getPath(path) != null)
 					return content.getPath(path);
 			}
 		}
@@ -86,7 +86,7 @@ class Paths
 		var result:Array<String> = [];
 		for (content in Content.packs)
 		{
-			if (FileSystem.exists(content.getPath(path)))
+			if (content.getPath(path) != null)
 				result.push(content.getPath(path));
 		}
 		if (FileSystem.exists("assets/" + path))

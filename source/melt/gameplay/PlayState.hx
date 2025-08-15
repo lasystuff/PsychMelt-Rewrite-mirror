@@ -1207,11 +1207,9 @@ class PlayState extends MusicBeatState
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
 
-		var instrumental = Paths.inst(PlayState.SONG.song, "-" + boyfriend.curCharacter);
-		if (instrumental == null)
-			instrumental = Paths.inst(PlayState.SONG.song);
-
-		FlxG.sound.list.add(new FlxSound().loadEmbedded(Paths.inst(instrumental)));
+		// preload
+		if (Paths.inst(PlayState.SONG.song, "-" + boyfriend.curCharacter) == null)
+			Paths.inst(PlayState.SONG.song);
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
