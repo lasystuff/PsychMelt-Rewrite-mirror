@@ -103,29 +103,36 @@ class CoolUtil
 	{
 		return [for (i in string.trim().split('\n')) i.trim()];
 	}
-	public static function dominantColor(sprite:flixel.FlxSprite):Int{
-		final countByColor:Map<Int, Int> = [];
-		for(col in 0...sprite.frameWidth){
-			for(row in 0...sprite.frameHeight){
-			  final colorOfThisPixel:Int = sprite.pixels.getPixel32(col, row);
-			  if(colorOfThisPixel != 0){
-				  if(countByColor.exists(colorOfThisPixel)){
-				    countByColor[colorOfThisPixel] =  countByColor[colorOfThisPixel] + 1;
-				  }else if(countByColor[colorOfThisPixel] != 13520687 - (2*13520687)){
-					 countByColor[colorOfThisPixel] = 1;
-				  }
-			  }
+
+	inline public static function dominantColor(bitmap:openfl.display.BitmapData):Int
+	{
+		var countByColor:Map<Int, Int> = [];
+		for(col in 0...bitmap.width)
+		{
+			for(row in 0...bitmap.height)
+			{
+				var colorOfThisPixel:FlxColor = bitmap.getPixel32(col, row);
+				if(colorOfThisPixel.alphaFloat > 0.05)
+				{
+					colorOfThisPixel = FlxColor.fromRGB(colorOfThisPixel.red, colorOfThisPixel.green, colorOfThisPixel.blue, 255);
+					var count:Int = countByColor.exists(colorOfThisPixel) ? countByColor[colorOfThisPixel] : 0;
+					countByColor[colorOfThisPixel] = count + 1;
+				}
 			}
-		 }
+		}
+
 		var maxCount = 0;
-		var maxKey:Int = 0;//after the loop this will store the max color
-		countByColor[flixel.util.FlxColor.BLACK] = 0;
-			for(key in countByColor.keys()){
-			if(countByColor[key] >= maxCount){
-				maxCount = countByColor[key];
+		var maxKey:Int = 0; //after the loop this will store the max color
+		countByColor[FlxColor.BLACK] = 0;
+		for(key => count in countByColor)
+		{
+			if(count >= maxCount)
+			{
+				maxCount = count;
 				maxKey = key;
 			}
 		}
+		countByColor = [];
 		return maxKey;
 	}
 

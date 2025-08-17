@@ -12,6 +12,8 @@ class HealthIcon extends FlxSprite
 	private var isPlayer:Bool = false;
 	private var char:String = '';
 
+	private var filePath:String = "";
+
 	public function new(char:String = 'bf', isPlayer:Bool = false)
 	{
 		super();
@@ -32,10 +34,10 @@ class HealthIcon extends FlxSprite
 	private var iconOffsets:Array<Float> = [0, 0, 0];
 	public function changeIcon(char:String) {
 		if(this.char != char) {
-			var name:String = 'icons/' + char;
-			if(!AssetUtil.exists('images/' + name + '.png')) name = 'icons/icon-' + char; //Older versions of psych engine's support
-			if(!AssetUtil.exists('images/' + name + '.png')) name = 'icons/icon-face'; //Prevents crash from missing icon
-			var file:Dynamic = Paths.image(name);
+			filePath = 'icons/' + char;
+			if(Paths.image(filePath) == null) filePath = 'icons/icon-' + char; //Older versions of psych engine's support
+			if(Paths.image(filePath) == null) filePath = 'icons/icon-face'; //Prevents crash from missing icon
+			var file:Dynamic = Paths.image(filePath);
 
 			loadGraphic(file); //Load stupidly first for getting the file size
 

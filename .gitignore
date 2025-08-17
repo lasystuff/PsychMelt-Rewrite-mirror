@@ -21,3 +21,5 @@ export/*
 # MacOS Shits!!!! Die!!!!
 .DS_Store
 /.haxelib
+
+/_ignore

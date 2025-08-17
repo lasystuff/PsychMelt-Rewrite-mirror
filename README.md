@@ -32,22 +32,8 @@ function onCreatePost()
 
 - Small but useful chart editor enhancements (Organizing the time display, Shift + Enter for instant preview, Ctrl + S shortcut)
 
-- Mod folder loading has been slightly overhauled (it now uses the content folder instead of the mods folder like Hit Single does).
+- Mod folder loading has been slightly overhauled (it now uses the content folder instead of the mods folder like Hit Single does)
 
-- Song Metadata (You can set the display name of the song and the artist that will be displayed on the pause screen.)
+- Song Metadata (You can set the display name of the song and the artist that will be displayed on the pause screen)
 
-#### This engine borrows a lot from various engines:
-
-- Modchart from Andromeda Engine
-
-- Note splashes from Forever Engine
-
-#### ToDo (by priority)
-
-- Redo abstract macros to not dependence RuleScriptAbstracts.txt
-
-- More source restructuring
-
-- Lua parser rework
-
-- Scripted Classes "as" importing support
+- Modchart Manager from Andromeda Engine
