@@ -15,4 +15,3 @@ Scripting
 - Abstract macro rework
 - Better Lua parser
 - Scripted Classes "as" importing support
-    - fix class manager to works on new Paths system
