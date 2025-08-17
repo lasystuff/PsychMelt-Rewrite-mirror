@@ -46,9 +46,9 @@ class ScriptClassManager
 		{
 			if (file.endsWith(".hx"))
 			{
-				var expr = parser.parse(File.getContent(file));
+				var expr = parser.parse(File.getContent(Paths.getPath(file)));
 				// using base parser for getting stuff
-				var ogExpr = new Parser().parseModule(File.getContent(file));
+				var ogExpr = new Parser().parseModule(File.getContent(Paths.getPath(file)));
 				var parentCls:Class<Dynamic> = ScriptedDummyClass;
 				var baseCls = null;
 				var imports:Map<String, String> = [];

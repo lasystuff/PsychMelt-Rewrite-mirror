@@ -28,8 +28,17 @@ class AssetUtil
 
 	public static inline function readRecursive(path:String):Array<String>
 	{
-		// rework in progress sorry
-		return [];
+		var result:Array<String> = [];
+		for (directory in Paths.listPaths(path))
+		{
+			for (file in CoolUtil.recursivelyReadFolders(directory))
+			{
+				if (!result.contains(file))
+					result.push(file);
+			}
+		}
+
+		return result;
 	}
 
 	public static function getText(path:String, mode:GetTextType = OVERRIDE):String
