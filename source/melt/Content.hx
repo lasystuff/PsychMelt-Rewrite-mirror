@@ -46,7 +46,8 @@ class Content
 		var value:Null<Dynamic> = defaultValue;
 		for (content in packs)
 		{
-			value = Reflect.getProperty(content.config.flags, flag);
+			if (Reflect.hasField(content.config.flags, flag))
+				value = Reflect.getProperty(content.config.flags, flag);
 		}
 
 		return value;
@@ -93,5 +94,8 @@ typedef ContentConfig = {
 
 @:structInit class ContentFlags
 {
+	public var MOD_NAME:String = Constants.ENGINE_NAME_PREFIX;
+	public var MOD_VERSION:String = Constants.ENGINE_VERSION;
+
 	public var DEFAULT_HUD:String = Constants.SONG_DEFAULT_HUD;
 }

@@ -16,7 +16,6 @@ import flixel.math.FlxMath;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import lime.app.Application;
 import melt.Achievements;
 import melt.editors.MasterEditorMenu;
 import flixel.input.keyboard.FlxKey;
@@ -128,11 +127,11 @@ class MainMenuState extends MusicBeatState
 
 		FlxG.camera.follow(camFollowPos, null, 1);
 
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, 'PsychMelt (Psych Engine v 0.6.3)', 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 44, 0, '${Constants.ENGINE_NAME_PREFIX} v${Constants.ENGINE_VERSION}', 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
 		add(versionShit);
-		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "Friday Night Funkin' v" + Application.current.meta.get('version'), 12);
+		var versionShit:FlxText = new FlxText(12, FlxG.height - 24, 0, "(Heavyily modified Psych Engine v0.6.3)", 12);
 		versionShit.scrollFactor.set();
 		versionShit.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE_FAST, FlxColor.BLACK);
 		add(versionShit);
@@ -251,8 +250,9 @@ class MainMenuState extends MusicBeatState
 			#if desktop
 			else if (FlxG.keys.anyJustPressed(debugKeys))
 			{
-				selectedSomethin = true;
-				MusicBeatState.switchState(new MasterEditorMenu());
+				persistentDraw = true;
+				persistentUpdate = false;
+				openSubState(new MasterEditorMenu());
 			}
 			#end
 		}

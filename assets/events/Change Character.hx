@@ -16,6 +16,7 @@ function onEventPushed(event)
 				charType = 2;
 			case 'dad' | 'opponent' | '0':
 				charType = 1;
+				
 			default:
 				charType = Std.parseInt(event.value1);
 				if (Math.isNaN(charType))
@@ -42,6 +43,10 @@ function onEvent(eventName, value1, value2)
 				charType = 1;
 			case 'opponent':
 				charType = 1;
+			case 'bf':
+				charType = 0;
+			case 'boyfriend':
+				charType = 0;
 			default:
 				charType = Std.parseInt(value1);
 				if (Math.isNaN(charType))

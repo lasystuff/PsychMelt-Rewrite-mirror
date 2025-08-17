@@ -19,7 +19,7 @@ import sys.FileSystem;
 
 using StringTools;
 
-class MasterEditorMenu extends MusicBeatSubstate
+class MasterEditorMenuOld extends MusicBeatState
 {
 	var options:Array<String> = [
 		'Week Editor',
@@ -35,14 +35,15 @@ class MasterEditorMenu extends MusicBeatSubstate
 
 	override function create()
 	{
+		FlxG.camera.bgColor = FlxColor.BLACK;
 		#if desktop
 		// Updating Discord Rich Presence
 		DiscordClient.changePresence("Editors Main Menu", null);
 		#end
 
-		var bg:FlxSprite = new FlxSprite().makeGraphic(1280, 720, FlxColor.BLACK);
-		bg.alpha = 0.8;
+		var bg:FlxSprite = new FlxSprite().loadGraphic(Paths.image('menuDesat'));
 		bg.scrollFactor.set();
+		bg.color = 0xFF353535;
 		add(bg);
 
 		grpTexts = new FlxTypedGroup<Alphabet>();
@@ -50,12 +51,10 @@ class MasterEditorMenu extends MusicBeatSubstate
 
 		for (i in 0...options.length)
 		{
-			var leText:Alphabet = new Alphabet(100, 300, options[i], true);
+			var leText:Alphabet = new Alphabet(90, 320, options[i], true);
 			leText.isMenuItem = true;
 			leText.targetY = i;
-			leText.changeX = false;
 			grpTexts.add(leText);
-			leText.scrollFactor.set();
 			leText.snapToPosition();
 		}
 
@@ -78,9 +77,7 @@ class MasterEditorMenu extends MusicBeatSubstate
 
 		if (controls.BACK)
 		{
-			FlxG.sound.play(Paths.sound('cancelMenu'), 0.4);
-			FlxG.state.persistentUpdate = true;
-			this.close();
+			MusicBeatState.switchState(new MainMenuState());
 		}
 
 		if (controls.ACCEPT)
@@ -88,17 +85,17 @@ class MasterEditorMenu extends MusicBeatSubstate
 			switch (options[curSelected])
 			{
 				case 'Character Editor':
-					MusicBeatState.switchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
+					LoadingState.loadAndSwitchState(new CharacterEditorState(Character.DEFAULT_CHARACTER, false));
 				case 'Week Editor':
 					MusicBeatState.switchState(new WeekEditorState());
 				case 'Menu Character Editor':
 					MusicBeatState.switchState(new MenuCharacterEditorState());
 				case 'Dialogue Portrait Editor':
-					MusicBeatState.switchState(new DialogueCharacterEditorState(), false);
+					LoadingState.loadAndSwitchState(new DialogueCharacterEditorState(), false);
 				case 'Dialogue Editor':
-					MusicBeatState.switchState(new DialogueEditorState(), false);
+					LoadingState.loadAndSwitchState(new DialogueEditorState(), false);
 				case 'Chart Editor': // felt it would be cool maybe
-					MusicBeatState.switchState(new ChartingState(), false);
+					LoadingState.loadAndSwitchState(new ChartingState(), false);
 			}
 			FlxG.sound.music.volume = 0;
 			#if PRELOAD_ALL
@@ -113,10 +110,12 @@ class MasterEditorMenu extends MusicBeatSubstate
 			bullShit++;
 
 			item.alpha = 0.6;
+			// item.setGraphicSize(Std.int(item.width * 0.8));
 
 			if (item.targetY == 0)
 			{
 				item.alpha = 1;
+				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
 		super.update(elapsed);

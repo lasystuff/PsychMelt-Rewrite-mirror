@@ -492,7 +492,7 @@ class WeekEditorState extends MusicBeatState
 			FlxG.sound.volumeUpKeys = TitleState.volumeUpKeys;
 			if (FlxG.keys.justPressed.ESCAPE)
 			{
-				MusicBeatState.switchState(new MasterEditorMenu());
+				MusicBeatState.switchState(new MasterEditorMenuOld());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 		}
@@ -892,7 +892,7 @@ class WeekEditorFreeplayState extends MusicBeatState
 			FlxG.sound.volumeUpKeys = TitleState.volumeUpKeys;
 			if (FlxG.keys.justPressed.ESCAPE)
 			{
-				MusicBeatState.switchState(new MasterEditorMenu());
+				MusicBeatState.switchState(new MasterEditorMenuOld());
 				FlxG.sound.playMusic(Paths.music('freakyMenu'));
 			}
 

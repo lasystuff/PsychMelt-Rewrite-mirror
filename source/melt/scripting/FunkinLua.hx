@@ -26,4 +26,9 @@ class FunkinLua extends FunkinRule
 		var scriptToRun:String = File.getContent(path);
 		execute(scriptToRun, skipCreate);
     }
+
+    override public function presetVariables():Void
+    {
+        super.presetVariables();
+    }
 }

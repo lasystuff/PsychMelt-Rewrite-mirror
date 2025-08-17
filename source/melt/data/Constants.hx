@@ -1,9 +1,16 @@
 package melt.data;
 
+import openfl.Lib;
+import lime.app.Application;
+
 class Constants
 {
-    public static inline final ENGINE_WINDOW_PREFIX:String = "PsychMelt";
-    public static inline final ENGINE_VERSION:String = "0.0.1";
+    @:isVar public static var ENGINE_NAME_PREFIX(get, never):String;
+    static inline function get_ENGINE_NAME_PREFIX():String
+        return Content.getFlag("MOD_NAME", openfl.Lib.application.window.title);
+    @:isVar public static var ENGINE_VERSION(get, never):String;
+    static inline function get_ENGINE_VERSION():String
+        return Content.getFlag("MOD_VERSION", Application.current.meta.get('version'));
 
     public static inline final CONTENT_ROOT_FOLDER:String = "content";
 

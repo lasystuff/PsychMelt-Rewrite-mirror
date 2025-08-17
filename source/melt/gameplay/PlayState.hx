@@ -3,8 +3,7 @@ package melt.gameplay;
 import melt.gameplay.notes.*;
 import melt.gameplay.notes.Note.EventNote;
 import melt.gameplay.song.*;
-import melt.gameplay.song.Song.SwagSong;
-import melt.gameplay.song.Section.SwagSection;
+import melt.gameplay.song.Song;
 import melt.gameplay.objects.*;
 import melt.gameplay.hud.*;
 
@@ -84,6 +83,9 @@ class PlayState extends MusicBeatState
 
 	// event variables
 	private var isCameraOnForcedPos:Bool = false;
+	private var sectionCamera:Bool = true;
+
+	private var defaultCameraEase:EaseFunction = FlxEase.quintOut;
 
 	public var modchartTweens:Map<String, FlxTween> = new Map();
 	public var modchartSprites:Map<String, FlxSprite> = new Map();
@@ -1976,9 +1978,9 @@ class PlayState extends MusicBeatState
 	public function moveCamera(x:Float = 0, y:Float = 0, ?speed:Float, ?ease:EaseFunction)
 	{
 		if (speed == null)
-			speed = cameraSpeed + 0.5;
+			speed = cameraSpeed + 0.8;
 		if (ease == null)
-			ease = FlxEase.quintOut;
+			ease = defaultCameraEase;
 
 		if (_cameraTween != null)
 			_cameraTween.cancel();
@@ -2082,15 +2084,10 @@ class PlayState extends MusicBeatState
 		var ret:Dynamic = callOnScripts('onEndSong');
 		if (ret != FunkinLua.Function_Stop && !transitioning)
 		{
-			if (SONG.validScore)
-			{
-				#if !switch
-				var percent:Float = ratingPercent;
-				if (Math.isNaN(percent))
-					percent = 0;
-				Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
-				#end
-			}
+			var percent:Float = ratingPercent;
+			if (Math.isNaN(percent))
+				percent = 0;
+			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
 			playbackRate = 1;
 
 			if (chartingMode)
@@ -2122,10 +2119,7 @@ class PlayState extends MusicBeatState
 					{
 						StoryMenuState.weekCompleted.set(WeekData.weeksList[storyWeek], true);
 
-						if (SONG.validScore)
-						{
-							Highscore.saveWeekScore(WeekData.weeksList[storyWeek], campaignScore, storyDifficulty);
-						}
+						Highscore.saveWeekScore(WeekData.weeksList[storyWeek], campaignScore, storyDifficulty);
 
 						FlxG.save.data.weekCompleted = StoryMenuState.weekCompleted;
 						FlxG.save.flush();
@@ -3073,7 +3067,7 @@ class PlayState extends MusicBeatState
 
 		if (SONG.notes[curSection] != null)
 		{
-			if (generatedMusic && !endingSong && !isCameraOnForcedPos)
+			if (generatedMusic && !endingSong && !isCameraOnForcedPos && sectionCamera)
 			{
 				moveCameraSection();
 			}

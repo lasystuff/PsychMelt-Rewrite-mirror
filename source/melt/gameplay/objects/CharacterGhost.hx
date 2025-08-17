@@ -52,7 +52,7 @@ class CharacterGhost extends FlxSprite
 
 			animation.play(anim, true);
 
-			alphaTween = FlxTween.tween(this, {alpha: 0}, (Conductor.crochet / 1000)*1.5, {ease: FlxEase.quadOut});
+			alphaTween = FlxTween.tween(this, {alpha: 0}, 1.5, {ease: FlxEase.quadOut});
 		}
 	}
 }
