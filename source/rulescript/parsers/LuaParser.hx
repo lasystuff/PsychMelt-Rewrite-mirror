@@ -145,6 +145,15 @@ class LuaParser extends Parser
 						push(tk);
 
 					args.push(parseExpr());
+
+					tk = token();
+					if (tk == TComma)
+						continue;
+					else if (tk == TPClose)
+						break;
+					else
+						push(tk);
+						break;
 				}
 
 				maybe(TSemicolon);
@@ -220,10 +229,21 @@ class LuaParser extends Parser
 					{
 						case TId(id):
 							args.push({name: id});
+							tk = token();
+							if (tk == TComma)
+                                continue;
+                            else if (tk == TPClose)
+                                break;
+                            else
+                                push(tk);
+                                break;
 						case TPClose:
 							break;
 						default:
+							push(tk);
+							break;
 					}
+					if (tk == TPClose) break;
 				}
 
 				EFunction(args, parseExpr(), name, null);

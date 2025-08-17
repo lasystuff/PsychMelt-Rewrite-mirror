@@ -30,5 +30,6 @@ class FunkinLua extends FunkinRule
     override public function presetVariables():Void
     {
         super.presetVariables();
+        PsychCompatUtil.buildFunctions(this);
     }
 }

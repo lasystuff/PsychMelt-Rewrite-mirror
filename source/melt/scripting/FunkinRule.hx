@@ -48,37 +48,53 @@ class FunkinRule
 
 	function presetVariables()
 	{
-		rule.variables.set("Paths", Paths);
-        rule.variables.set("Character", Character);
-        rule.variables.set("CoolUtil", CoolUtil);
-        rule.variables.set("MusicBeatState", MusicBeatState);
-        rule.variables.set("Conductor", Conductor);
-		rule.variables.set("ClientPrefs", melt.ClientPrefs);
-        rule.variables.set("PlayState", melt.gameplay.PlayState);
-        rule.variables.set("BGSprite", melt.gameplay.objects.BGSprite);
+		setVar("Paths", Paths);
+        setVar("Character", Character);
+        setVar("CoolUtil", CoolUtil);
+        setVar("MusicBeatState", MusicBeatState);
+        setVar("Conductor", Conductor);
+		setVar("ClientPrefs", melt.ClientPrefs);
+        setVar("PlayState", melt.gameplay.PlayState);
+        setVar("BGSprite", melt.gameplay.objects.BGSprite);
 
-		rule.variables.set("FunkinRule", melt.scripting.FunkinRule);
-		rule.variables.set("FunkinHScript", melt.scripting.FunkinHScript);
-		rule.variables.set("FunkinLua", melt.scripting.FunkinLua);
+		setVar("FunkinRule", melt.scripting.FunkinRule);
+		setVar("FunkinHScript", melt.scripting.FunkinHScript);
+		setVar("FunkinLua", melt.scripting.FunkinLua);
 
-		rule.variables.set("AssetUtil", melt.util.AssetUtil);
+		setVar("AssetUtil", melt.util.AssetUtil);
 
-		rule.variables.set("Paths", Paths);
+		setVar("Paths", Paths);
 	}
 
     //call function in Interp
     public function callFunc(func:String, ?args:Array<Dynamic>):Dynamic
 	{
-		if (rule.variables.exists(func)) {
-			if (args == null){ args = []; }
+		if (existsVar(func)) 
+		{
+			if (args == null)
+				args = [];
 
-			try {
+			try
+			{
 				return Reflect.callMethod(null, rule.variables.get(func), args);
 			}
-			catch(e){
+			catch(e)
+			{
 				trace(e.message);
-            }
+			}
 		}
+		return null;
+	}
+
+	public function existsVar(variable:String)
+	{
+		return rule.variables.exists(variable);
+	}
+
+	public function getVar(variable:String)
+	{
+		if (rule.variables.exists(variable))
+			rule.variables.get(variable);
 		return null;
 	}
 
