@@ -26,11 +26,12 @@ function onCreatePost()
     return FunkinLua.Function_Stop; //also you can return "Function_" thing like doing in lua!
 }
 ```
-- Fully rewritten lua with shared backend (allows scripting at the same level as HScript)
+- ~~Fully rewritten lua with shared backend (allows scripting at the same level as HScript)~~
+    - its fucking broken for now guh pls don't use that
 
 - Scripted Classes! (Supports many features such as direct instantiation with new() function, static fields and etc!!!!)
 
-- Small but useful chart editor enhancements (Organizing the time display, Shift + Enter for instant preview, Ctrl + S shortcut)
+- little Chart editor reworks (Organizing the time display, blue(coolest color) ui, Shift + Enter for instant preview, Ctrl + S shortcut)
 
 - Mod folder loading has been slightly overhauled (it now uses the content folder instead of the mods folder like Hit Single does)
 
