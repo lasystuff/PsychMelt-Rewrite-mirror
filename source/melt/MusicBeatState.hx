@@ -49,7 +49,7 @@ class MusicBeatState extends FlxUIState
 			if (AssetUtil.exists('states/$stateString.hx') && !excludeStates.contains(stateString))
 				scriptArray.push(new FunkinHScript(Paths.hscript(stateString, "states"), this));
 			if (AssetUtil.exists('states/$stateString.lua') && !excludeStates.contains(stateString))
-				scriptArray.push(new FunkinHScript(Paths.hscript(stateString, "states"), this));	
+				scriptArray.push(new FunkinLua(Paths.hscript(stateString, "states")));
 		}
 	}
 

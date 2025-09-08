@@ -441,11 +441,16 @@ class PlayState extends MusicBeatState
 
 		for (file in AssetUtil.readDirectory("scripts"))
 		{
-			var script = FunkinRule.fromFile(Paths.getPath("scripts/" + file), this);
+			var script:IFunkinScript = null;
+			var path = Paths.getPath("scripts/" + file);
+
+			if (file.endsWith(".hx"))
+				script = new FunkinHScript(path, this);
+			else if (file.endsWith(".lua"))
+				script = new FunkinLua(path);
+	
 			if (script != null)
-			{
 				scriptArray.push(script);
-			}
 		}
 
 		var gfVersion:String = SONG.gfVersion;
@@ -581,7 +586,7 @@ class PlayState extends MusicBeatState
 		{
 			var luaToLoad = Paths.getPath('events/' + notetype + '.lua');
 			if (luaToLoad != null)
-				scriptArray.push(new FunkinLua(luaToLoad, this));
+				scriptArray.push(new FunkinLua(luaToLoad));
 
 			var hxToLoad = Paths.getPath('events/' + notetype + '.hx');
 			if (hxToLoad != null)
@@ -592,7 +597,7 @@ class PlayState extends MusicBeatState
 		{
 			var luaToLoad = Paths.getPath('events/' + event + '.lua');
 			if (luaToLoad != null)
-				scriptArray.push(new FunkinLua(luaToLoad, this));
+				scriptArray.push(new FunkinLua(luaToLoad));
 
 			var hxToLoad = Paths.getPath('events/' + event + '.hx');
 			if (hxToLoad != null)
@@ -610,7 +615,7 @@ class PlayState extends MusicBeatState
 		{
 			var path = Paths.getPath('data/' + Song.formatName(curSong) + "/" + scr);
 			if (scr.endsWith(".lua"))
-				scriptArray.push(new FunkinLua(path, this));
+				scriptArray.push(new FunkinLua(path));
 			if (scr.endsWith(".hx"))
 				scriptArray.push(new FunkinHScript(path, this));
 		}
@@ -717,7 +722,7 @@ class PlayState extends MusicBeatState
 		var doPush:Bool = false;
 		var luaFile:String = 'characters/' + name + '.lua';
 		if (AssetUtil.exists(luaFile))
-			scriptArray.push(new FunkinLua(Paths.getPath(luaFile), this));
+			scriptArray.push(new FunkinLua(Paths.getPath(luaFile)));
 
 		var hxFile:String = 'characters/' + name + '.hx';
 		if (AssetUtil.exists(hxFile))

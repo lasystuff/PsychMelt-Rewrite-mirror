@@ -927,7 +927,7 @@ class ChartingState extends MusicBeatState
 		for (file in AssetUtil.readDirectory("events"))
 		{
 			if (file != 'events-go-here.txt' && file.endsWith(".txt"))
-				eventStuff.push([file.split(".txt")[0], AssetUtil.getText("events/" + file)]);
+				eventStuff.push([file.split(".txt")[0], AssetUtil.getText(file, "events", "")]);
 		}
 
 		descText = new FlxText(20, 200, 0, eventStuff[0][0]);
@@ -2712,11 +2712,11 @@ class ChartingState extends MusicBeatState
 
 	function loadHealthIconFromCharacter(char:String)
 	{
-		var characterPath:String = 'characters/' + char + '.json';
-		if (!AssetUtil.exists(characterPath))
-			characterPath = 'characters/' + Character.DEFAULT_CHARACTER + '.json';
+		var path:String = char;
+		if (Paths.json(char) == null)
+			path = Character.DEFAULT_CHARACTER;
 
-		var json:Character.CharacterFile = cast Json.parse(AssetUtil.getText(characterPath));
+		var json:Character.CharacterFile = cast AssetUtil.parseJson(path, "characters");
 		return json.healthicon;
 	}
 

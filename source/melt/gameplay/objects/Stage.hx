@@ -39,15 +39,13 @@ class Stage extends FlxGroup
 
 		build(); // for hardcoders ig
 
-		createScript(Paths.lua(this.name, "stages"));
-		createScript(Paths.hscript(this.name, "stages"));
-	}
+		var script:IFunkinScript = null;
 
-	function createScript(path)
-	{
-		if (path == "")
-			return;
-		var script = FunkinRule.fromFile(path, PlayState.instance, true);
+		if (Paths.hscript(name) != null)
+			script = new FunkinHScript(path, PlayState.instance, true);
+		else if (Paths.lua(name) != null)
+			script = new FunkinLua(path, true);
+
 		if (script != null)
 		{
 			@:privateAccess
@@ -66,13 +64,13 @@ class Stage extends FlxGroup
 		}
 	}
 
-	function addVariables(rule:rulescript.RuleScript)
+	function addVariables(script:IFunkinScript)
 	{
-		rule.variables.set("foreground", this.foreground);
+		script.setVar("foreground", this.foreground);
 
-		rule.variables.set("insert", this.insert);
-		rule.variables.set("remove", this.remove);
-		rule.variables.set("add", this.add);
+		script.setVar("insert", this.insert);
+		script.setVar("remove", this.remove);
+		script.setVar("add", this.add);
 	}
 }
 

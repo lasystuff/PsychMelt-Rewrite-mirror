@@ -8,7 +8,7 @@ import hscript.Expr;
 import hscript.Parser;
 import sys.io.File;
 import melt.scripting.base.*;
-import melt.scripting.FunkinRule.RuleScriptInterpEx;
+import melt.scripting.extension.RuleScriptInterpEx;
 
 using StringTools;
 
@@ -148,7 +148,7 @@ class ScriptClassManager
 
 	static function __buildRuleScript(typeName:String, superInstance:Dynamic)
 	{
-		var interp = new FunkinRule.RuleScriptInterpEx();
+		var interp = new RuleScriptInterpEx();
 		interp.ref = classes.get(typeName);
 		var rulescript = new RuleScript(interp, new HxParser());
 		rulescript.superInstance = superInstance;

@@ -107,7 +107,7 @@ class TitleState extends MusicBeatState
 		swagShader = new ColorSwap();
 
 		// IGNORE THIS!!!
-		titleJSON = Json.parse(AssetUtil.getText('images/gfDanceTitle.json'));
+		titleJSON = AssetUtil.parseJson('gfDanceTitle', 'images');
 
 		if (!initialized)
 		{
@@ -263,7 +263,7 @@ class TitleState extends MusicBeatState
 
 	function getIntroTextShit():Array<Array<String>>
 	{
-		var fullText:String = AssetUtil.getText("data/introText.txt", MERGE);
+		var fullText:String = AssetUtil.getText("introText", MERGE);
 
 		var firstArray:Array<String> = fullText.split('\n');
 		var swagGoodArray:Array<Array<String>> = [];

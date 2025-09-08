@@ -4,6 +4,7 @@ import sys.FileSystem;
 import sys.io.File;
 import haxe.io.Path;
 import flixel.graphics.frames.FlxAtlasFrames;
+import haxe.Json;
 import openfl.media.Sound;
 
 using StringTools;
@@ -41,8 +42,9 @@ class AssetUtil
 		return result;
 	}
 
-	public static function getText(path:String, mode:GetTextType = OVERRIDE):String
+	public static function getText(key:String, folder:String = "data", extension:String = ".txt", mode:GetTextType = OVERRIDE):String
 	{
+		var path:String = '$folder/$key$extension';
 		switch(mode)
 		{
 			default:
@@ -73,10 +75,19 @@ class AssetUtil
 		return "";
 	}
 
-	private static var __audioCache:Map<String, Sound> = [];
-	public static function getSound(key:String):Sound
+	public static function parseJson(key:String, ?folder:String):Dynamic
 	{
-		var path = Paths.getPath(key);
+		var path = Paths.json(key, folder);
+		if (path == null)
+			return null;
+
+		return Json.parse(getText(key + ".json"));
+	}
+
+	private static var __audioCache:Map<String, Sound> = [];
+	public static function getSound(key:String, folder:String = "music"):Sound
+	{
+		var path = Paths.getPath('$folder/$key.ogg');
 		if (path == null)
 			return null;
 
@@ -98,8 +109,8 @@ class AssetUtil
 	}
 }
 
-enum abstract GetTextType(String)
+enum GetTextType
 {
-	var OVERRIDE = "override";
-	var MERGE = "merge";
+	OVERRIDE;
+	MERGE;
 }

@@ -23,7 +23,7 @@ class PsychCompatUtil
 		"instanceArg"
 	];
 
-	public static function buildFunctions(script:FunkinRule)
+	public static function buildVariables(script:IFunkinScript)
 	{
 		script.setVar("makeLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0)
         {

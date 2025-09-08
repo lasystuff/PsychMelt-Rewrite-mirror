@@ -1,35 +1,62 @@
 package melt.scripting;
 
-import rulescript.parsers.LuaParser;
-import sys.io.File;
-
-import flixel.FlxG;
-import flixel.FlxSprite;
-import melt.gameplay.PlayState;
+import vm.lua.Lua;
 
 using StringTools;
 
-class FunkinLua extends FunkinRule
+@:build(lumod.LuaScriptClass.build("")) // handle scripts on custom script so ok i think
+class FunkinLua implements IFunkinScripts
 {
+    public static var scriptType:String = "Lua Script";
+
+    //
 	public static var Function_Stop:Dynamic = 1;
 	public static var Function_Continue:Dynamic = 0;
 	public static var Function_StopLua:Dynamic = 2;
+    //
 
+    private var lua:Lua;
 
-    public function new(path:String, parentInstance:Dynamic = null, skipCreate:Bool = false){
-        super(path, parentInstance, skipCreate);
-        scriptType = "Lua script";
+    public function new(path:String, skipCreate:Bool = false)
+    {
+        var lua = new Lua();
 
-        rule.parser = new LuaParser();
-        // rule.getParser(LuaParser).allowAll();
+        var scriptToRun:String = File.getContent(path);
 
-		var scriptToRun:String = File.getContent(path);
-		execute(scriptToRun, skipCreate);
+        ScriptingUtil.buildVariables(this);
+        PsychCompatUtil.buildVariables(this);
+
+        lua.run(scriptToRun);
+
+        if (!skipCreate)
+            callFunction("onCreate");
     }
 
-    override public function presetVariables():Void
+    public function callFunction(func:String, ?args:Array<Dynamic>)
+	{
+        if (args == null)
+            args = [];
+		return lua.call(func, args);
+	}
+
+	public function existsVar(variable:String)
+	{
+		return lua.getGlobalVar(variable) != null;
+	}
+
+	public function getVar(variable:String)
+	{
+        return lua.getGlobalVar(variable);
+	}
+
+	public function setVar(variable:String, data:Dynamic)
+	{
+		return lua.setGlobalVar(variable, data);
+	}
+
+    // pls wtf is that fucking that fucking shit
+    public function stop()
     {
-        super.presetVariables();
-        PsychCompatUtil.buildFunctions(this);
+        lua.destroy();
     }
 }
