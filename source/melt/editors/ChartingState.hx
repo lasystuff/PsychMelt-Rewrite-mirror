@@ -927,7 +927,7 @@ class ChartingState extends MusicBeatState
 		for (file in AssetUtil.readDirectory("events"))
 		{
 			if (file != 'events-go-here.txt' && file.endsWith(".txt"))
-				eventStuff.push([file.split(".txt")[0], AssetUtil.getText(file, "events", "")]);
+				eventStuff.push([file.split(".txt")[0], AssetUtil.getText(file, "events")]);
 		}
 
 		descText = new FlxText(20, 200, 0, eventStuff[0][0]);

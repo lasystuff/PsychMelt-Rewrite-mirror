@@ -42,9 +42,9 @@ class AssetUtil
 		return result;
 	}
 
-	public static function getText(key:String, folder:String = "data", extension:String = ".txt", mode:GetTextType = OVERRIDE):String
+	public static function getText(key:String, folder:String = "data", mode:GetTextType = OVERRIDE):String
 	{
-		var path:String = '$folder/$key$extension';
+		var path:String = '$folder/$key';
 		switch(mode)
 		{
 			default:
@@ -81,7 +81,7 @@ class AssetUtil
 		if (path == null)
 			return null;
 
-		return Json.parse(getText(key + ".json"));
+		return Json.parse(File.getContent(path));
 	}
 
 	private static var __audioCache:Map<String, Sound> = [];
@@ -98,13 +98,13 @@ class AssetUtil
 
 	public static inline function getSparrow(key:String):FlxAtlasFrames
 	{
-		var xmlText = getText("images/" + key + ".xml");
+		var xmlText = getText(key + ".xml", "images");
 		return FlxAtlasFrames.fromSparrow(Paths.image(key), xmlText);
 	}
 
 	public static inline function getPacker(key:String):FlxAtlasFrames
 	{
-		var packText = getText("images/" + key + ".txt");
+		var packText = getText(key + ".txt", "images");
 		return FlxAtlasFrames.fromSpriteSheetPacker(Paths.image(key), packText);
 	}
 }

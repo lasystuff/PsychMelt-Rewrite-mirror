@@ -10,16 +10,16 @@ class Paths
 {
 	// well can't i just make these functions compiled on macro?? idk for now
 	public static inline function inst(song:String, postfix:String = "")
-		return AssetUtil.getSound('songs/${Song.formatName(song)}/Inst$postfix.ogg');
+		return AssetUtil.getSound('Inst$postfix', 'songs/${Song.formatName(song)}');
 
 	public static inline function voices(song:String, postfix:String = "")
-		return AssetUtil.getSound('songs/${Song.formatName(song)}/Voices$postfix.ogg');
+		return AssetUtil.getSound('Voices$postfix', 'songs/${Song.formatName(song)}');
 
 	public static inline function sound(key:String, folder:String = "sounds")
-		return AssetUtil.getSound('$folder/$key.ogg');
+		return AssetUtil.getSound(key, folder);
 
 	public static inline function music(key:String, folder:String = "music")
-		return AssetUtil.getSound('$folder/$key.ogg');
+		return AssetUtil.getSound(key, folder);
 
 	public static inline function frag(key:String, folder:String = "shaders"):Null<String>
 		return getPath('$folder/$key.frag');

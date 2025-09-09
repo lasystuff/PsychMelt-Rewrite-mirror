@@ -1,7 +1,12 @@
 package melt.scripting;
 
-import rulescript.parsers.HxParser;
 import sys.io.File;
+import flixel.util.FlxColor;
+
+import rulescript.*;
+import rulescript.parsers.*;
+
+import melt.scripting.extension.RuleScriptInterpEx;
 
 using StringTools;
 
@@ -24,13 +29,13 @@ class FunkinHScript implements IFunkinScript
 
         ScriptingUtil.buildVariables(this);
 
-        rule.tryExecute(code);
+        rule.tryExecute(scriptToRun);
 		if (!skipCreate)
-            callFunc("onCreate");	
+            callFunction("onCreate");
     }
 
     //call function in Interp
-    public function callFunction(func:String, ?args:Array<Dynamic>)
+    public function callFunction(func:String, ?args:Array<Dynamic>):Dynamic
 	{
 		if (existsVar(func)) 
 		{
@@ -49,19 +54,19 @@ class FunkinHScript implements IFunkinScript
 		return null;
 	}
 
-	public function existsVar(variable:String)
+	public function existsVar(variable:String):Bool
 	{
 		return rule.variables.exists(variable);
 	}
 
-	public function getVar(variable:String)
+	public function getVar(variable:String):Dynamic
 	{
 		if (rule.variables.exists(variable))
 			rule.variables.get(variable);
 		return null;
 	}
 
-	public function setVar(variable:String, data:Dynamic)
+	public function setVar(variable:String, data:Dynamic):Void
 	{
 		rule.variables.set(variable, data);
 	}
@@ -75,7 +80,7 @@ class FunkinHScript implements IFunkinScript
 		return e.details();
 	}
 
-    public function stop()
+    public function stop():Void
     {
         //idk how can i stop them please help me please
         rule.interp = null;

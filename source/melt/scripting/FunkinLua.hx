@@ -1,11 +1,11 @@
 package melt.scripting;
 
 import vm.lua.Lua;
+import sys.io.File;
 
 using StringTools;
 
-@:build(lumod.LuaScriptClass.build("")) // handle scripts on custom script so ok i think
-class FunkinLua implements IFunkinScripts
+class FunkinLua implements IFunkinScript
 {
     public static var scriptType:String = "Lua Script";
 
@@ -19,12 +19,13 @@ class FunkinLua implements IFunkinScripts
 
     public function new(path:String, skipCreate:Bool = false)
     {
-        var lua = new Lua();
+        lua = new Lua();
 
         var scriptToRun:String = File.getContent(path);
 
-        ScriptingUtil.buildVariables(this);
+        // ScriptingUtil.buildVariables(this);
         PsychCompatUtil.buildVariables(this);
+        buildVariables();
 
         lua.run(scriptToRun);
 
@@ -32,31 +33,38 @@ class FunkinLua implements IFunkinScripts
             callFunction("onCreate");
     }
 
-    public function callFunction(func:String, ?args:Array<Dynamic>)
+    public function callFunction(func:String, ?args:Array<Dynamic>):Dynamic
 	{
         if (args == null)
             args = [];
-		return lua.call(func, args);
+        if (existsVar(func))
+		    return lua.call(func, args);
+        return null;
 	}
 
-	public function existsVar(variable:String)
+	public function existsVar(variable:String):Bool
 	{
 		return lua.getGlobalVar(variable) != null;
 	}
 
-	public function getVar(variable:String)
+	public function getVar(variable:String):Dynamic
 	{
         return lua.getGlobalVar(variable);
 	}
 
-	public function setVar(variable:String, data:Dynamic)
+	public function setVar(variable:String, data:Dynamic):Void
 	{
-		return lua.setGlobalVar(variable, data);
+		lua.setGlobalVar(variable, data);
 	}
 
     // pls wtf is that fucking that fucking shit
-    public function stop()
+    public function stop():Void
     {
         lua.destroy();
+    }
+
+    function buildVariables()
+    {
+        setVar("print", function(thing:String){trace(thing);});
     }
 }

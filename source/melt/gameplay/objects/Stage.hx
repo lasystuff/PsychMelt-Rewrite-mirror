@@ -25,6 +25,8 @@ class Stage extends FlxGroup
 		camera_speed: 1
 	};
 
+	public var script:IFunkinScript;
+
 	override public function new(name:String)
 	{
 		super();
@@ -39,19 +41,15 @@ class Stage extends FlxGroup
 
 		build(); // for hardcoders ig
 
-		var script:IFunkinScript = null;
-
-		if (Paths.hscript(name) != null)
-			script = new FunkinHScript(path, PlayState.instance, true);
-		else if (Paths.lua(name) != null)
-			script = new FunkinLua(path, true);
+		if (Paths.hscript(name, "stages") != null)
+			script = new FunkinHScript(Paths.hscript(name, "stages"), PlayState.instance, true);
+		else if (Paths.lua(name, "stages") != null)
+			script = new FunkinLua(Paths.lua(name, "stages"), true);
 
 		if (script != null)
 		{
-			@:privateAccess
-			addVariables(script.rule);
+			addVariables(script);
 			PlayState.instance.scriptArray.push(script);
-			script.callFunc("onCreate");
 		}
 	}
 

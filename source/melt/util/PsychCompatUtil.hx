@@ -1,6 +1,6 @@
 package melt.util;
 
-import melt.scripting.FunkinRule;
+import melt.scripting.IFunkinScript;
 import melt.gameplay.PlayState;
 
 import flixel.FlxSprite;
@@ -23,15 +23,20 @@ class PsychCompatUtil
 		"instanceArg"
 	];
 
+	public static var psychVariables:Map<String, Dynamic> = [];
+
 	public static function buildVariables(script:IFunkinScript)
 	{
+		if (!FlxG.signals.preStateCreate.has(clearVariables))
+			FlxG.signals.preStateCreate.add(clearVariables);
+
 		script.setVar("makeLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0)
         {
             var spr = new FlxSprite(x, y);
 			if (Paths.image(image) != null)
 				spr.loadGraphic(Paths.image(image));
 			spr.antialiasing = ClientPrefs.globalAntialiasing;
-			script.setVar(tag, spr);
+			psychVariables.set(tag, spr);
         });
 
 		script.setVar("makeAnimatedLuaSprite", function(tag:String, ?image:String = null, ?x:Float = 0, ?y:Float = 0, ?spriteType:String = 'auto')
@@ -40,55 +45,55 @@ class PsychCompatUtil
 			if (Paths.xml(image) != null)
 				spr.frames = AssetUtil.getSparrow(image);
 			spr.antialiasing = ClientPrefs.globalAntialiasing;
-			script.setVar(tag, spr);
+			psychVariables.set(tag, spr);
         });
 
 		script.setVar("addAnimationByPrefix", function(tag:String, name:String, prefix:String, ?framerate:Float = 24, ?loop:Bool = true)
         {
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 
-			cast(script.getVar(tag), FlxSprite).animation.addByPrefix(name, prefix, framerate, loop);
+			cast(psychVariables.get(tag), FlxSprite).animation.addByPrefix(name, prefix, framerate, loop);
         });
 
 		script.setVar("playAnim", function(tag:String, name:String, ?forced:Bool = false, ?reverse:Bool = false, ?startFrame:Int = 0)
         {
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 
-			cast(script.getVar(tag), FlxSprite).animation.play(name, forced, reverse, startFrame);
+			cast(psychVariables.get(tag), FlxSprite).animation.play(name, forced, reverse, startFrame);
         });
 
 		script.setVar("makeGraphic", function(tag:String, ?width:Int = 256, ?height:Int = 256, ?color:String = 'FFFFFF')
 		{
-			if (script.existsVar(tag))
-				cast(script.getVar(tag), FlxSprite).makeGraphic(width, height, FlxColor.fromString(color));
+			if (psychVariables.exists(tag))
+				cast(psychVariables.get(tag), FlxSprite).makeGraphic(width, height, FlxColor.fromString(color));
 		});
 		
 		script.setVar("scaleObject", function(tag:String, x:Float, y:Float, ?updateHitbox:Bool = true)
 		{
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 			
-			cast(script.getVar(tag), FlxSprite).scale.set(x, y);
+			cast(psychVariables.get(tag), FlxSprite).scale.set(x, y);
 			if (updateHitbox)
-				cast(script.getVar(tag), FlxSprite).updateHitbox();
+				cast(psychVariables.get(tag), FlxSprite).updateHitbox();
 		});
 
 		script.setVar("setScrollFactor", function(tag:String, scrollX:Float, scrollY:Float)
 		{
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 			
-			cast(script.getVar(tag), FlxSprite).scrollFactor.set(scrollX, scrollY);
+			cast(psychVariables.get(tag), FlxSprite).scrollFactor.set(scrollX, scrollY);
 		});
 
 		script.setVar("screenCenter", function(tag:String, ?axis:String = "xy")
 		{
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 			
-			var target = cast(script.getVar(tag), FlxSprite);
+			var target = cast(psychVariables.get(tag), FlxSprite);
 			switch(axis.toLowerCase())
 			{
 				case "x":
@@ -100,27 +105,42 @@ class PsychCompatUtil
 			}
 		});
 
+		script.setVar("setObjectCamera", function(tag:String, camera:String)
+		{
+			if (!psychVariables.exists(tag))
+				return;
+			switch(camera.toLowerCase())
+			{
+				case "hud":
+					cast(psychVariables.get(tag), FlxSprite).cameras = [PlayState.instance.camHUD];
+				case "other":
+					cast(psychVariables.get(tag), FlxSprite).cameras = [PlayState.instance.camOther];
+				default:
+					cast(psychVariables.get(tag), FlxSprite).cameras = [PlayState.instance.camGame];
+			};
+		});
+
 		script.setVar("setBlendMode", function(obj:String, blend:String = '')
 		{
-			if (!script.existsVar(obj))
+			if (!psychVariables.exists(obj))
 				return;
-			script.getVar(obj).blend = blendModeFromString(blend);
+			psychVariables.get(obj).blend = blendModeFromString(blend);
 		});
 
 		script.setVar("updateHitbox", function(tag:String)
 		{
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
-			cast(script.getVar(tag), FlxSprite).updateHitbox();
+			cast(psychVariables.get(tag), FlxSprite).updateHitbox();
 		});
 
 		script.setVar("addLuaSprite", function(tag:String, ?inFront:Bool = false)
 		{
-			if (!script.existsVar(tag))
+			if (!psychVariables.exists(tag))
 				return;
 
-			var target = cast(script.getVar(tag), FlxSprite);
-			if (PlayState.instance != null && !inFront)
+			var target = cast(psychVariables.get(tag), FlxSprite);
+			if (PlayState.instance != null && PlayState.instance.stage != null)
 				if (!inFront)
 					PlayState.instance.stage.add(target);
 				else
@@ -143,33 +163,41 @@ class PsychCompatUtil
             script.setVar(dummy, function(?_arg0, ?_arg0, ?_arg0, ?_arg0, ?_arg0, ?_arg0){return null;});
 	}
 
-
+	static function clearVariables(state):Void
+	{
+		psychVariables.clear();
+	}
 
 	// shitty infamous psychlua funcs
-	private static function setVarPsychLua(?parent:Dynamic, path:String, value:Dynamic, ?script:FunkinRule):Void
+	private static function setVarPsychLua(?parent:Dynamic, path:String, value:Dynamic):Void
 	{
 		var killMe:Array<String> = path.split('.');
-		if (parent == null && script != null)
+
+		if(killMe.length == 1)
 		{
-			@:privateAccess
-			if (script.existsVar(killMe[0]))
-				parent = script.rule.interp.variables;
-			else
-				parent = FlxG.state;
+			if (parent == null && psychVariables.exists(killMe[0]))
+				Reflect.setProperty(parent, killMe[0], value);
+			else if (parent == null && Reflect.hasField(FlxG.state, killMe[0]))
+				Reflect.setProperty(FlxG.state, killMe[0], value);
+			return;
 		}
-		var die:Dynamic = Reflect.getProperty(parent, killMe[0]);
 
-		if(killMe.length > 1) {
+		if (psychVariables.exists(killMe[0]))
+			parent = psychVariables.get(killMe[0]);
+		else
+			parent = FlxG.state;
+		killMe.shift();
+
+		var thing:Dynamic = null;
+
+		for (i in 0...killMe.length)
+		{
+			// oh god no
+			if (i == killMe.length - 1)
+				Reflect.setProperty(thing, killMe[i], value);
+			else
+				thing = Reflect.getProperty(thing, killMe[i]);
 			killMe.shift();
-
-			for (i in 0...killMe.length)
-			{
-				// oh god no
-				if (i == killMe.length - 1)
-					Reflect.setProperty(die, killMe[i], value);
-				else
-					die = Reflect.getProperty(die, killMe[i]);
-			}
 		}
 	}
 

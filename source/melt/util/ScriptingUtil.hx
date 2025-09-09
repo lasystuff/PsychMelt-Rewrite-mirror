@@ -1,6 +1,6 @@
 package melt.util;
 
-import melt.scripting.FunkinRule;
+import melt.scripting.IFunkinScript;
 import melt.gameplay.PlayState;
 
 import flixel.FlxSprite;

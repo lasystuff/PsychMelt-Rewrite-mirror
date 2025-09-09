@@ -389,6 +389,7 @@ class PlayState extends MusicBeatState
 
 		stage = new Stage(curStage);
 		add(stage);
+
 		var stageData = stage.data;
 
 		defaultCamZoom = stageData.defaultZoom;
@@ -420,12 +421,6 @@ class PlayState extends MusicBeatState
 		dadGroup = new FlxSpriteGroup(DAD_X, DAD_Y);
 		gfGroup = new FlxSpriteGroup(GF_X, GF_Y);
 
-		switch (Song.formatName(SONG.song))
-		{
-			case 'stress':
-				GameOverSubstate.characterName = 'bf-holding-gf-dead';
-		}
-
 		if (isPixelStage)
 		{
 			introSoundsSuffix = '-pixel';
@@ -436,6 +431,9 @@ class PlayState extends MusicBeatState
 		add(gfGroup);
 		add(dadGroup);
 		add(boyfriendGroup);
+
+		if (stage.script != null)
+			stage.script.callFunction("onCreate");
 
 		// "GLOBAL" SCRIPTS
 
@@ -581,29 +579,24 @@ class PlayState extends MusicBeatState
 		// cameras = [FlxG.cameras.list[1]];
 		startingSong = true;
 
-		#if LUA_ALLOWED
 		for (notetype in noteTypeMap.keys())
 		{
-			var luaToLoad = Paths.getPath('events/' + notetype + '.lua');
-			if (luaToLoad != null)
-				scriptArray.push(new FunkinLua(luaToLoad));
+			if (Paths.lua(notetype, "notetypes") != null)
+				scriptArray.push(new FunkinLua(Paths.lua(notetype, "notetypes")));
 
-			var hxToLoad = Paths.getPath('events/' + notetype + '.hx');
-			if (hxToLoad != null)
-				scriptArray.push(new FunkinHScript(hxToLoad, this));
+			if (Paths.hscript(notetype, "notetypes") != null)
+				scriptArray.push(new FunkinHScript(Paths.hscript(notetype, "notetypes"), this));
 		}
 
 		for (event in eventPushedMap.keys())
 		{
-			var luaToLoad = Paths.getPath('events/' + event + '.lua');
-			if (luaToLoad != null)
-				scriptArray.push(new FunkinLua(luaToLoad));
+			if (Paths.lua(event, "events") != null)
+				scriptArray.push(new FunkinLua(Paths.lua(event, "events")));
 
-			var hxToLoad = Paths.getPath('events/' + event + '.hx');
-			if (hxToLoad != null)
-				scriptArray.push(new FunkinHScript(hxToLoad, this));
+			if (Paths.hscript(event, "events") != null)
+				scriptArray.push(new FunkinHScript(Paths.hscript(event, "events"), this));
 		}
-		#end
+
 		noteTypeMap.clear();
 		noteTypeMap = null;
 		eventPushedMap.clear();
@@ -719,14 +712,11 @@ class PlayState extends MusicBeatState
 
 	function startCharacterLua(name:String)
 	{
-		var doPush:Bool = false;
-		var luaFile:String = 'characters/' + name + '.lua';
-		if (AssetUtil.exists(luaFile))
-			scriptArray.push(new FunkinLua(Paths.getPath(luaFile)));
+		if (Paths.lua(name, "characters") != null)
+			scriptArray.push(new FunkinLua(Paths.lua(name, "characters")));
 
-		var hxFile:String = 'characters/' + name + '.hx';
-		if (AssetUtil.exists(hxFile))
-			scriptArray.push(new FunkinHScript(Paths.getPath(hxFile), this));
+		if (Paths.hscript(name, "characters") != null)
+			scriptArray.push(new FunkinHScript(Paths.hscript(name, "characters"), this));
 	}
 
 	function startCharacterPos(char:Character, ?gfCheck:Bool = false)

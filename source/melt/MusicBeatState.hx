@@ -13,7 +13,7 @@ using StringTools;
 
 class MusicBeatState extends FlxUIState
 {
-	public var scriptArray:Array<FunkinRule> = [];
+	public var scriptArray:Array<IFunkinScript> = [];
 	
 	//states that don't allow scripting/overriding by hscripts!
 	static final excludeStates:Array<Dynamic> = [LoadingState, melt.gameplay.PlayState, ScriptedState];
@@ -49,7 +49,7 @@ class MusicBeatState extends FlxUIState
 			if (AssetUtil.exists('states/$stateString.hx') && !excludeStates.contains(stateString))
 				scriptArray.push(new FunkinHScript(Paths.hscript(stateString, "states"), this));
 			if (AssetUtil.exists('states/$stateString.lua') && !excludeStates.contains(stateString))
-				scriptArray.push(new FunkinLua(Paths.hscript(stateString, "states")));
+				scriptArray.push(new FunkinLua(Paths.lua(stateString, "states")));
 		}
 	}
 
@@ -213,7 +213,7 @@ class MusicBeatState extends FlxUIState
 		var returnThing:Dynamic = FunkinLua.Function_Continue;
 		for (script in scriptArray)
 		{
-			var scriptThing = script.callFunc(func, args);
+			var scriptThing = script.callFunction(func, args);
 			if (scriptThing == FunkinLua.Function_Stop)
 				returnThing = scriptThing;
 		}
