@@ -72,7 +72,7 @@ class Paths
 
 		if (!FileSystem.exists("assets/" + path))
 		{
-			if (noWarning)
+			if (!noWarning)
 				trace("Failed to fetch file path from " + path);
 			return null;
 		}
