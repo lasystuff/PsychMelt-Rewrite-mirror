@@ -59,7 +59,7 @@ class Paths
 	public static inline function xml(key:String, folder:String = "images"):Null<String>
 		return getPath('$folder/$key.xml');
 
-	public static function getPath(path:String, noWarning:Bool = false, noContent:Bool = false):Null<String>
+	public static function getPath(path:String, noContent:Bool = false):Null<String>
 	{
 		if (!noContent)
 		{
@@ -71,11 +71,7 @@ class Paths
 		}
 
 		if (!FileSystem.exists("assets/" + path))
-		{
-			if (!noWarning)
-				trace("Failed to fetch file path from " + path);
 			return null;
-		}
 
 		return "assets/" + path;
 	}

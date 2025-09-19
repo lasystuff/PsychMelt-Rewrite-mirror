@@ -24,6 +24,8 @@ class InitState extends FlxState
 			// trace('LOADED FULLSCREEN SETTING!!');
 		}
 
+		MemoryUtil.enable();
+
 		FlxG.game.focusLostFramerate = 60;
 		FlxG.sound.muteKeys = TitleState.muteKeys;
 		FlxG.sound.volumeDownKeys = TitleState.volumeDownKeys;

@@ -64,9 +64,10 @@ class VisualsUISubState extends BaseOptionsMenu
 		addOption(option);
 
 		#if !mobile
-		var option:Option = new Option('FPS Counter', 'If unchecked, hides FPS Counter.', 'showFPS', 'bool', true);
+		var option:Option = new Option('Debug Display Type:', 'How FPS and other debug stats will be displayed?', 'debugType', 'string', "simple",
+			['Simple', 'Advanced', 'Disabled']);
 		addOption(option);
-		option.onChange = onChangeFPSCounter;
+		option.onChange = onChangeDebugType;
 		#end
 
 		var option:Option = new Option('Pause Screen Song:', "What song do you prefer for the Pause Screen?", 'pauseMusic', 'string', 'Tea Time',
@@ -107,10 +108,9 @@ class VisualsUISubState extends BaseOptionsMenu
 	}
 
 	#if !mobile
-	function onChangeFPSCounter()
+	function onChangeDebugType()
 	{
-		if (Main.fpsVar != null)
-			Main.fpsVar.visible = ClientPrefs.showFPS;
+		Main.debugDisplay.updateByOption();
 	}
 	#end
 }

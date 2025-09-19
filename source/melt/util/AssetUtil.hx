@@ -12,7 +12,7 @@ using StringTools;
 class AssetUtil
 {
 	public static inline function exists(path:String)
-		return Paths.getPath(path, false) != null;
+		return Paths.getPath(path) != null;
 
 	// basic shallow readDirectory thing!!!
 	public static inline function readDirectory(path:String):Array<String>
@@ -59,8 +59,8 @@ class AssetUtil
 
 			case MERGE:
 				var result = "";
-				if (Paths.getPath(path, true, false) != null)
-					result = File.getContent(Paths.getPath(path, true, false));
+				if (Paths.getPath(path, false) != null)
+					result = File.getContent(Paths.getPath(path, false));
 
 				for (content in Content.packs)
 				{

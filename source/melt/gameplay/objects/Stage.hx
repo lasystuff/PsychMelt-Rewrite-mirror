@@ -4,6 +4,7 @@ package melt.gameplay.objects;
 import flixel.group.FlxGroup;
 import sys.FileSystem;
 import melt.scripting.*;
+import haxe.Json;
 
 class Stage extends FlxGroup
 {
@@ -22,8 +23,12 @@ class Stage extends FlxGroup
 		camera_boyfriend: [0, 0],
 		camera_opponent: [0, 0],
 		camera_girlfriend: [0, 0],
-		camera_speed: 1
+		camera_speed: 1,
+
+		objects: []
 	};
+
+	public var jsonObjects:Map<String, BGSprite> = [];
 
 	public var script:IFunkinScript;
 
@@ -36,10 +41,11 @@ class Stage extends FlxGroup
 		var jsonPath = Paths.json(name, "stages");
 		if (FileSystem.exists(jsonPath))
 		{
-			data = haxe.Json.parse(sys.io.File.getContent(jsonPath));
+			data = Json.parse(sys.io.File.getContent(jsonPath));
 		}
+		trace(data);
 
-		build(); // for hardcoders ig
+		build();
 
 		if (Paths.hscript(name, "stages") != null)
 			script = new FunkinHScript(Paths.hscript(name, "stages"), PlayState.instance, true);
@@ -55,10 +61,29 @@ class Stage extends FlxGroup
 
 	function build()
 	{
+		if (data.objects != null)
+		{
+			for (obj in data.objects)
+			{
+				var scroll:Array<Float> = obj.scrollFactor != null ? obj.scrollFactor : [1, 1];
+				var anims:Array<BGSprite.AnimData> = obj.animations != null ? obj.animations : [];
+
+
+				var sprite = new BGSprite(obj.image, obj.position[0], obj.position[1], scroll[0], scroll[1], anims);
+				if (obj.id != null)
+					jsonObjects.set(obj.id, sprite);
+
+				if (obj.foreground != null && obj.foreground)
+					foreground.add(sprite);
+				else
+					add(sprite);
+			}
+		}
+
+		// hardcode ur stages here
 		switch(name)
 		{
 			default:
-				// nothin
 		}
 	}
 
@@ -69,11 +94,13 @@ class Stage extends FlxGroup
 		script.setVar("insert", this.insert);
 		script.setVar("remove", this.remove);
 		script.setVar("add", this.add);
+
+		for (id => sprite in jsonObjects)
+			script.setVar(id, sprite);
 	}
 }
 
-typedef StageFile =
-{
+typedef StageFile = {
 	var directory:String;
 	var defaultZoom:Float;
 	var isPixelStage:Bool;
@@ -87,4 +114,18 @@ typedef StageFile =
 	var camera_opponent:Array<Float>;
 	var camera_girlfriend:Array<Float>;
 	var camera_speed:Null<Float>;
+
+	var ?objects:Array<StageObject>;
+}
+
+typedef StageObject =
+{
+	var id:String;
+	var image:String;
+
+	var position:Array<Float>;
+	var ?scrollFactor:Array<Float>;
+	var ?foreground:Bool;
+
+	var ?animations:Array<BGSprite.AnimData>;
 }
