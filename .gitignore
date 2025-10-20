@@ -22,4 +22,5 @@ export/*
 .DS_Store
 /.haxelib
 
-/_ignore
+_ignore/*
+example_content/*
