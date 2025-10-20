@@ -43,7 +43,6 @@ class Stage extends FlxGroup
 		{
 			data = Json.parse(sys.io.File.getContent(jsonPath));
 		}
-		trace(data);
 
 		build();
 

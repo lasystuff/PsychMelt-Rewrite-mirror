@@ -1939,7 +1939,7 @@ class PlayState extends MusicBeatState
 		else
 		{
 			var pos = FlxPoint.get(boyfriend.getMidpoint().x - 100, boyfriend.getMidpoint().y - 100);
-			pos.x +=boyfriend.cameraPosition[0] + boyfriendCameraOffset[0];
+			pos.x -= boyfriend.cameraPosition[0] - boyfriendCameraOffset[0];
 			pos.y += boyfriend.cameraPosition[1] + boyfriendCameraOffset[1];
 			moveCamera(pos.x, pos.y);
 			callOnScripts('onMoveCamera', ['boyfriend']);

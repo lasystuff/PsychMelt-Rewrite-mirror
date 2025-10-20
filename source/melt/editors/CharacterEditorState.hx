@@ -1057,7 +1057,6 @@ class CharacterEditorState extends MusicBeatState
 			x += 150 + char.cameraPosition[0];
 
 		x -= cameraFollowPointer.width / 2;
-		y -= cameraFollowPointer.height / 2;
 		cameraFollowPointer.setPosition(x, y);
 		mid.put();
 	}

@@ -45,12 +45,12 @@ class WeekEditorState extends MusicBeatState
 	var weekThing:MenuItem;
 	var missingFileText:FlxText;
 
-	var weekFile:WeekFile = null;
+	var weekFile:WeekData = null;
 
-	public function new(weekFile:WeekFile = null)
+	public function new(weekFile:WeekData = null)
 	{
 		super();
-		this.weekFile = WeekData.createWeekFile();
+		this.weekFile = new WeekData();
 		if (weekFile != null)
 			this.weekFile = weekFile;
 		else
@@ -521,7 +521,7 @@ class WeekEditorState extends MusicBeatState
 		_file.browse([jsonFilter]);
 	}
 
-	public static var loadedWeek:WeekFile = null;
+	public static var loadedWeek:WeekData = null;
 	public static var loadError:Bool = false;
 
 	private static function onLoadComplete(_):Void
@@ -541,17 +541,7 @@ class WeekEditorState extends MusicBeatState
 			var rawJson:String = File.getContent(fullPath);
 			if (rawJson != null)
 			{
-				loadedWeek = cast Json.parse(rawJson);
-				if (loadedWeek.weekCharacters != null && loadedWeek.weekName != null) // Make sure it's really a week
-				{
-					var cutName:String = _file.name.substr(0, _file.name.length - 5);
-					trace("Successfully loaded file: " + cutName);
-					loadError = false;
-
-					weekFileName = cutName;
-					_file = null;
-					return;
-				}
+				loadedWeek = WeekData.fromJson(fullPath);
 			}
 		}
 		loadError = true;
@@ -586,9 +576,9 @@ class WeekEditorState extends MusicBeatState
 		trace("Problem loading file");
 	}
 
-	public static function saveWeek(weekFile:WeekFile)
+	public static function saveWeek(weekFile:WeekData)
 	{
-		var data:String = Json.stringify(weekFile, "\t");
+		var data:String = weekFile.stringify();
 		if (data.length > 0)
 		{
 			_file = new FileReference();
@@ -634,12 +624,12 @@ class WeekEditorState extends MusicBeatState
 
 class WeekEditorFreeplayState extends MusicBeatState
 {
-	var weekFile:WeekFile = null;
+	var weekFile:WeekData = null;
 
-	public function new(weekFile:WeekFile = null)
+	public function new(weekFile:WeekData = null)
 	{
 		super();
-		this.weekFile = WeekData.createWeekFile();
+		this.weekFile = new WeekData();
 		if (weekFile != null)
 			this.weekFile = weekFile;
 	}

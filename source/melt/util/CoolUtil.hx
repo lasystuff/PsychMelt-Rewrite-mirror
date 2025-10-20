@@ -181,4 +181,15 @@ class CoolUtil
 			toAdd.push((full+'/'+path));
 		}
 	}
+
+	inline public static function sortByList(list:String, a:String, b:String)
+	{
+		var listArray:Array<String> = list.split("\n");
+		// remove coments
+		for (thing in listArray)
+			if(thing.startsWith("#") || thing.startsWith("--") || thing.startsWith("//"))
+				listArray.remove(thing);
+		if(listArray.indexOf(a) < listArray.indexOf(b)){ return -1; }
+		return 1;
+	}
 }
