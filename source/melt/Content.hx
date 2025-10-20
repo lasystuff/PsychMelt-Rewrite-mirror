@@ -75,7 +75,7 @@ class Content
 
 	public function getPath(path:String):Null<String>
 	{
-		var thing = '${Constants.CONTENT_ROOT_FOLDER}/$folder/$path';
+		var thing = '${Constants.CONTENT_ROOT_FOLDER}$folder/$path';
 		if (FileSystem.exists(thing))
 			return thing;
 

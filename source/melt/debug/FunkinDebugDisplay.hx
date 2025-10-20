@@ -161,6 +161,20 @@ class FunkinDebugDisplay extends Sprite
 			times.shift();
 		}
 
+		if (FlxG.keys.justPressed.F2)
+		{
+			switch (ClientPrefs.debugType)
+			{
+				case "Simple":
+					ClientPrefs.debugType = "Advanced";
+				case "Advanced":
+					ClientPrefs.debugType = "Disabled";
+				default:
+					ClientPrefs.debugType = "Simple";
+			}
+			updateByOption();
+		}
+
 		if (deltaTimeout < UPDATE_DELAY)
 		{
 			deltaTimeout += deltaTime;

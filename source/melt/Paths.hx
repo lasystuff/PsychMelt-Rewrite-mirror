@@ -70,10 +70,10 @@ class Paths
 			}
 		}
 
-		if (!FileSystem.exists("assets/" + path))
+		if (!FileSystem.exists(Constants.ASSETS_ROOT_FOLDER + path))
 			return null;
 
-		return "assets/" + path;
+		return Constants.ASSETS_ROOT_FOLDER + path;
 	}
 
 	// Similar to getPath or readDirectory, but returns a list of every object that has same path instead with full path
@@ -85,9 +85,9 @@ class Paths
 			if (content.getPath(path) != null)
 				result.push(content.getPath(path));
 		}
-		if (FileSystem.exists("assets/" + path))
+		if (FileSystem.exists(Constants.ASSETS_ROOT_FOLDER + path))
 		{
-			result.push("assets/" + path);
+			result.push(Constants.ASSETS_ROOT_FOLDER + path);
 		}
 		return result;
 	}

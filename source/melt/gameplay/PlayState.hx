@@ -7,8 +7,6 @@ import melt.gameplay.song.Song;
 import melt.gameplay.objects.*;
 import melt.gameplay.hud.*;
 
-import melt.data.PlayData;
-
 #if desktop
 import melt.Discord.DiscordClient;
 #end
@@ -67,19 +65,6 @@ class PlayState extends MusicBeatState
 
 	public static final STRUM_X = 42;
 	public static final STRUM_X_MIDDLESCROLL = -278;
-
-	public static var ratingStuff:Array<Dynamic> = [
-		['You Suck!', 0.2], // From 0% to 19%
-		['Shit', 0.4], // From 20% to 39%
-		['Bad', 0.5], // From 40% to 49%
-		['Bruh', 0.6], // From 50% to 59%
-		['Meh', 0.69], // From 60% to 68%
-		['Nice', 0.7], // 69%
-		['Good', 0.8], // From 70% to 79%
-		['Great', 0.9], // From 80% to 89%
-		['Sick!', 1], // From 90% to 99%
-		['Perfect!!', 1] // The value on this one isn't used actually, since Perfect is always "1"
-	];
 
 	// event variables
 	private var isCameraOnForcedPos:Bool = false;
@@ -175,8 +160,6 @@ class PlayState extends MusicBeatState
 	public static var changedDifficulty:Bool = false;
 	public static var chartingMode:Bool = false;
 
-	public static var data:PlayData = null;
-
 	// Gameplay settings
 	public var healthGain:Float = 1;
 	public var healthLoss:Float = 1;
@@ -201,6 +184,7 @@ class PlayState extends MusicBeatState
 	public var songScore:Int = 0;
 	public var songHits:Int = 0;
 	public var songMisses:Int = 0;
+	public var songAccuracy:Float = 1;
 
 	public static var campaignScore:Int = 0;
 	public static var campaignMisses:Int = 0;
@@ -257,13 +241,6 @@ class PlayState extends MusicBeatState
 	public static var lastCombo:FlxSprite;
 	// stores the last combo score objects in an array
 	public static var lastScore:Array<FlxSprite> = [];
-
-	public function new(?_data:PlayData)
-	{
-		if(_data != null)
-			data = _data;
-		super();
-	}
 
 	override public function create()
 	{
@@ -628,7 +605,7 @@ class PlayState extends MusicBeatState
 		{
 			startCountdown();
 		}
-		RecalculateRating();
+		recalculateRating();
 
 		// PRECACHING MISS SOUNDS BECAUSE I THINK THEY CAN LAG PEOPLE AND FUCK THEM UP IDK HOW HAXE WORKS
 		if (ClientPrefs.hitsoundVolume > 0)
@@ -2079,7 +2056,7 @@ class PlayState extends MusicBeatState
 		var ret:Dynamic = callOnScripts('onEndSong');
 		if (ret != FunkinLua.Function_Stop && !transitioning)
 		{
-			var percent:Float = ratingPercent;
+			var percent:Float = songAccuracy;
 			if (Math.isNaN(percent))
 				percent = 0;
 			Highscore.saveScore(SONG.song, songScore, storyDifficulty, percent);
@@ -2253,7 +2230,7 @@ class PlayState extends MusicBeatState
 			{
 				songHits++;
 				totalPlayed++;
-				RecalculateRating(false);
+				recalculateRating(false);
 			}
 		}
 
@@ -2660,7 +2637,7 @@ class PlayState extends MusicBeatState
 			songScore -= 10;
 
 		totalPlayed++;
-		RecalculateRating(true);
+		recalculateRating(true);
 
 		var char:Character = boyfriend;
 		if (daNote.gfNote)
@@ -2709,7 +2686,7 @@ class PlayState extends MusicBeatState
 				songMisses++;
 			}
 			totalPlayed++;
-			RecalculateRating(true);
+			recalculateRating(true);
 
 			FlxG.sound.play(Paths.sound('missnote' + Std.string(FlxG.random.int(1, 3))), FlxG.random.float(0.1, 0.2));
 			// FlxG.sound.play(Paths.sound('missnote1'), 1, false);
@@ -3105,64 +3082,17 @@ class PlayState extends MusicBeatState
 		}
 	}
 
-	public var ratingName:String = '?';
-	public var ratingPercent:Float;
-	public var ratingFC:String;
-
-	public function RecalculateRating(badHit:Bool = false)
+	public function recalculateRating(badHit:Bool = false)
 	{
 		setOnScripts('score', songScore);
 		setOnScripts('misses', songMisses);
 		setOnScripts('hits', songHits);
 
-		var ret:Dynamic = callOnScripts('onRecalculateRating');
-		if (ret != FunkinLua.Function_Stop)
-		{
-			if (totalPlayed < 1) // Prevent divide by 0
-				ratingName = '?';
-			else
-			{
-				// Rating Percent
-				ratingPercent = Math.min(1, Math.max(0, totalNotesHit / totalPlayed));
-				// trace((totalNotesHit / totalPlayed) + ', Total: ' + totalPlayed + ', notes hit: ' + totalNotesHit);
-
-				// Rating Name
-				if (ratingPercent >= 1)
-				{
-					ratingName = ratingStuff[ratingStuff.length - 1][0]; // Uses last string
-				}
-				else
-				{
-					for (i in 0...ratingStuff.length - 1)
-					{
-						if (ratingPercent < ratingStuff[i][1])
-						{
-							ratingName = ratingStuff[i][0];
-							break;
-						}
-					}
-				}
-			}
-
-			// Rating FC
-			ratingFC = "";
-			if (killers > 0)
-				ratingFC = "KFC";
-			if (sicks > 0)
-				ratingFC = "SFC";
-			if (goods > 0)
-				ratingFC = "GFC";
-			if (bads > 0 || shits > 0)
-				ratingFC = "FC";
-			if (songMisses > 0 && songMisses < 10)
-				ratingFC = "SDCB";
-			else if (songMisses >= 10)
-				ratingFC = "Clear";
-		}
+		var ret:Dynamic = callOnScripts('onrecalculateRating');
+		if (ret != FunkinLua.Function_Stop && totalPlayed > 0)
+			songAccuracy = Math.min(1, Math.max(0, totalNotesHit / totalPlayed));
 		updateScore(badHit); // score will only update after rating is calculated, if it's a badHit, it shouldn't bounce -Ghost
-		setOnScripts('rating', ratingPercent);
-		setOnScripts('ratingName', ratingName);
-		setOnScripts('ratingFC', ratingFC);
+		setOnScripts('accuracy', songAccuracy);
 	}
 
 	#if ACHIEVEMENTS_ALLOWED
@@ -3193,12 +3123,12 @@ class PlayState extends MusicBeatState
 				switch (achievementName)
 				{
 					case 'ur_bad':
-						if (ratingPercent < 0.2 && !practiceMode)
+						if (songAccuracy < 0.2 && !practiceMode)
 						{
 							unlock = true;
 						}
 					case 'ur_good':
-						if (ratingPercent >= 1 && !usedPractice)
+						if (songAccuracy >= 1 && !usedPractice)
 						{
 							unlock = true;
 						}

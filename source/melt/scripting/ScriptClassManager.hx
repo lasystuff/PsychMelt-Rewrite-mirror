@@ -20,7 +20,8 @@ class ScriptClassManager
 
 		melt.gameplay.hud.BasicHUD => ScriptedHUD,
 		melt.gameplay.hud.VanillaHUD => ScriptedHUD.ScriptedVanillaHUD,
-		melt.gameplay.hud.PsychHUD => ScriptedHUD.ScriptedPsychHUD
+		melt.gameplay.hud.PsychHUD => ScriptedHUD.ScriptedPsychHUD,
+		melt.gameplay.hud.MeltHUD => ScriptedHUD.ScriptedMeltHUD
 	];
 
 

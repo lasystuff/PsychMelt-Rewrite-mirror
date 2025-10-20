@@ -16,9 +16,27 @@ class PsychHUD extends VanillaHUD
 
 	var timeTxt:FlxText;
 	private var timeBarBG:AttachedSprite;
+
 	public var timeBar:FlxBar;
+
 	var songPercent:Float = 0;
 	var songTime:Float = 0;
+
+	public var ratingName:String = '?';
+	public var ratingFC:String = "KFC";
+
+	public static final ratingStuff:Array<Dynamic> = [
+		['You Suck!', 0.2], // From 0% to 19%
+		['Shit', 0.4], // From 20% to 39%
+		['Bad', 0.5], // From 40% to 49%
+		['Bruh', 0.6], // From 50% to 59%
+		['Meh', 0.69], // From 60% to 68%
+		['Nice', 0.7], // 69%
+		['Good', 0.8], // From 70% to 79%
+		['Great', 0.9], // From 80% to 89%
+		['Sick!', 1], // From 90% to 99%
+		['Perfect!!', 1] // The value on this one isn't used actually, since Perfect is always "1"
+	];
 
 	override public function new()
 	{
@@ -124,15 +142,53 @@ class PsychHUD extends VanillaHUD
 	}
 
 	override public function updateScore(miss:Bool)
-	{	
+	{
+		if (PlayState.instance.totalPlayed < 1) // Prevent divide by 0
+			ratingName = '?';
+		else
+		{
+			// trace((totalNotesHit / totalPlayed) + ', Total: ' + totalPlayed + ', notes hit: ' + totalNotesHit);
+
+			// Rating Name
+			if (PlayState.instance.songAccuracy >= 1)
+			{
+				ratingName = ratingStuff[ratingStuff.length - 1][0]; // Uses last string
+			}
+			else
+			{
+				for (i in 0...ratingStuff.length - 1)
+				{
+					if (PlayState.instance.songAccuracy < ratingStuff[i][1])
+					{
+						ratingName = ratingStuff[i][0];
+						break;
+					}
+				}
+			}
+		}
+		if (PlayState.instance.killers > 0)
+			ratingFC = "KFC";
+		if (PlayState.instance.sicks > 0)
+			ratingFC = "SFC";
+		if (PlayState.instance.goods > 0)
+			ratingFC = "GFC";
+		if (PlayState.instance.bads > 0 || PlayState.instance.shits > 0)
+			ratingFC = "FC";
+		if (PlayState.instance.songMisses > 0 && PlayState.instance.songMisses < 10)
+			ratingFC = "SDCB";
+		else if (PlayState.instance.songMisses >= 10)
+			ratingFC = "Clear";
+		else
+			ratingFC = "";
+
 		scoreTxt.text = 'Score: '
 			+ FlxStringUtil.formatMoney(PlayState.instance.songScore, false)
 			+ ' | Misses: '
 			+ FlxStringUtil.formatMoney(PlayState.instance.songMisses, false)
 			+ ' | Rating: '
-			+ PlayState.instance.ratingName
+			+ ratingName
 			+
-			(PlayState.instance.ratingName != '?' ? ' (${Highscore.floorDecimal(PlayState.instance.ratingPercent * 100, 2)}%) - ${PlayState.instance.ratingFC}' : '');
+			(ratingName != '?' ? ' (${Highscore.floorDecimal(PlayState.instance.songAccuracy * 100, 2)}%) - ${ratingFC}' : '');
 
 		if (ClientPrefs.scoreZoom && !miss && !PlayState.instance.cpuControlled)
 		{
