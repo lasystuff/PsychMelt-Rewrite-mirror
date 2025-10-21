@@ -91,9 +91,9 @@ class AssetUtil
 		if (path == null)
 			return null;
 
-		if (!__audioCache.exists(key))
-			__audioCache.set(key, Sound.fromFile(path));
-		return __audioCache.get(key);
+		if (!__audioCache.exists(path))
+			__audioCache.set(path, Sound.fromFile(path));
+		return __audioCache.get(path);
 	}
 
 	public static inline function getSparrow(key:String):FlxAtlasFrames

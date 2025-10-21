@@ -16,7 +16,6 @@ You can download latest build of this engine at [Nightly.link](https://nightly.l
 - Fairly advanced HScript support
 ```haxe
 //Template of Hscript Script
-import flixel.util.FlxColor; //You can import abstracts/enums!
 
 function onCreatePost()
 {
@@ -26,8 +25,7 @@ function onCreatePost()
     return FunkinLua.Function_Stop; //also you can return "Function_" thing like doing in lua!
 }
 ```
-- ~~Fully rewritten lua with shared backend (allows scripting at the same level as HScript)~~
-    - its fucking broken for now guh pls don't use that
+- Fully rewritten lua
 
 - Scripted Classes! (Supports many features such as direct instantiation with new() function, static fields and etc!!!!)
 

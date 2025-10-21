@@ -70,7 +70,8 @@ class PlayState extends MusicBeatState
 	private var isCameraOnForcedPos:Bool = false;
 	private var sectionCamera:Bool = true;
 
-	private var defaultCameraEase:EaseFunction = FlxEase.quintOut;
+	public var defaultCameraEase:EaseFunction = FlxEase.quintOut;
+	public var cameraMoveOffset:Float = 10;
 
 	public var modchartTweens:Map<String, FlxTween> = new Map();
 	public var modchartSprites:Map<String, FlxSprite> = new Map();
@@ -128,8 +129,11 @@ class PlayState extends MusicBeatState
 
 	private var strumLine:FlxSprite;
 
-	public var camFollowPos:FlxObject;
-	private static var prevCamFollowPos:FlxPoint;
+	public var camFollowFinal:FlxObject;
+
+	public var camFollow:FlxPoint;
+	public var camFollowOffset:FlxPoint;
+	private static var prevCamFollow:FlxPoint;
 
 	public var strumLineNotes:FlxTypedGroup<StrumNote>;
 	public var opponentStrums:FlxTypedGroup<StrumNote>;
@@ -503,18 +507,17 @@ class PlayState extends MusicBeatState
 		generateSong(SONG.song);
 		modManager = new ModManager(this);
 
-		// After all characters being loaded, it makes then invisible 0.01s later so that the player won't freeze when you change characters
-		// add(strumLine);
+		camFollowFinal = new FlxObject();
+		camFollow = FlxPoint.get();
+		camFollowOffset = FlxPoint.get();
 
-		camFollowPos = new FlxObject();
-
-		if (prevCamFollowPos != null)
+		if (prevCamFollow != null)
 		{
-			camFollowPos.setPosition(prevCamFollowPos.x, prevCamFollowPos.y);
-			prevCamFollowPos = null;
+			camFollow.copyFrom(prevCamFollow);
+			prevCamFollow = null;
 		}
 
-		FlxG.camera.follow(camFollowPos, LOCKON, 1);
+		FlxG.camera.follow(camFollowFinal, LOCKON, 1);
 		// FlxG.camera.setScrollBounds(0, FlxG.width, 0, FlxG.height);
 
 		FlxG.worldBounds.set(0, 0, FlxG.width, FlxG.height);
@@ -1574,6 +1577,9 @@ class PlayState extends MusicBeatState
 			botplayTxt.alpha = 1 - Math.sin((Math.PI * botplaySine) / 180);
 		}
 
+		camFollowFinal.setPosition(camFollow.x + camFollowOffset.x, camFollow.y + camFollowOffset.y);
+		FlxG.camera.followLerp = 1;
+
 		if (controls.PAUSE && startedCountdown && canPause)
 		{
 			var ret:Dynamic = callOnScripts('onPause');
@@ -1593,6 +1599,8 @@ class PlayState extends MusicBeatState
 
 		if (FlxG.keys.anyJustPressed(debugKeysCharacter) && !endingSong && !inCutscene)
 		{
+			FlxG.camera.followLerp = 0;
+
 			persistentUpdate = false;
 			paused = true;
 			cancelMusicFadeTween();
@@ -1775,8 +1783,8 @@ class PlayState extends MusicBeatState
 		}
 		#end
 
-		setOnScripts('cameraX', camFollowPos.x);
-		setOnScripts('cameraY', camFollowPos.y);
+		setOnScripts('cameraX', camFollow.x);
+		setOnScripts('cameraY', camFollow.y);
 		setOnScripts('botPlay', cpuControlled);
 
 		grpNoteSplashes.forEachDead(function(splash:NoteSplash) {
@@ -1801,6 +1809,7 @@ class PlayState extends MusicBeatState
 
 	function openPauseMenu()
 	{
+		FlxG.camera.followLerp = 0;
 		persistentUpdate = false;
 		persistentDraw = true;
 		paused = true;
@@ -1824,6 +1833,8 @@ class PlayState extends MusicBeatState
 
 	function openChartEditor()
 	{
+		FlxG.camera.followLerp = 0;
+
 		persistentUpdate = false;
 		paused = true;
 		cancelMusicFadeTween();
@@ -1864,7 +1875,7 @@ class PlayState extends MusicBeatState
 					timer.active = true;
 				}
 				openSubState(new GameOverSubstate(boyfriend.getScreenPosition().x - boyfriend.positionArray[0],
-					boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollowPos.x, camFollowPos.y));
+					boyfriend.getScreenPosition().y - boyfriend.positionArray[1], camFollow.x, camFollow.y));
 
 				// MusicBeatState.switchState(new GameOverState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 
@@ -1957,7 +1968,21 @@ class PlayState extends MusicBeatState
 		if (_cameraTween != null)
 			_cameraTween.cancel();
 
-		_cameraTween = FlxTween.tween(camFollowPos, {x: x, y: y}, speed / playbackRate, {ease: ease});
+		_cameraTween = FlxTween.tween(camFollow, {x: x, y: y}, speed / playbackRate, {ease: ease});
+	}
+
+	private var _cameraOffsetTween:FlxTween;
+	public function moveCameraOffset(x:Float = 0, y:Float = 0, ?speed:Float, ?ease:EaseFunction)
+	{
+		if (speed == null)
+			speed = 0.8;
+		if (ease == null)
+			ease = FlxEase.expoOut;
+
+		if (_cameraOffsetTween != null)
+			_cameraOffsetTween.cancel();
+
+		_cameraOffsetTween = FlxTween.tween(camFollowOffset, {x: x, y: y}, speed / playbackRate, {ease: ease});
 	}
 
 	private var _zoomTween:FlxTween;
@@ -2107,7 +2132,7 @@ class PlayState extends MusicBeatState
 					FlxTransitionableState.skipNextTransIn = true;
 					FlxTransitionableState.skipNextTransOut = true;
 
-					prevCamFollowPos = FlxPoint.get(camFollowPos.x, camFollowPos.y);
+					prevCamFollow = camFollow.clone();
 
 					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0] + difficulty, PlayState.storyPlaylist[0]);
 					FlxG.sound.music.stop();
@@ -2747,6 +2772,21 @@ class PlayState extends MusicBeatState
 					char.lastSingAnim = animToPlay;
 					char.lastSingPosition = note.strumTime;
 				}
+
+				if (SONG.notes[curSection] != null && !SONG.notes[curSection].mustHitSection)
+				{
+					switch(note.noteData)
+					{
+						case 0:
+							moveCameraOffset(-cameraMoveOffset, 0);
+						case 1:
+							moveCameraOffset(0, cameraMoveOffset);
+						case 2:
+							moveCameraOffset(0, -cameraMoveOffset);
+						case 3:
+							moveCameraOffset(cameraMoveOffset, 0);
+					}
+				}
 			}
 		}
 
@@ -2852,6 +2892,21 @@ class PlayState extends MusicBeatState
 						char.playAnim(animToPlay, true);
 						char.lastSingAnim = animToPlay;
 						char.lastSingPosition = note.strumTime;
+					}
+
+					if (SONG.notes[curSection] != null && SONG.notes[curSection].mustHitSection)
+					{
+						switch(note.noteData)
+						{
+							case 0:
+								moveCameraOffset(-cameraMoveOffset, 0);
+							case 1:
+								moveCameraOffset(0, cameraMoveOffset);
+							case 2:
+								moveCameraOffset(0, -cameraMoveOffset);
+							case 3:
+								moveCameraOffset(cameraMoveOffset, 0);
+						}
 					}
 				}
 
